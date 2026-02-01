@@ -1,0 +1,882 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Elektronika samochodowa – ECU • Immobilizer • ELV/ESCL</title>
+  
+  <link rel="icon" type="image/png" href="assets_v8/favicon.png" />
+<meta name="description" content="Naprawa elektroniki samochodowej, programowanie sterowników ECU, naprawa i wymiana, immobilizery oraz ELV/ESCL." />
+  <meta name="theme-color" content="#0b0d12" />
+  <style>
+    :root{
+      --bg:#0b0d12;
+      --text:#e9ecf2;
+      --muted:#aab2c5;
+      --accent:#ff8a1d;
+      --border:rgba(255,255,255,.10);
+      --shadow:0 14px 45px rgba(0,0,0,.42);
+      --radius:20px;
+      --max:1120px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+      background:
+        radial-gradient(900px 520px at 18% 0%, rgba(255,138,29,.14), transparent 60%),
+        radial-gradient(700px 450px at 82% 10%, rgba(126,231,135,.10), transparent 55%),
+        var(--bg);
+      color:var(--text);
+      line-height:1.5;
+      overflow-x:hidden;
+    }
+    a{color:inherit;text-decoration:none}
+
+    footer{padding:22px 0;border-top:1px solid rgba(255,255,255,.10);margin-top:10px}
+    .footer-inner{display:flex;align-items:center;justify-content:space-between;gap:14px;color:rgba(255,255,255,.70)}
+    .footer-logo{width:120px;height:auto;opacity:.9}
+    @media (max-width: 720px){
+      .footer-inner{flex-direction:column;align-items:flex-start}
+      .footer-logo{width:110px}
+    }
+
+    .wrap{max-width:var(--max);margin:0 auto;padding:0 18px}
+
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;gap:8px;
+      padding:10px 14px;border-radius:16px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.04);
+      color:var(--text);
+      cursor:pointer;
+      transition: transform .08s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease;
+      user-select:none; white-space:nowrap;
+    }
+    .btn:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.18);box-shadow: 0 10px 26px rgba(0,0,0,.26)}
+    .btn:active{transform:translateY(1px)}
+    .btn.primary{
+      border:none;
+      background: linear-gradient(135deg, rgba(255,138,29,.96), rgba(126,231,135,.68));
+      color:#0b0d12;font-weight:900;
+      box-shadow: 0 16px 45px rgba(255,138,29,.16);
+    }
+
+    /* HERO */
+
+    .brand{display:flex;align-items:center;gap:12px;margin:4px 0 10px}
+    .brand-logo{width:160px;height:auto;display:block;filter: drop-shadow(0 16px 26px rgba(0,0,0,.55))}
+    .brand-text{display:flex;flex-direction:column;gap:2px}
+    .brand-name{font-weight:900;letter-spacing:.08em;font-size:12px;color:rgba(255,255,255,.86)}
+    .brand-tag{font-size:13px;color:rgba(255,255,255,.72)}
+    @media (max-width: 720px){
+      .brand-logo{width:130px}
+    }
+
+    .hero{padding:28px 0 18px}
+    .hero-card{
+      padding:0;
+      overflow:hidden;
+      position:relative;
+      border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: var(--shadow);
+      background: rgba(18,22,37,.70);
+    }
+    .hero-bg{
+      position:absolute; inset:0;
+      background-image:
+        radial-gradient(900px 520px at 15% 5%, rgba(255,138,29,.22), transparent 60%),
+        radial-gradient(700px 450px at 82% 30%, rgba(126,231,135,.14), transparent 55%),
+        linear-gradient(180deg, rgba(11,13,18,.25), rgba(11,13,18,.90)),
+        url("assets_v8/hero_bg.jpg");
+      background-size: cover;
+      background-position: center;
+      filter: saturate(1.05) contrast(1.06);
+      transform: scale(1.04);
+      transition: transform .2s ease;
+    }
+    .hero-bg::after{
+      content:"";
+      position:absolute; inset:0;
+      background-image:
+        url("assets_v8/pcb1.jpg"),
+        url("assets_v8/pcb2.jpg");
+      background-size: cover, cover;
+      background-position: center, center;
+      opacity:.12;
+      mix-blend-mode: screen;
+      filter: hue-rotate(15deg) saturate(1.15);
+    }
+    .scan{
+      position:absolute; inset:-120px -120px -120px -120px;
+      background: linear-gradient(90deg, transparent, rgba(255,138,29,.20), transparent);
+      transform: translateX(-60%);
+      animation: sweep 4.8s ease-in-out infinite;
+      opacity:.55;
+      pointer-events:none;
+    }
+    @keyframes sweep{
+      0%{ transform: translateX(-60%); opacity:0 }
+      18%{ opacity:1 }
+      50%{ transform: translateX(60%); opacity:0 }
+      100%{ transform: translateX(60%); opacity:0 }
+    }
+
+    .hero-inner{
+      position:relative;
+      display:grid;
+      grid-template-columns: 1.12fr .88fr;
+      gap: 18px;
+      padding: 18px;
+      min-height: 410px;
+      align-items:start;
+    }
+    .hero-left{padding: 8px 6px 8px; max-width: 660px;}
+    .badge{
+      display:inline-flex; align-items:center; gap:10px;
+      font-size:12px; color: rgba(255,255,255,.82);
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.04);
+      padding: 7px 12px;
+      border-radius: 999px;
+      backdrop-filter: blur(8px);
+    }
+    h1{margin:12px 0 10px;font-size:clamp(28px, 4vw, 46px);line-height:1.10;letter-spacing:-.2px}
+    .lead{margin:0 0 16px;color:rgba(233,236,242,.84);font-size:16px;max-width: 60ch}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .small{font-size:12px;color:rgba(233,236,242,.70)}
+
+    .hero-right{
+      display:flex;
+      flex-direction:column;
+      gap: 12px;
+    }
+
+    /* Ikony w jednym, wyeksponowanym panelu */
+    .icon-panel{
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(11,13,18,.56);
+      border-radius: 18px;
+      padding: 12px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 18px 50px rgba(0,0,0,.35);
+      position:relative;
+      overflow:hidden;
+    }
+    .icon-panel::before{
+      content:"";
+      position:absolute; inset:0;
+      background:
+        radial-gradient(500px 240px at 20% 10%, rgba(255,138,29,.16), transparent 60%),
+        radial-gradient(420px 240px at 90% 30%, rgba(255,255,255,.06), transparent 55%);
+      pointer-events:none;
+    }
+    .icon-panel > *{position:relative}
+    .icon-title{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      margin:0 0 10px;
+      font-weight:900;
+      letter-spacing:.2px;
+    }
+    .icon-title span{color:rgba(233,236,242,.85); font-size:14px}
+    .icon-grid{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      align-items:center;
+    }
+    .icon-cell{
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      border-radius: 16px;
+      height: 72px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+      overflow:hidden;
+    }
+    .icon-cell::after{
+      content:"";
+      position:absolute; inset:-70%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.14), transparent);
+      transform: rotate(25deg) translateX(-65%);
+      animation: cellshine 6.2s ease-in-out infinite;
+      opacity:.0;
+      pointer-events:none;
+    }
+    @keyframes cellshine{
+      0%, 70%{ transform: rotate(25deg) translateX(-65%); opacity:0; }
+      78%{ opacity:.35; }
+      90%{ transform: rotate(25deg) translateX(65%); opacity:0; }
+      100%{ opacity:0; }
+    }
+    .dash-ico{
+      width: 46px;
+      height:auto;
+      opacity:.95;
+      filter: drop-shadow(0 12px 18px rgba(0,0,0,.45)) drop-shadow(0 0 12px rgba(255,138,29,.12));
+      animation: floatMini 6.8s ease-in-out infinite;
+    }
+    .dash-ico.big{width:52px}
+    @keyframes floatMini{
+      0%,100%{ transform: translateY(0px) rotate(var(--r,0deg)); }
+      50%{ transform: translateY(-6px) rotate(calc(var(--r,0deg) + 1.5deg)); }
+    }
+
+    /* Miganie (zsynchronizowane): immo + airbag + check engine */
+    .blink{ animation: floatMini 6.8s ease-in-out infinite, blink 2.6s steps(1,end) infinite; }
+    /* (usunęliśmy wariant slow – wszystko miga równo) */
+    @keyframes blink{
+      0%, 70%, 100%{ opacity: .95; }
+      72%, 74%, 76%{ opacity: .18; }
+      78%{ opacity: .95; }
+    }
+      72%, 74%, 76%{ opacity: .18; }
+      78%{ opacity: .95; }
+    }
+
+    /* Zapłon: przez chwilę świecą wszystkie */
+    body.ignition .dash-ico:not(.blink-immo){
+      opacity:1 !important;
+      filter: drop-shadow(0 12px 18px rgba(0,0,0,.45)) drop-shadow(0 0 26px rgba(255,138,29,.26)) !important;
+      animation-play-state: paused !important;
+    }
+    body.ignition .scan{ opacity:.95; }
+
+    /* EPS zmiana koloru (czerwony -> żółty) */
+    .eps-stack{ position:relative; width:52px; height:52px; }
+    .eps-stack img{ position:absolute; inset:0; width:52px; height:auto; margin:auto; }
+    .eps-stack .eps-yellow{ opacity:0; }
+    /* start: czerwony widoczny */
+    .eps-stack.ry.shift .eps-yellow{ animation: epsShiftRY 2.4s ease-in-out infinite; }
+    .eps-stack.ry.shift .eps-red{ animation: epsShiftRYInv 2.4s ease-in-out infinite; }
+    @keyframes epsShiftRY{ 0%,45%{opacity:0} 55%,100%{opacity:1} }
+    @keyframes epsShiftRYInv{ 0%,45%{opacity:1} 55%,100%{opacity:0} } 55%,100%{opacity:0} }
+
+    /* Stat card */
+    .info-card{
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(11,13,18,.45);
+      border-radius: 18px;
+      padding: 14px;
+      backdrop-filter: blur(10px);
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      gap: 12px;
+    }
+    .section-title{font-size:18px;margin:0 0 10px;color:var(--text);font-weight:900}
+    .stat{
+      display:flex;justify-content:space-between;gap:12px;align-items:baseline;
+      padding:12px;border-radius:16px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.03);
+    }
+    .stat b{font-size:16px}
+    .stat span{color:rgba(233,236,242,.75);font-size:13px;text-align:right}
+
+    
+/* Mini ikony w panelu Zakres (obok nazw) */
+.stat b{ display:flex; align-items:center; gap:10px; }
+.mini-ico{
+  width:22px; height:auto; opacity:.95;
+  filter: drop-shadow(0 8px 12px rgba(0,0,0,.35)) drop-shadow(0 0 10px rgba(255,138,29,.10));
+}
+.mini-eps{ position:relative; width:22px; height:22px; }
+.mini-eps img{ position:absolute; inset:0; width:22px; height:auto; margin:auto; }
+.mini-eps .eps-yellow{ opacity:0; }
+.mini-eps.ry .eps-yellow{ animation: epsMiniRY 2.4s ease-in-out infinite; }
+.mini-eps.ry .eps-red{ animation: epsMiniRYInv 2.4s ease-in-out infinite; }
+@keyframes epsMiniRY{ 0%,45%{opacity:0} 55%,100%{opacity:1} }
+@keyframes epsMiniRYInv{ 0%,45%{opacity:1} 55%,100%{opacity:0} }
+
+
+/* ===== Oferta: listy (ikony + animacje) ===== */
+.offer-ul{
+  list-style:none;
+  padding:0;
+  margin:10px 0 0;
+  display:grid;
+  grid-template-columns: 1fr;
+  gap:10px;
+}
+@media (min-width: 980px){
+  .offer-ul{
+    grid-template-columns: 1fr 1fr; /* 2 kolumny na szerokich ekranach */
+    gap:12px 16px;
+  }
+}
+.offer-ul li{
+  position:relative;
+  padding:10px 12px 10px 44px;
+  border:1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.02);
+  border-radius:16px;
+  color: rgba(233,236,242,.86);
+  font-size:14px;
+  line-height:1.45;
+
+  opacity:0;
+  transform: translateY(10px);
+  transition: opacity .55s ease, transform .55s ease, border-color .2s ease, background .2s ease;
+}
+.offer-ul li:hover{
+  border-color: rgba(255,255,255,.18);
+  background: rgba(255,255,255,.03);
+}
+.offer-ul.in li{
+  opacity:1;
+  transform: translateY(0);
+}
+.offer-ul li::before{ display:none; }
+
+/* Ikony per sekcja */
+.ecu-ul li::before{ background-image:url("assets_v8/icon_check.png"); }
+.immo-ul li::before{ background-image:url("assets_v8/icon_immo.png"); }
+.elv-ul li::before{ background-image:url("assets_v8/icon_eps_red.png"); }
+
+/* Delikatny akcent na pierwszym punkcie */
+.offer-ul li:first-child{
+  background: rgba(255,138,29,.06);
+  border-color: rgba(255,138,29,.22);
+}
+
+/* Sections */
+    section{padding:18px 0}
+    .card{
+      background:rgba(18,22,37,.84);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:18px;
+      position:relative;
+      overflow:hidden;
+    }
+    .card.tech::before{
+      content:"";
+      position:absolute; inset:0;
+      background:
+        linear-gradient(180deg, rgba(11,13,18,.92), rgba(11,13,18,.70)),
+        url("assets_v8/pcb3.jpg");
+      background-size: cover;
+      background-position: center;
+      opacity:.36;
+      mix-blend-mode: screen;
+      pointer-events:none;
+    }
+    .card > *{ position: relative; }
+    .cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .divider{height:1px;background:rgba(255,255,255,.10);margin:18px 0}
+    .feature{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.02);
+      padding:14px;
+      border-radius: 18px;
+      transition: transform .18s ease, border-color .18s ease, background .18s ease;
+    }
+    .feature:hover{transform: translateY(-3px);border-color: rgba(255,255,255,.18);background: rgba(255,255,255,.03);}
+    .feature h3{margin:0 0 6px;font-size:16px}
+    .feature p{margin:0;color:var(--muted);font-size:14px}
+
+    .pcb-grid{display:grid;grid-template-columns: 1fr 1fr;gap:12px;}
+    .pcb-shot{
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.02);
+      border-radius: 18px;
+      overflow:hidden;
+      position:relative;
+    }
+    .pcb-shot img{width:100%;height:240px;object-fit:cover;display:block;filter: contrast(1.05) saturate(1.05);transform: scale(1.02);}
+    .pcb-shot .cap{padding:10px 12px;color: rgba(233,236,242,.78);font-size:13px;border-top:1px solid rgba(255,255,255,.10);background: rgba(11,13,18,.55);}
+
+    /* Form */
+    .form{display:grid;gap:10px}
+    input, textarea{
+      width:100%;
+      padding:12px 12px;
+      border-radius:16px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.03);
+      color:var(--text);
+      outline:none;
+    }
+    textarea{min-height:120px;resize:vertical}
+    input:focus, textarea:focus{border-color:rgba(255,138,29,.55)}
+    footer{padding:26px 0 34px;color:rgba(233,236,242,.60);font-size:13px}
+
+    .toast{
+      position:fixed;right:16px;bottom:16px;
+      max-width:360px;
+      padding:12px 14px;border-radius:16px;
+      border:1px solid var(--border);
+      background:rgba(18,22,37,.92);
+      box-shadow:var(--shadow);
+      color:var(--text);
+      opacity:0;
+      transform:translateY(8px);
+      pointer-events:none;
+      transition:opacity .2s ease, transform .2s ease;
+    }
+    .toast.show{opacity:1;transform:translateY(0)}
+
+    .reveal{opacity:0;transform: translateY(14px);transition: opacity .6s ease, transform .6s ease;}
+    .reveal.in{opacity:1;transform: translateY(0);}
+
+    @media (max-width: 980px){
+      .hero-inner{grid-template-columns:1fr; min-height: 520px;}
+      .cols3{grid-template-columns:1fr}
+      .pcb-grid{grid-template-columns:1fr}
+      .icon-grid{grid-template-columns: repeat(4, 1fr);}
+    }
+    @media (max-width: 420px){
+      .icon-grid{grid-template-columns: repeat(3, 1fr);}
+      .icon-cell{height:68px}
+    }
+    @media (prefers-reduced-motion: reduce){
+      *{ animation: none !important; transition: none !important; scroll-behavior:auto !important }
+      .reveal{ opacity:1 !important; transform:none !important }
+    }
+  
+/* ===== IMMO – szybkie miganie po zapłonie (ciągłe) ===== */
+.blink-immo{
+  animation: blinkImmo 0.5s steps(1,end) infinite;
+}
+@keyframes blinkImmo{
+  0%,50%{opacity:1;}
+  51%,100%{opacity:.15;}
+}
+
+
+/* ===== Powiększone ikony kontrolek (Zakres + Oferta) ===== */
+.offer-ul li::before{ display:none; }
+.offer-ul li{
+  /* padding-left */:56px;
+}
+
+.zakres-icons img,
+.zakres-icons .icon,
+.zakres-icons svg{
+  width:42px;
+  height:42px;
+}
+
+@media (min-width: 900px){
+  .zakres-icons img,
+  .zakres-icons .icon,
+  .zakres-icons svg{
+    width:48px;
+    height:48px;
+  }
+}
+
+
+/* ===== Jeszcze większe ikony w sekcji ZAKRES ===== */
+.zakres-icons img,
+.zakres-icons .icon,
+.zakres-icons svg{
+  width:64px;
+  height:64px;
+}
+
+@media (min-width: 900px){
+  .zakres-icons img,
+  .zakres-icons .icon,
+  .zakres-icons svg{
+    width:72px;
+    height:72px;
+  }
+}
+
+/* Ikona tylko przy tytułach oferty */
+.oferta h3::before{
+  content:"";
+  display:inline-block;
+  width:36px;
+  height:36px;
+  margin-right:12px;
+  vertical-align:middle;
+  background-size:contain;
+  background-repeat:no-repeat;
+}
+
+
+/* ===== ZAKRES – bardzo duże ikony ===== */
+.zakres-icons img,
+.zakres-icons .icon,
+.zakres-icons svg{
+  width:80px;
+  height:80px;
+  animation: zakresPulse 3.5s ease-in-out infinite;
+}
+
+@media (min-width: 900px){
+  .zakres-icons img,
+  .zakres-icons .icon,
+  .zakres-icons svg{
+    width:96px;
+    height:96px;
+  }
+}
+
+/* ===== OFERTA – ikony tylko przy tytułach ===== */
+.oferta h3{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.oferta h3 img,
+.oferta h3 svg,
+.oferta h3 .icon{
+  width:64px;
+  height:64px;
+  animation: zakresPulse 3.5s ease-in-out infinite;
+}
+
+/* Wspólna animacja */
+@keyframes zakresPulse{
+  0%   { transform: scale(1);   filter: drop-shadow(0 0 0 rgba(255,138,29,0)); }
+  50%  { transform: scale(1.06); filter: drop-shadow(0 0 18px rgba(255,138,29,.45)); }
+  100% { transform: scale(1);   filter: drop-shadow(0 0 0 rgba(255,138,29,0)); }
+}
+
+
+/* ===== OFERTA: kontrolki przy tytułach (ECU / IMMO / ELV) + animacje jak w ZAKRES ===== */
+.oferta .offer-title{
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
+
+.oferta .offer-icon{
+  width:64px;
+  height:auto;
+  opacity:.95;
+  filter: drop-shadow(0 12px 18px rgba(0,0,0,.45)) drop-shadow(0 0 12px rgba(255,138,29,.12));
+  animation: floatMini 6.8s ease-in-out infinite, zakresPulse 3.5s ease-in-out infinite;
+}
+
+.oferta .offer-icon.blink-immo{
+  animation: floatMini 6.8s ease-in-out infinite, blinkImmo 0.5s steps(1,end) infinite, zakresPulse 3.5s ease-in-out infinite;
+}
+
+/* ELV: EPS zmiana koloru (czerwony -> żółty), jak w ZAKRES */
+.oferta .offer-eps{
+  position:relative;
+  width:64px;
+  height:64px;
+  display:inline-block;
+  animation: floatMini 6.8s ease-in-out infinite, zakresPulse 3.5s ease-in-out infinite;
+  filter: drop-shadow(0 12px 18px rgba(0,0,0,.45)) drop-shadow(0 0 12px rgba(255,138,29,.12));
+}
+.oferta .offer-eps img{
+  position:absolute;
+  inset:0;
+  width:64px;
+  height:auto;
+  margin:auto;
+}
+.oferta .offer-eps .eps-yellow{ opacity:0; }
+.oferta .offer-eps.ry.shift .eps-yellow{ animation: epsShiftRY 2.4s ease-in-out infinite; }
+.oferta .offer-eps.ry.shift .eps-red{ animation: epsShiftRYInv 2.4s ease-in-out infinite; }
+
+@media (min-width: 900px){
+  .oferta .offer-icon{ width:72px; }
+  .oferta .offer-eps{ width:72px; height:72px; }
+  .oferta .offer-eps img{ width:72px; }
+}
+
+</style>
+</head>
+<body class="ignition">
+
+<main id="top">
+  <div class="wrap hero">
+    <div class="hero-card reveal" id="heroCard">
+      <div class="hero-bg" id="heroBg"></div>
+      <div class="scan" aria-hidden="true"></div>
+
+      <div class="hero-inner">
+        <div class="hero-left">
+          <div class="brand">
+            <img class="brand-logo" src="assets_v8/logo/logo_main.png" alt="Logo" />
+            <div class="brand-text">
+              <div class="brand-name">ECU • IMMO • ELV</div>
+              <div class="brand-tag">Elektronika pojazdowa</div>
+            </div>
+          </div>
+
+          <div class="badge">⚠️ ECU • immobilizer • ELV/ESCL • programowanie</div>
+          <h1>Diagnoza i naprawa elektroniki<br/>sterowniki ECU • immobilizer • ELV/ESCL</h1>
+          <p class="lead">
+            Specjalizuję się w naprawie, programowaniu elektroniki w pojazdach osobowych: <b>programowanie i naprawa sterowników ECU</b>,
+            naprawa układów <b>immobilizera</b> oraz blokad kolumny kierowniczej <b>ELV/ESCL</b>.
+          </p>
+          <div class="actions">
+            <a class="btn primary" href="#oferta">Zobacz zakres</a>
+            <button class="btn" id="callBtn" type="button">Skopiuj telefon</button>
+            <button class="btn" id="mailBtn" type="button">Skopiuj e-mail</button>
+          </div>
+</div>
+
+        <div class="hero-right">
+          <!-- Jedna strefa z kontrolkami -->
+          <div class="icon-panel" aria-label="Kontrolki">
+<div class="icon-grid">
+              <div class="icon-cell"><img class="dash-ico big" style="--r:-6deg" src="assets_v8/icon_warn.png" alt="Ostrzeżenie"/></div>
+              <div class="icon-cell"><img class="dash-ico" style="--r:4deg" src="assets_v8/icon_esp.png" alt="ESP"/></div>
+
+              <div class="icon-cell"><img class="dash-ico" style="--r:1deg" src="assets_v8/icon_abs.png" alt="ABS"/></div>
+
+
+              <div class="icon-cell">
+                <div class="eps-stack shift ry" aria-label="EPS">
+                  <img class="eps-yellow" src="assets_v8/icon_eps_yellow.png" alt="EPS"/>
+                  <img class="eps-red" src="assets_v8/icon_eps_red.png" alt="EPS czerwone"/>
+                </div>
+              </div>
+
+              <div class="icon-cell"><img class="dash-ico" style="--r:2deg" src="assets_v8/icon_brake.png" alt="Hamulce"/></div>
+
+              <div class="icon-cell"><img class="dash-ico blink-immo" style="--r:-3deg" src="assets_v8/icon_immo.png" alt="Immobilizer"/></div>
+              <div class="icon-cell"><img class="dash-ico blink" style="--r:6deg" src="assets_v8/icon_airbag_custom.png" alt="Airbag"/></div>
+              <div class="icon-cell"><img class="dash-ico blink" style="--r:-2deg" src="assets_v8/icon_check.png" alt="Check engine"/></div>
+              <div class="icon-cell"><img class="dash-ico" style="--r:3deg" src="assets_v8/icon_aku.png" alt="Akumulator"/></div>
+
+              <div class="icon-cell"><img class="dash-ico" style="--r:-4deg" src="assets_v8/icon_diesel.png" alt="Świece żarowe"/></div>
+            </div>
+</div>
+
+          <div class="info-card">
+            <div>
+              <div class="section-title">Zakres</div>
+              <div class="stat"><b><img class="mini-ico" src="assets_v8/icon_check.png" alt="Kontrolka silnika">Sterowniki ECU</b><span>programowanie • naprawa • wymiana</span></div>
+              <div class="stat"><b><img class="mini-ico blink-immo" src="assets_v8/icon_immo.png" alt="Kontrolka immo">Immobilizer</b><span>diagnoza • naprawa</span></div>
+              <div class="stat"><b><span class="mini-eps ry" aria-hidden="true"><img class="eps-red" src="assets_v8/icon_eps_red.png" alt=""><img class="eps-yellow" src="assets_v8/icon_eps_yellow.png" alt=""></span>ELV / ESCL</b><span>naprawa blokady kolumny</span></div>
+            </div>
+            <div class="small" id="contactText">tel: +48 000 000 000<br/>e-mail: kontakt@twojadomena.pl</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section id="oferta" class="oferta">
+    <div class="wrap">
+      <div class="card tech reveal">
+        <div class="section-title">Oferta</div>
+        <div class="cols3">
+          <div class="feature">
+            <h3 class="offer-title"><img class="offer-icon" src="assets_v8/icon_check.png" alt="Kontrolka silnika">Sterowniki ECU</h3>
+            
+<ul class="offer-ul ecu-ul">
+  <li>Diagnostyka usterek sterownika ECU (brak komunikacji, błędy wewnętrzne, problemy z zasilaniem oraz liniami CAN).</li>
+  <li>Programowanie sterowników ECU: odczyt i zapis pamięci, aktualizacje oprogramowania oraz konfiguracja parametrów sterownika.</li>
+  <li>Naprawa elektroniki ECU: lokalizacja uszkodzeń, wymiana elementów (sekcje zasilania, sterowniki, układy pamięci) oraz przywracanie poprawnej pracy modułu.</li>
+  <li>Przygotowanie i dopasowanie sterownika po wymianie: adaptacja do pojazdu oraz synchronizacja z immobilizerem i pozostałymi modułami.</li>
+  <li>Obsługa programowania przez procedury diagnostyczne w trybie serwisowym, zależnie od architektury elektroniki pojazdu.</li>
+</ul>
+
+          </div>
+          <div class="feature">
+            <h3 class="offer-title"><img class="offer-icon blink-immo" src="assets_v8/icon_immo.png" alt="Kontrolka immobilizera">Immobilizer</h3>
+            
+<ul class="offer-ul immo-ul">
+  <li>Diagnostyka usterek immobilizera: brak autoryzacji rozruchu, błędy klucza, problemy z komunikacją modułów.</li>
+  <li>Analiza synchronizacji immobilizera ze sterownikiem silnika oraz innymi modułami pojazdu (zależnie od architektury).</li>
+  <li>Programowanie i adaptacja elementów systemu w trybie serwisowym przez procedury diagnostyczne.</li>
+  <li>Konfiguracja po naprawie lub wymianie modułów: dopasowanie i testy funkcjonalne układu.</li>
+  <li>Wsparcie serwisowe przy problemach z rozruchem i autoryzacją – z naciskiem na rozwiązania naprawcze i adaptacyjne.</li>
+</ul>
+
+          </div>
+          <div class="feature">
+            <h3 class="offer-title"><span class="offer-eps ry shift" aria-hidden="true"><img class="eps-yellow" src="assets_v8/icon_eps_yellow.png" alt=""><img class="eps-red" src="assets_v8/icon_eps_red.png" alt=""></span>ELV / ESCL</h3>
+            
+<ul class="offer-ul elv-ul">
+  <li>Diagnostyka elektronicznych blokad kolumny kierowniczej ELV / ESCL / ESL: usterki mechanizmu blokady, silnika, czujników położenia i elektroniki sterującej.</li>
+  <li>Analiza komunikacji z immobilizerem, sterownikiem silnika i pozostałymi modułami pojazdu (CAN/LIN), w tym przypadki braku odblokowania po zapłonie.</li>
+  <li>Naprawa modułu blokady: lokalizacja uszkodzeń, regeneracja połączeń, wymiana elementów oraz przywracanie poprawnej pracy mechanizmu.</li>
+  <li>Programowanie, inicjalizacja i adaptacja ELV / ESCL / ESL w trybie serwisowym – dopasowanie po naprawie lub wymianie.</li>
+  <li>Dobór metody serwisowej zależnie od wariantu systemu i konfiguracji elektroniki pojazdu.</li>
+</ul>
+
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="section-title" style="margin-bottom:12px;">PCB / elektronika</div>
+        <div class="pcb-grid">
+          <div class="pcb-shot">
+            <img src="assets_v8/pcb1.jpg" alt="Płytka sterownika – PCB (zbliżenie)">
+            <div class="cap">Sterownik ECU – elektronika, ścieżki, układy scalone.</div>
+          </div>
+          <div class="pcb-shot">
+            <img src="assets_v8/pcb2.jpg" alt="Płytka sterownika – PCB (zbliżenie)">
+            <div class="cap">Diagnoza i naprawa elektroniki modułów samochodowych.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="kontakt">
+    <div class="wrap">
+      <div class="card reveal">
+        <div class="section-title">Kontakt</div>
+<p class="lead" style="margin-bottom:8px;"><img src="assets_v8/phone_icon.png" alt="" style="width:18px;vertical-align:middle;margin-right:8px;"><a href="tel:+48504949149" style="font-weight:900">+48 504 949 149</a></p>
+        <p class="lead">Napisz objawy + marka/model/rocznik. Odpowiem z informacją co można zrobić.</p>
+        <form class="form" id="contactForm">
+          <input name="name" placeholder="Imię" autocomplete="name" required />
+          <input name="phone" placeholder="Telefon (opcjonalnie)" autocomplete="tel" />
+          <input name="email" placeholder="E-mail" type="email" autocomplete="email" required />
+          <textarea name="message" placeholder="Wiadomość (objawy, auto, sterownik)" required></textarea>
+          <button class="btn primary" type="submit">Wyślij (demo)</button>
+        </form>
+</div>
+    </div>
+  </section>
+
+  
+<section class="section stats-section">
+  <div class="wrap">
+    <div class="card reveal">
+      <div class="section-title">Statystyki</div>
+      <div class="cols3">
+        <div class="feature">
+          <h3>Odwiedzin strony</h3>
+          <p style="font-size:32px;font-weight:900" id="counterViews">—</p>
+        </div>
+        <div class="feature">
+          <h3>Kliknięć numeru telefonu</h3>
+          <p style="font-size:32px;font-weight:900" id="counterPhone">—</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+    <div class="wrap footer-inner">
+      <img class="footer-logo" src="assets_v8/logo/logo_main.png" alt="Logo" />
+      <div>© <span id="year"></span> • Elektronika pojazdowa</div>
+    </div>
+  </footer>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+  const PHONE = "+48 504 949 149";
+  const EMAIL = "kontakt@twojadomena.pl";
+
+  const toast = (msg) => {
+    const el = document.getElementById("toast");
+    el.textContent = msg;
+    el.classList.add("show");
+    clearTimeout(window.__toastTimer);
+    window.__toastTimer = setTimeout(() => el.classList.remove("show"), 2400);
+  };
+
+  document.getElementById("year").textContent = new Date().getFullYear();
+  document.getElementById("contactText").innerHTML = `<img src="assets_v8/phone_icon.png" alt="" style="width:16px;vertical-align:middle;margin-right:6px;"> <a href="tel:+48504949149">+48 504 949 149</a><br/>e-mail: ${EMAIL}`;
+
+  document.getElementById("callBtn").addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(PHONE); toast("Skopiowano numer: " + PHONE); }
+    catch(e){ toast("Nie udało się skopiować. Numer: " + PHONE); }
+  });
+
+  document.getElementById("mailBtn").addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(EMAIL); toast("Skopiowano e-mail: " + EMAIL); }
+    catch(e){ toast("Nie udało się skopiować. E-mail: " + EMAIL); }
+  });
+
+  document.getElementById("contactForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    toast("Dzięki! Wiadomość została „zapisana” lokalnie (demo).");
+    e.target.reset();
+  });
+
+  // Reveal
+  const els = document.querySelectorAll(".reveal");
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries){
+      if (e.isIntersecting){
+        e.target.classList.add("in");
+        io.unobserve(e.target);
+      }
+    }
+  }, { threshold: 0.12 });
+  els.forEach((el) => io.observe(el));
+
+  // Efekt zapłonu (1.3s): wszystkie kontrolki świecą na stałe, potem normalne animacje
+  window.setTimeout(() => document.body.classList.remove("ignition"), 1300);
+
+  // Subtelny parallax tła hero
+  const hero = document.getElementById("heroCard");
+  const bg = document.getElementById("heroBg");
+  let raf = null;
+  function onMove(ev){
+    const rect = hero.getBoundingClientRect();
+    const cx = (ev.clientX - rect.left) / rect.width - 0.5;
+    const cy = (ev.clientY - rect.top) / rect.height - 0.5;
+    if (raf) cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(() => {
+      bg.style.transform = `scale(1.06) translate(${cx * 10}px, ${cy * 10}px)`;
+    });
+  }
+  hero.addEventListener("mousemove", onMove);
+  hero.addEventListener("mouseleave", () => { bg.style.transform = "scale(1.04)"; });
+
+  // ===== Oferta: animacja list (stagger) =====
+  const offerLists = document.querySelectorAll(".offer-ul");
+  offerLists.forEach((ul) => {
+    const items = Array.from(ul.querySelectorAll("li"));
+    items.forEach((li, idx) => {
+      li.style.transitionDelay = `${idx * 70}ms`;
+    });
+  });
+
+  const offerIO = new IntersectionObserver((entries) => {
+    for (const e of entries){
+      if (e.isIntersecting){
+        e.target.classList.add("in");
+        offerIO.unobserve(e.target);
+      }
+    }
+  }, { threshold: 0.18 });
+
+  offerLists.forEach((ul) => offerIO.observe(ul));
+
+
+// ===== LICZNIKI =====
+const NS = "eko-strona-v16";
+async function hit(key){
+  const r = await fetch(`https://api.countapi.xyz/hit/${NS}/${key}`);
+  return (await r.json()).value;
+}
+async function get(key){
+  const r = await fetch(`https://api.countapi.xyz/get/${NS}/${key}`);
+  return (await r.json()).value;
+}
+
+// odwiedziny
+hit("views").then(v=>document.getElementById("counterViews").textContent=v);
+
+// kliknięcia telefonu
+document.querySelectorAll('a[href^="tel:"]').forEach(a=>{
+  a.addEventListener("click", ()=>hit("phone").then(v=>{
+    document.getElementById("counterPhone").textContent=v;
+  }));
+});
+get("phone").then(v=>{
+  if(v) document.getElementById("counterPhone").textContent=v;
+});
+
+</script>
+</body>
+</html>
