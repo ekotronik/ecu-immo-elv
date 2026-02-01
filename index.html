@@ -589,6 +589,19 @@
   .oferta .offer-eps img{ width:72px; }
 }
 
+/* Anty-spam: ukrycie honeypota */
+.hp-field{
+  position:absolute !important;
+  left:-10000px !important;
+  top:auto !important;
+  width:1px !important;
+  height:1px !important;
+  overflow:hidden !important;
+}
+.hp-field input{
+  opacity:0 !important;
+}
+
 </style>
 </head>
 <body class="ignition">
@@ -731,6 +744,13 @@
 <p class="lead" style="margin-bottom:8px;"><img src="assets_v8/phone_icon.png" alt="" style="width:18px;vertical-align:middle;margin-right:8px;"><a href="tel:+48504949149" style="font-weight:900">+48 504 949 149</a></p>
         <p class="lead">Napisz objawy + marka/model/rocznik. Odpowiem z informacją co można zrobić.</p>
         <form class="form" id="contactForm" action="https://formspree.io/f/xkozjdln" method="POST">
+<!-- Anty-spam: pole-pułapka (honeypot). Ludzie go nie widzą, boty często wypełniają. -->
+<div class="hp-field" aria-hidden="true">
+  <label for="website">Zostaw puste</label>
+  <input id="website" name="website" type="text" autocomplete="off" tabindex="-1" />
+</div>
+<input type="hidden" name="_ts" id="formTs" value="">
+
     <input type="hidden" name="_subject" value="Wiadomość ze strony EKOTRONIK">
 
           <input name="name" placeholder="Imię" autocomplete="name" required />
@@ -889,29 +909,88 @@ if (contactForm) {
   offerLists.forEach((ul) => offerIO.observe(ul));
 
 
-// ===== LICZNIKI =====
-const NS = "eko-strona-v16";
-async function hit(key){
-  const r = await fetch(`https://api.countapi.xyz/hit/${NS}/${key}`);
-  return (await r.json()).value;
+// ===== LICZNIKI (stabilne) =====
+// CountAPI bywa czasem niedostępne / blokowane. Dlatego mamy fallback do localStorage,
+// żeby liczniki zawsze coś pokazały.
+
+const NS = "ekotronik-ghpages"; // unikalna przestrzeń nazw (możesz zmienić)
+const LS_PREFIX = "ekotronik_stats_";
+
+async function countApiHit(key){
+  const r = await fetch(`https://api.countapi.xyz/hit/${NS}/${key}`, { cache: "no-store" });
+  const j = await r.json();
+  return j.value;
 }
-async function get(key){
-  const r = await fetch(`https://api.countapi.xyz/get/${NS}/${key}`);
-  return (await r.json()).value;
+async function countApiGet(key){
+  const r = await fetch(`https://api.countapi.xyz/get/${NS}/${key}`, { cache: "no-store" });
+  const j = await r.json();
+  return j.value;
 }
 
-// odwiedziny
-hit("views").then(v=>document.getElementById("counterViews").textContent=v);
+function lsGet(key){
+  const v = Number(localStorage.getItem(LS_PREFIX + key) || "0");
+  return Number.isFinite(v) ? v : 0;
+}
+function lsHit(key){
+  const v = lsGet(key) + 1;
+  localStorage.setItem(LS_PREFIX + key, String(v));
+  return v;
+}
+function setText(id, val){
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = String(val ?? 0);
+}
 
-// kliknięcia telefonu
-document.querySelectorAll('a[href^="tel:"]').forEach(a=>{
-  a.addEventListener("click", ()=>hit("phone").then(v=>{
-    document.getElementById("counterPhone").textContent=v;
-  }));
-});
-get("phone").then(v=>{
-  if(v) document.getElementById("counterPhone").textContent=v;
-});
+// 1) ODWIEDZINY — licz tylko raz na sesję (żeby odświeżanie nie nabijało)
+(async () => {
+  const sessionKey = "ekotronik_viewed_session";
+  const already = sessionStorage.getItem(sessionKey) === "1";
+  try{
+    if (!already){
+      const v = await countApiHit("views");
+      setText("counterViews", v);
+      sessionStorage.setItem(sessionKey, "1");
+    } else {
+      const v = await countApiGet("views");
+      setText("counterViews", v);
+    }
+  }catch(e){
+    const v = already ? lsGet("views") : lsHit("views");
+    setText("counterViews", v);
+    sessionStorage.setItem(sessionKey, "1");
+  }
+})();
+
+// 2) KLIKNIĘCIA TELEFONU — klik w tel: + klik w przycisk kopiowania numeru (callBtn)
+async function hitPhone(){
+  try{
+    const v = await countApiHit("phone");
+    setText("counterPhone", v);
+  }catch(e){
+    const v = lsHit("phone");
+    setText("counterPhone", v);
+  }
+}
+
+(async () => {
+  // pokaż stan początkowy
+  try{
+    const v = await countApiGet("phone");
+    setText("counterPhone", v);
+  }catch(e){
+    setText("counterPhone", lsGet("phone"));
+  }
+
+  document.querySelectorAll('a[href^="tel:"]').forEach(a=>{
+    a.addEventListener("click", hitPhone);
+  });
+
+  const callBtn = document.getElementById("callBtn");
+  if (callBtn){
+    callBtn.addEventListener("click", hitPhone);
+  }
+})();
 
 </script>
 </body>
