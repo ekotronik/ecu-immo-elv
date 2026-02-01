@@ -964,12 +964,21 @@ function setText(id, val){
 
 // 2) KLIKNIĘCIA TELEFONU — klik w tel: + klik w przycisk kopiowania numeru (callBtn)
 async function hitPhone(){
+  // Na urządzeniach mobilnych klik w tel: może natychmiast przełączyć do dialera
+  // i przerwać zapytanie sieciowe. Dlatego:
+  // 1) zwiększamy licznik lokalnie od razu (UI + localStorage),
+  // 2) dopiero potem próbujemy uaktualnić CountAPI (fetch z keepalive).
+  const local = lsHit("phone");
+  setText("counterPhone", local);
+
   try{
-    const v = await countApiHit("phone");
-    setText("counterPhone", v);
+    const r = await fetch(`https://api.countapi.xyz/hit/${NS}/phone`, { cache: "no-store", keepalive: true });
+    const j = await r.json();
+    setText("counterPhone", j.value);
+    // synchronizacja localStorage
+    localStorage.setItem(LS_PREFIX + "phone", String(j.value));
   }catch(e){
-    const v = lsHit("phone");
-    setText("counterPhone", v);
+    // zostaje wartość lokalna
   }
 }
 
