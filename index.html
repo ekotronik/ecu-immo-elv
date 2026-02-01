@@ -730,7 +730,9 @@
         <div class="section-title">Kontakt</div>
 <p class="lead" style="margin-bottom:8px;"><img src="assets_v8/phone_icon.png" alt="" style="width:18px;vertical-align:middle;margin-right:8px;"><a href="tel:+48504949149" style="font-weight:900">+48 504 949 149</a></p>
         <p class="lead">Napisz objawy + marka/model/rocznik. Odpowiem z informacją co można zrobić.</p>
-        <form class="form" id="contactForm">
+        <form class="form" id="contactForm" action="https://formspree.io/f/xkozjdln" method="POST">
+    <input type="hidden" name="_subject" value="Wiadomość ze strony EKOTRONIK">
+
           <input name="name" placeholder="Imię" autocomplete="name" required />
           <input name="phone" placeholder="Telefon (opcjonalnie)" autocomplete="tel" />
           <input name="email" placeholder="E-mail" type="email" autocomplete="email" required />
@@ -795,13 +797,47 @@
     catch(e){ toast("Nie udało się skopiować. E-mail: " + EMAIL); }
   });
 
-  document.getElementById("contactForm").addEventListener("submit", (e) => {
-    e.preventDefault();
-    toast("Dzięki! Wiadomość została „zapisana” lokalnie .");
-    e.target.reset();
-  });
+  // ===== Formularz kontaktowy: Formspree (bez backendu) =====
+// 1) Załóż formularz na Formspree i wklej swój adres do atrybutu action w <form>.
+//    Ma wyglądać tak: https://formspree.io/f/XXXXYYYY
+// 2) Ten kod wysyła AJAX-em i pokazuje komunikat "Wiadomość wysłana ✅" bez przeładowania strony.
 
-  // Reveal
+const contactForm = document.getElementById("contactForm");
+if (contactForm) {
+  contactForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const form = e.target;
+    const btn = form.querySelector('button[type="submit"]');
+    const old = btn?.textContent || "Wyślij";
+    if (btn) { btn.disabled = true; btn.textContent = "Wysyłanie..."; }
+
+    try {
+      const res = await fetch(form.action, {
+        method: "POST",
+        body: new FormData(form),
+        headers: { "Accept": "application/json" }
+      });
+
+      if (res.ok) {
+        toast("Wiadomość wysłana ✅");
+        form.reset();
+      } else {
+        // Formspree zwykle zwraca JSON z errors
+        const data = await res.json().catch(() => ({}));
+        const msg = (data?.errors && data.errors[0]?.message) ? data.errors[0].message : "Błąd wysyłki";
+        toast("Nie wysłano: " + msg);
+      }
+    } catch (err) {
+      toast("Nie wysłano: błąd połączenia");
+      console.error(err);
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = old; }
+    }
+  });
+}
+
+// Reveal
   const els = document.querySelectorAll(".reveal");
   const io = new IntersectionObserver((entries) => {
     for (const e of entries){
