@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ekotronik.github.io/ecu-immo-elv/sitemap.xml

@@ -3,11 +3,24 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Naprawa ECU, IMMO, ELV | Elektronika samochodowa Rumia • Reda • Gdynia • Gdańsk</title>
+    <meta name="robots" content="index,follow" />
+<title>Elektronika samochodowa ECU • IMMO • ELV/ESCL | Trójmiasto</title>
   
   <link rel="icon" type="image/png" href="assets_v8/favicon.png" />
-<meta name="description" content="Naprawa ECU, immobilizera IMMO oraz ELV/ESL. Elektronika samochodowa – Rumia, Reda, Gdynia, Gdańsk (Trójmiasto). Diagnostyka, programowanie sterowników, usuwanie blokady kierownicy." />
-  <meta name="theme-color" content="#0b0d12" />
+<meta name="description" content="Elektronika samochodowa: ECU, immobilizer (IMMO) oraz blokada kolumny kierowniczej ELV/ESCL. Diagnostyka, programowanie i naprawa modułów – Trójmiasto i okolice. Telefon: +48 504 949 149." />
+  
+  <meta name="keywords" content="ECU, immobilizer, IMMO, ELV, ESCL, ESL, elektronika samochodowa, diagnostyka, programowanie sterowników, Trójmiasto" />
+  <link rel="canonical" href="https://ekotronik.github.io/ecu-immo-elv/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://ekotronik.github.io/ecu-immo-elv/" />
+  <meta property="og:title" content="Elektronika samochodowa ECU • IMMO • ELV/ESCL | Trójmiasto" />
+  <meta property="og:description" content="Elektronika samochodowa: ECU, immobilizer (IMMO) oraz blokada kolumny kierowniczej ELV/ESCL. Diagnostyka, programowanie i naprawa modułów – Trójmiasto i okolice. Telefon: +48 504 949 149." />
+  <meta property="og:image" content="https://ekotronik.github.io/ecu-immo-elv/assets_v8/hero_bg.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Elektronika samochodowa ECU • IMMO • ELV/ESCL | Trójmiasto" />
+  <meta name="twitter:description" content="Elektronika samochodowa: ECU, immobilizer (IMMO) oraz blokada kolumny kierowniczej ELV/ESCL. Diagnostyka, programowanie i naprawa modułów – Trójmiasto i okolice. Telefon: +48 504 949 149." />
+
+<meta name="theme-color" content="#0b0d12" />
   <style>
     :root{
       --bg:#0b0d12;
@@ -602,91 +615,41 @@
   opacity:0 !important;
 }
 
-/* === SEO + FAQ (estetyka zgodna z motywem) === */
-.seo-card, .faq-card{
-  margin: 18px 0;
-}
-.seo-inner{
-  max-width: var(--max);
-  margin: 0 auto;
-  padding: 0 18px;
-}
-.seo-card .seo-inner, .faq-card .seo-inner{
-  padding-top: 0;
-}
-.seo-card .seo-inner > *, .faq-card .seo-inner > *{ 
-  max-width: 920px;
-}
-.seo-card{
-  border-top: 1px solid rgba(255,255,255,.08);
-}
-.faq-card{
-  border-top: 1px solid rgba(255,255,255,.08);
-}
-.seo-title{
-  margin: 14px 0 10px;
-  font-size: 18px;
-  font-weight: 900;
-  color: var(--text);
-  letter-spacing: .2px;
-}
-#seo-lokalne p, #qa p{
-  margin: 0 0 10px;
-  color: rgba(233,236,242,.84);
-  line-height: 1.55;
-}
-.seo-note{
-  padding: 10px 12px;
-  border-radius: 16px;
-  border: 1px solid rgba(255,255,255,.12);
-  background: rgba(255,255,255,.03);
-}
 
-/* FAQ accordion */
-.faq{
-  display: grid;
-  gap: 10px;
-  margin-top: 10px;
-}
-.faq-item{
-  border-radius: 16px;
-  border: 1px solid rgba(255,255,255,.12);
-  background: rgba(255,255,255,.03);
-  overflow: hidden;
-}
-.faq-item summary{
-  cursor: pointer;
-  list-style: none;
-  padding: 12px 14px;
-  font-weight: 800;
-  color: var(--text);
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap: 12px;
-}
-.faq-item summary::-webkit-details-marker{ display:none; }
-.faq-item summary:after{
-  content: "+";
-  font-weight: 900;
-  opacity: .9;
-}
-.faq-item[open] summary:after{
-  content: "–";
-}
-.faq-body{
-  padding: 0 14px 12px;
-}
+
+#faq{padding:70px 0;}
+#faq .faq-wrap{max-width:1100px;margin:0 auto;padding:0 20px;}
+#faq h2{font-size:28px;letter-spacing:.3px;margin:0 0 10px;}
+#faq p.lead{opacity:.85;margin:0 0 22px;line-height:1.6;}
+.faq-grid{display:grid;grid-template-columns:1fr;gap:14px;}
+@media (min-width:900px){.faq-grid{grid-template-columns:1fr 1fr;}}
+.faq-item{border:1px solid rgba(255,255,255,.12);border-radius:14px;overflow:hidden;background:rgba(10,16,26,.55);backdrop-filter: blur(6px);}
+.faq-item summary{list-style:none;cursor:pointer;padding:16px 16px;font-weight:700;display:flex;align-items:center;gap:10px;}
+.faq-item summary::-webkit-details-marker{display:none;}
+.faq-item summary:after{content:'+';margin-left:auto;font-size:20px;opacity:.7;}
+.faq-item[open] summary:after{content:'–';}
+.faq-content{padding:0 16px 16px 16px;opacity:.9;line-height:1.6;}
+.faq-tag{display:inline-flex;align-items:center;justify-content:center;min-width:46px;height:26px;border-radius:999px;background:rgba(0,168,255,.14);border:1px solid rgba(0,168,255,.35);color:#bfe9ff;font-size:12px;font-weight:800;letter-spacing:.4px;}
+
+
+/* ===== FAQ (Pytania i odpowiedzi) ===== */
+#faq{padding:72px 0;}
+#faq .faq-wrap{max-width:1100px;margin:0 auto;padding:0 20px;}
+#faq h2{font-size:28px;letter-spacing:.3px;margin:0 0 10px;}
+#faq p.lead{opacity:.86;margin:0 0 22px;line-height:1.6;}
+.faq-grid{display:grid;grid-template-columns:1fr;gap:12px;}
+@media (min-width: 860px){.faq-grid{grid-template-columns:1fr 1fr;gap:14px;}}
+.faq-item{border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.04);border-radius:16px;overflow:hidden;backdrop-filter: blur(6px);}
+.faq-item summary{list-style:none;cursor:pointer;padding:14px 16px;font-weight:650;display:flex;align-items:center;gap:10px;}
+.faq-item summary::-webkit-details-marker{display:none;}
+.faq-item summary::after{content:'+';margin-left:auto;opacity:.75;font-size:18px;line-height:1;}
+.faq-item[open] summary::after{content:'–';}
+.faq-item:hover{border-color:rgba(255,255,255,.18);}
+.faq-content{padding:0 16px 14px 16px;opacity:.9;line-height:1.65;}
+.faq-content ul{margin:10px 0 0 18px;}
+.faq-content li{margin:6px 0;}
 
 </style>
-  <meta property="og:title" content="Naprawa ECU, IMMO, ELV | Elektronika samochodowa Rumia • Reda • Gdynia • Gdańsk" />
-<meta property="og:description" content="Naprawa ECU, immobilizera IMMO oraz ELV/ESL. Diagnostyka i elektronika samochodowa – Trójmiasto." />
-<meta property="og:url" content="https://ekotronik.github.io/ecu-immo-elv/" />
-<meta property="og:type" content="website" />
-<meta name="twitter:card" content="summary" />
-
-  <link rel="canonical" href="https://ekotronik.github.io/ecu-immo-elv/" />
-
 </head>
 <body class="ignition">
 
@@ -821,7 +784,61 @@
     </div>
   </section>
 
-  <section id="kontakt">
+  <section id="faq">
+    <div class="faq-wrap">
+      <h2>Pytania i odpowiedzi – ECU, IMMO, ELV</h2>
+      <p class="lead">Krótko i konkretnie – jeśli napiszesz model auta i objawy, od razu podpowiem możliwe przyczyny i dalsze kroki diagnostyczne.</p>
+
+      <div class="faq-grid">
+        <details class="faq-item">
+          <summary><span class="faq-tag">IMMO</span> Dlaczego samochód nie odpala mimo sprawnego akumulatora?</summary>
+          <div class="faq-content">
+            Najczęściej to problem z autoryzacją (immobilizer, transponder w kluczyku, antena/stacyjka) albo komunikacją modułów. W diagnostyce sprawdza się status IMMO (Authorized/Denied), błędy w ECU/IMMO oraz synchronizację kluczy.
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary><span class="faq-tag">IMMO</span> Co to jest immobilizer i kiedy ulega awarii?</summary>
+          <div class="faq-content">
+            Immobilizer blokuje uruchomienie silnika bez poprawnego klucza. Awarie wynikają m.in. z uszkodzeń pamięci/EEPROM, problemów z kluczem, zalania modułu, spadków napięcia lub błędów w oprogramowaniu po nieudanych naprawach.
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary><span class="faq-tag">ELV</span> Na czym polega awaria blokady kierownicy ELV/ESCL?</summary>
+          <div class="faq-content">
+            Objawia się m.in. brakiem odblokowania kolumny, komunikatami o blokadzie kierownicy lub brakiem zapłonu. Przyczyną bywa zużyty silnik/zębatki, zimne luty, uszkodzenie elektroniki lub błędy synchronizacji z innymi modułami.
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary><span class="faq-tag">ECU</span> Czy można naprawić ECU zamiast wymieniać na nowe?</summary>
+          <div class="faq-content">
+            W wielu przypadkach tak – zależy od rodzaju usterki. Naprawia się m.in. sekcje zasilania, sterowanie wtryskami, komunikację CAN, a w niektórych przypadkach przywraca/aktualizuje oprogramowanie.
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary><span class="faq-tag">ECU</span> Kiedy naprawa ECU zamienia się na „klonowanie”?</summary>
+          <div class="faq-content">
+            Gdy stary sterownik ma uszkodzenia pamięci/CPU lub poważne zwarcia i nie daje się stabilnie uruchomić – wtedy przenosi się dane (np. flash/eeprom) do sprawnego sterownika-dawcy, zachowując dopasowanie do auta.
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary><span class="faq-tag">DIAG</span> Kiedy warto zgłosić się do elektronika samochodowego?</summary>
+          <div class="faq-content">
+            Gdy problem jest powtarzalny, pojawiają się błędy komunikacji, auto nie odpala mimo sprawnych podzespołów mechanicznych albo po wymianie modułu potrzebna jest adaptacja/programowanie.
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+
+  
+
+<section id="kontakt">
     <div class="wrap">
       <div class="card reveal">
         <div class="section-title">Kontakt</div>
@@ -866,92 +883,46 @@
   </div>
 </section>
 
-
-  <section id="seo-lokalne" class="seo-card">
-  <div class="seo-inner">
-    <h2 class="seo-title">Elektronika samochodowa – ECU, IMMO, ELV | Rumia, Reda, Gdynia, Gdańsk</h2>
-
-    <p>
-      Zajmuję się naprawą elektroniki samochodowej, w szczególności sterowników ECU, immobilizerów IMMO
-      oraz blokad kolumny kierownicy ELV/ESL. Pomagam w sytuacjach, gdy samochód nie odpala,
-      występują błędy immobilizera lub blokada kierownicy uniemożliwia uruchomienie pojazdu.
-    </p>
-
-    <p>
-      Wykonuję diagnostykę komputerową, programowanie i naprawy sterowników silnika ECU,
-      usuwanie usterek immobilizera IMMO oraz naprawę i emulację ELV/ESL.
-      Usługi realizuję lokalnie na terenie Rumii, Redy, Gdyni oraz Gdańska, a także w całym Trójmieście i okolicach.
-    </p>
-
-    <p class="seo-note">
-      Szukasz pomocy w zakresie elektroniki samochodowej? Skontaktuj się — odpowiem i podpowiem najlepsze rozwiązanie.
-    </p>
-  </div>
-</section>
-
-  <section id="qa" class="faq-card">
-  <div class="seo-inner">
-    <h2 class="seo-title">Pytania i odpowiedzi – ECU, IMMO, ELV</h2>
-
-    <div class="faq">
-      <details class="faq-item">
-        <summary>Dlaczego samochód nie odpala mimo sprawnego akumulatora?</summary>
-        <div class="faq-body">
-          <p>
-            Częstą przyczyną jest problem z immobilizerem IMMO lub sterownikiem ECU. Objawia się to brakiem reakcji na rozruch,
-            migającą kontrolką immobilizera albo błędami komunikacji w diagnostyce.
-          </p>
-        </div>
-      </details>
-
-      <details class="faq-item">
-        <summary>Co to jest immobilizer i kiedy ulega awarii?</summary>
-        <div class="faq-body">
-          <p>
-            Immobilizer to system zabezpieczający pojazd przed uruchomieniem bez autoryzowanego klucza.
-            Awaria może pojawić się po rozładowaniu akumulatora, zalaniu elektroniki lub przy problemach z modułem/sterownikiem.
-          </p>
-        </div>
-      </details>
-
-      <details class="faq-item">
-        <summary>Na czym polega awaria blokady kierownicy ELV/ESL?</summary>
-        <div class="faq-body">
-          <p>
-            Uszkodzenie ELV/ESL objawia się zablokowaną kierownicą i brakiem możliwości uruchomienia pojazdu.
-            Często dotyczy to aut marki Mercedes i wymaga diagnostyki oraz naprawy elektroniki.
-          </p>
-        </div>
-      </details>
-
-      <details class="faq-item">
-        <summary>Czy można naprawić ECU zamiast wymieniać na nowe?</summary>
-        <div class="faq-body">
-          <p>
-            W wielu przypadkach sterownik ECU można naprawić lub zaprogramować ponownie, co bywa znacznie tańsze niż wymiana modułu.
-          </p>
-        </div>
-      </details>
-
-      <details class="faq-item">
-        <summary>Kiedy warto zgłosić się do elektronika samochodowego?</summary>
-        <div class="faq-body">
-          <p>
-            Gdy pojawiają się problemy z uruchomieniem auta, błędy immobilizera, brak komunikacji z ECU albo blokada kierownicy —
-            warto skorzystać z pomocy specjalisty od elektroniki samochodowej.
-          </p>
-        </div>
-      </details>
-    </div>
-  </div>
-</section>
-
 <footer>
     <div class="wrap footer-inner">
       <img class="footer-logo" src="assets_v8/logo/logo_main.png" alt="Logo" />
       <div>© <span id="year"></span> • Elektronika pojazdowa</div>
     </div>
-  </footer>
+  <section id="seo-lokalne">
+  <h2>Elektronika samochodowa – ECU, IMMO, ELV | Rumia, Reda, Gdynia, Gdańsk</h2>
+
+  <p>
+    Zajmuję się naprawą elektroniki samochodowej, w szczególności sterowników ECU,
+    immobilizerów IMMO oraz blokad kolumny kierownicy ELV/ESL. Pomagam w sytuacjach,
+    gdy samochód nie odpala, występują błędy immobilizera lub blokada kierownicy
+    uniemożliwia uruchomienie pojazdu.
+  </p>
+
+  <p>
+    Wykonuję diagnostykę komputerową, programowanie i naprawy sterowników silnika ECU,
+    usuwanie usterek immobilizera IMMO oraz naprawę i emulację ELV/ESL.
+    Usługi realizuję lokalnie na terenie Rumii, Redy, Gdyni oraz Gdańska,
+    a także w całym Trójmieście i okolicach.
+  </p>
+
+  <p>
+    Jeśli potrzebna jest szybka i skuteczna pomoc w zakresie elektroniki samochodowej,
+    diagnostyki ECU, problemów z immobilizerem lub blokadą kierownicy,
+    zapraszam do kontaktu.
+  </p>
+</section>
+
+  <div class="wrap" style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.10);">
+    <div style="color:rgba(255,255,255,.70);font-weight:800;margin-bottom:8px;">Linki zewnętrzne</div>
+    <ul style="margin:0;padding-left:18px;color:rgba(255,255,255,.72);line-height:1.55;">
+      <li><a href="https://pl.wikipedia.org/wiki/Sterownik_silnika" target="_blank" rel="noopener noreferrer">Sterownik silnika (ECU) – opis</a></li>
+      <li><a href="https://pl.wikipedia.org/wiki/Immobiliser" target="_blank" rel="noopener noreferrer">Immobiliser (IMMO) – opis</a></li>
+      <li><a href="https://en.wikipedia.org/wiki/Steering_lock" target="_blank" rel="noopener noreferrer">Steering lock (ELV/ESCL) – opis</a></li>
+    </ul>
+  </div>
+</section>
+
+</footer>
 </main>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
