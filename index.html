@@ -649,6 +649,139 @@
 .faq-content ul{margin:10px 0 0 18px;}
 .faq-content li{margin:6px 0;}
 
+
+/* ===== GALERIA (Diagnostyka i przypadki usterek) ===== */
+.galeria { padding: 72px 0; }
+.galeria .section-title { display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+.galeria .section-title h2 { margin:0; font-size: clamp(1.4rem, 2vw, 2rem); letter-spacing: 0.5px; }
+.galeria .section-sub { color: rgba(255,255,255,.75); margin:0 0 22px; line-height:1.5; }
+.gal-filters { display:flex; flex-wrap:wrap; gap:10px; margin: 18px 0 26px; }
+.gal-filter-btn{
+  appearance:none; border:1px solid rgba(255,255,255,.14);
+  background: rgba(10,18,34,.55);
+  color: rgba(255,255,255,.86);
+  padding: 10px 14px; border-radius: 999px;
+  cursor:pointer; transition: .2s ease; font-weight:600;
+}
+.gal-filter-btn:hover{ border-color: rgba(42,167,255,.55); box-shadow: 0 0 0 3px rgba(42,167,255,.12); }
+.gal-filter-btn.active{ background: rgba(42,167,255,.16); border-color: rgba(42,167,255,.75); color:#eaf6ff; }
+.gal-grid{
+  display:grid; gap:16px;
+  grid-template-columns: repeat(12, 1fr);
+}
+.gal-card{
+  grid-column: span 4;
+  background: rgba(7,18,33,.55);
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 18px;
+  overflow:hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.gal-card:hover{
+  transform: translateY(-2px);
+  border-color: rgba(42,167,255,.45);
+  box-shadow: 0 14px 40px rgba(0,0,0,.35);
+}
+.gal-thumb{
+  position:relative;
+  aspect-ratio: 3 / 2;
+  background: radial-gradient(circle at 30% 30%, rgba(42,167,255,.25), transparent 55%),
+              linear-gradient(135deg, rgba(6,18,37,.95), rgba(11,43,74,.75));
+}
+.gal-thumb img{
+  width:100%; height:100%; object-fit:cover; display:block;
+  filter: saturate(1.05) contrast(1.02);
+}
+.gal-badge{
+  position:absolute; left:12px; top:12px;
+  padding:6px 10px; border-radius:999px;
+  background: rgba(0,0,0,.45);
+  border:1px solid rgba(255,255,255,.14);
+  color: rgba(255,255,255,.9);
+  font-size:.78rem; font-weight:700; letter-spacing:.3px;
+}
+.gal-body{ padding:14px 14px 16px; }
+.gal-title{ margin:0 0 6px; font-size:1.02rem; color:#eaf6ff; }
+.gal-desc{ margin:0; color: rgba(255,255,255,.74); line-height:1.45; font-size:.95rem; }
+.gal-open{
+  margin-top:12px; display:inline-flex; align-items:center; gap:8px;
+  color:#eaf6ff; font-weight:700; font-size:.92rem;
+  text-decoration:none; opacity:.92;
+}
+.gal-open:hover{ opacity:1; text-decoration:underline; }
+
+/* Responsive */
+@media (max-width: 1024px){ .gal-card{ grid-column: span 6; } }
+@media (max-width: 640px){ .gal-card{ grid-column: span 12; } .galeria{ padding: 56px 0; } }
+
+/* Lightbox */
+.gal-lightbox{
+  position:fixed; inset:0; display:none;
+  background: rgba(0,0,0,.75);
+  backdrop-filter: blur(6px);
+  z-index: 9999;
+  align-items:center; justify-content:center;
+  padding: 18px;
+}
+.gal-lightbox.open{ display:flex; }
+.gal-lightbox-inner{
+  width:min(980px, 96vw);
+  background: rgba(10,18,34,.88);
+  border:1px solid rgba(255,255,255,.14);
+  border-radius: 18px;
+  overflow:hidden;
+  box-shadow: 0 30px 80px rgba(0,0,0,.55);
+}
+.gal-lightbox-media{ aspect-ratio: 16/9; background:#061225; }
+.gal-lightbox-media img{ width:100%; height:100%; object-fit:contain; display:block; }
+.gal-lightbox-meta{ padding:14px 16px 16px; }
+.gal-lightbox-meta h3{ margin:0 0 6px; color:#eaf6ff; font-size:1.1rem; }
+.gal-lightbox-meta p{ margin:0; color: rgba(255,255,255,.75); line-height:1.5; }
+.gal-lightbox-close{
+  position:absolute; right:14px; top:14px;
+  width:42px; height:42px; border-radius:999px;
+  border:1px solid rgba(255,255,255,.16);
+  background: rgba(0,0,0,.35);
+  color:#fff; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  font-size:22px; font-weight:800;
+}
+
+
+/* ===== DUŻE DANE KONTAKTOWE (czytelność) ===== */
+
+/* panel Zakres (hero prawa strona) */
+#contactText{
+  font-size:20px;
+  font-weight:700;
+  line-height:1.7;
+  margin-top:10px;
+}
+
+#contactText a{
+  font-size:24px;
+  font-weight:900;
+  color:#fff;
+  text-decoration:none;
+}
+
+#contactText a:hover{
+  opacity:.9;
+}
+
+/* sekcja Kontakt */
+#kontakt .lead a{
+  font-size:34px !important;
+  font-weight:900;
+  letter-spacing:1px;
+  text-decoration:none;
+}
+
+#kontakt .lead a:hover{
+  opacity:.9;
+}
+
 </style>
 </head>
 <body class="ignition">
@@ -784,7 +917,102 @@
     </div>
   </section>
 
-  <section id="faq">
+  
+<section id="galeria" class="galeria">
+  <div class="container">
+    <div class="section-title">
+      <h2>Diagnostyka i przypadki usterek</h2>
+    </div>
+    <p class="section-sub">
+      Przykładowe tematy i obszary pracy — docelowo ta sekcja będzie uzupełniana o Twoje zdjęcia z napraw i krótkie opisy.
+      Na start dodałem spójne grafiki w stylistyce strony, abyś mógł ocenić układ i czytelność.
+    </p>
+
+    <div class="gal-filters" aria-label="Filtry galerii">
+      <button class="gal-filter-btn active" data-filter="all">Wszystko</button>
+      <button class="gal-filter-btn" data-filter="ECU">ECU</button>
+      <button class="gal-filter-btn" data-filter="IMMO">IMMO</button>
+      <button class="gal-filter-btn" data-filter="ELV">ELV / ESCL</button>
+      <button class="gal-filter-btn" data-filter="DIAG">Diagnostyka</button>
+      <button class="gal-filter-btn" data-filter="PCB">Elektronika / PCB</button>
+    </div>
+
+    <div class="gal-grid">
+      <article class="gal-card" data-cat="ECU">
+        <div class="gal-thumb">
+          <span class="gal-badge">ECU</span>
+          <img src="assets_v8/gallery/g_ecu.svg" alt="Sterownik silnika ECU – diagnostyka i naprawa" loading="lazy">
+        </div>
+        <div class="gal-body">
+          <h3 class="gal-title">Sterownik ECU – diagnostyka i naprawa</h3>
+          <p class="gal-desc">Analiza komunikacji, zasilania i sygnałów, identyfikacja przyczyn braku startu / błędów oraz prace serwisowe w elektronice.</p>
+          <a class="gal-open" href="#" data-open>Podgląd</a>
+        </div>
+      </article>
+
+      <article class="gal-card" data-cat="IMMO">
+        <div class="gal-thumb">
+          <span class="gal-badge">IMMO</span>
+          <img src="assets_v8/gallery/g_immo.svg" alt="Immobilizer – klucze, adaptacje, procedury serwisowe" loading="lazy">
+        </div>
+        <div class="gal-body">
+          <h3 class="gal-title">Immobilizer – adaptacje i procedury</h3>
+          <p class="gal-desc">Obsługa typowych scenariuszy serwisowych: dopisanie klucza, synchronizacja, diagnostyka błędów autoryzacji.</p>
+          <a class="gal-open" href="#" data-open>Podgląd</a>
+        </div>
+      </article>
+
+      <article class="gal-card" data-cat="ELV">
+        <div class="gal-thumb">
+          <span class="gal-badge">ELV / ESCL</span>
+          <img src="assets_v8/gallery/g_elv.svg" alt="Blokada kolumny kierownicy ELV/ESCL – diagnostyka" loading="lazy">
+        </div>
+        <div class="gal-body">
+          <h3 class="gal-title">ELV/ESCL – typowe usterki i rozwiązania</h3>
+          <p class="gal-desc">Weryfikacja mechaniki/elektroniki modułu, testy komunikacji oraz rozwiązania serwisowe zależnie od platformy pojazdu.</p>
+          <a class="gal-open" href="#" data-open>Podgląd</a>
+        </div>
+      </article>
+
+      <article class="gal-card" data-cat="DIAG">
+        <div class="gal-thumb">
+          <span class="gal-badge">Diagnostyka</span>
+          <img src="assets_v8/gallery/g_diag.svg" alt="Diagnostyka komputerowa – odczyt błędów i parametrów" loading="lazy">
+        </div>
+        <div class="gal-body">
+          <h3 class="gal-title">Diagnostyka komputerowa</h3>
+          <p class="gal-desc">Odczyt kodów usterek, analiza parametrów bieżących, testy elementów wykonawczych — punkt startu do trafnej naprawy.</p>
+          <a class="gal-open" href="#" data-open>Podgląd</a>
+        </div>
+      </article>
+
+      <article class="gal-card" data-cat="PCB">
+        <div class="gal-thumb">
+          <span class="gal-badge">Elektronika / PCB</span>
+          <img src="assets_v8/gallery/g_pcb.svg" alt="Elektronika PCB – pomiary i prace serwisowe" loading="lazy">
+        </div>
+        <div class="gal-body">
+          <h3 class="gal-title">Elektronika / PCB</h3>
+          <p class="gal-desc">Pomiary, lokalizacja uszkodzeń, prace lutownicze i weryfikacja torów zasilania/sygnałowych w modułach samochodowych.</p>
+          <a class="gal-open" href="#" data-open>Podgląd</a>
+        </div>
+      </article>
+    </div>
+  </div>
+
+  <div class="gal-lightbox" id="galLightbox" aria-hidden="true">
+    <button class="gal-lightbox-close" type="button" aria-label="Zamknij" id="galClose">×</button>
+    <div class="gal-lightbox-inner" role="dialog" aria-modal="true" aria-label="Podgląd zdjęcia">
+      <div class="gal-lightbox-media"><img id="galImg" src="" alt=""></div>
+      <div class="gal-lightbox-meta">
+        <h3 id="galTitle"></h3>
+        <p id="galDesc"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
     <div class="faq-wrap">
       <h2>Pytania i odpowiedzi – ECU, IMMO, ELV</h2>
       <p class="lead">Krótko i konkretnie – jeśli napiszesz model auta i objawy, od razu podpowiem możliwe przyczyny i dalsze kroki diagnostyczne.</p>
@@ -1137,5 +1365,58 @@ async function hitPhone(){
 })();
 
 </script>
+
+<script>
+(function(){
+  const buttons = Array.from(document.querySelectorAll('.gal-filter-btn'));
+  const cards = Array.from(document.querySelectorAll('.gal-card'));
+  const lb = document.getElementById('galLightbox');
+  const closeBtn = document.getElementById('galClose');
+  const imgEl = document.getElementById('galImg');
+  const titleEl = document.getElementById('galTitle');
+  const descEl = document.getElementById('galDesc');
+
+  function setFilter(filter){
+    buttons.forEach(b => b.classList.toggle('active', b.dataset.filter === filter));
+    cards.forEach(c => {
+      const ok = filter === 'all' || c.dataset.cat === filter;
+      c.style.display = ok ? '' : 'none';
+    });
+  }
+  buttons.forEach(b => b.addEventListener('click', () => setFilter(b.dataset.filter)));
+
+  function openLightbox(card){
+    const img = card.querySelector('img');
+    const title = card.querySelector('.gal-title')?.textContent || '';
+    const desc = card.querySelector('.gal-desc')?.textContent || '';
+    imgEl.src = img.currentSrc || img.src;
+    imgEl.alt = img.alt || title;
+    titleEl.textContent = title;
+    descEl.textContent = desc;
+    lb.classList.add('open');
+    lb.setAttribute('aria-hidden','false');
+    document.body.style.overflow='hidden';
+  }
+  function closeLightbox(){
+    lb.classList.remove('open');
+    lb.setAttribute('aria-hidden','true');
+    imgEl.src = '';
+    document.body.style.overflow='';
+  }
+
+  document.addEventListener('click', (e) => {
+    const open = e.target.closest('[data-open]');
+    if(open){
+      e.preventDefault();
+      const card = open.closest('.gal-card');
+      if(card) openLightbox(card);
+    }
+    if(e.target === lb) closeLightbox();
+  });
+  closeBtn?.addEventListener('click', closeLightbox);
+  document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape' && lb.classList.contains('open')) closeLightbox(); });
+})();
+</script>
+
 </body>
 </html>

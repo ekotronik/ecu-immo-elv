@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+<defs>
+<linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+<stop offset="0" stop-color="#061225"/><stop offset="1" stop-color="#0b2b4a"/>
+</linearGradient>
+</defs>
+<rect width="1200" height="800" fill="url(#bg)"/>
+<circle cx="600" cy="360" r="260" fill="#2aa7ff" opacity="0.18"/>
+<g fill="none" stroke="#2aa7ff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+<path d="M320 520c120-220 440-220 560 0" opacity="0.55"/>
+</g>
+<g>
+<rect x="320" y="300" width="320" height="220" rx="30" fill="#0a2240" stroke="#2aa7ff" stroke-width="8"/>
+<text x="480" y="425" font-size="70" text-anchor="middle" fill="#eaf6ff" font-family="Arial, Helvetica, sans-serif">IMMO</text>
+</g>
+<g>
+<path d="M740 350c0-70 110-70 110 0v60h-110z" fill="#ffbf2a"/>
+<rect x="720" y="410" width="150" height="150" rx="26" fill="#0a2240" stroke="#2aa7ff" stroke-width="8"/>
+<circle cx="795" cy="480" r="22" fill="#ffbf2a"/>
+<path d="M795 480v50" stroke="#ffbf2a" stroke-width="12" stroke-linecap="round"/>
+</g>
+<g stroke="#2aa7ff" stroke-width="8">
+<line x1="320" y1="330" x2="260" y2="330"/><line x1="320" y1="370" x2="245" y2="370"/><line x1="320" y1="410" x2="260" y2="410"/>
+</g>
+</svg>

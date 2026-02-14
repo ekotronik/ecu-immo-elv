@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+<defs>
+<linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+<stop offset="0" stop-color="#061225"/><stop offset="1" stop-color="#0b2b4a"/>
+</linearGradient>
+</defs>
+<rect width="1200" height="800" fill="url(#bg)"/>
+<circle cx="630" cy="360" r="280" fill="#2aa7ff" opacity="0.16"/>
+<g>
+<circle cx="520" cy="460" r="170" fill="#0a2240" stroke="#2aa7ff" stroke-width="10"/>
+<circle cx="520" cy="460" r="34" fill="#2aa7ff"/>
+<path d="M520 460 L660 420" stroke="#2aa7ff" stroke-width="14" stroke-linecap="round"/>
+<path d="M520 460 L380 520" stroke="#2aa7ff" stroke-width="14" stroke-linecap="round"/>
+</g>
+<g>
+<rect x="710" y="360" width="220" height="160" rx="28" fill="#0a2240" stroke="#2aa7ff" stroke-width="8"/>
+<text x="820" y="455" font-size="70" text-anchor="middle" fill="#eaf6ff" font-family="Arial, Helvetica, sans-serif">ELV</text>
+</g>
+<g>
+<path d="M420 610h200" stroke="#ff7a1a" stroke-width="14" stroke-linecap="round" opacity="0.9"/>
+<path d="M420 640h200" stroke="#ff7a1a" stroke-width="14" stroke-linecap="round" opacity="0.55"/>
+</g>
+</svg>

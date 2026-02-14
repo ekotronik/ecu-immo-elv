@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+<defs>
+<linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+<stop offset="0" stop-color="#061225"/><stop offset="1" stop-color="#0b2b4a"/>
+</linearGradient>
+</defs>
+<rect width="1200" height="800" fill="url(#bg)"/>
+<circle cx="600" cy="360" r="280" fill="#2aa7ff" opacity="0.14"/>
+<g>
+<rect x="360" y="230" width="480" height="300" rx="40" fill="#0a2240" stroke="#2aa7ff" stroke-width="10"/>
+<rect x="410" y="280" width="380" height="140" rx="24" fill="#071e33" stroke="#2aa7ff" stroke-width="8"/>
+<path d="M450 350h120" stroke="#2aa7ff" stroke-width="12" stroke-linecap="round"/>
+<path d="M450 390h220" stroke="#2aa7ff" stroke-width="12" stroke-linecap="round" opacity="0.7"/>
+<circle cx="760" cy="460" r="18" fill="#ffbf2a"/>
+</g>
+<g stroke="#2aa7ff" stroke-width="12" stroke-linecap="round">
+<path d="M560 530v90"/>
+<path d="M640 530v90"/>
+<path d="M520 620h160"/>
+</g>
+<text x="600" y="200" font-size="56" text-anchor="middle" fill="#eaf6ff" font-family="Arial, Helvetica, sans-serif" opacity="0.9">DIAGNOSTYKA</text>
+</svg>

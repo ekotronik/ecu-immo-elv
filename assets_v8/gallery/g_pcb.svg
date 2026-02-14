@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+<defs>
+<linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+<stop offset="0" stop-color="#061225"/><stop offset="1" stop-color="#0b2b4a"/>
+</linearGradient>
+</defs>
+<rect width="1200" height="800" fill="url(#bg)"/>
+<rect x="220" y="170" width="760" height="460" rx="36" fill="#071e33" stroke="#2aa7ff" stroke-width="10"/>
+<g stroke="#2aa7ff" stroke-width="8" opacity="0.9">
+<path d="M300 260h220"/><path d="M300 320h180"/><path d="M300 380h260"/><path d="M300 440h200"/><path d="M300 500h240"/>
+<path d="M700 260h220"/><path d="M720 320h200"/><path d="M690 380h250"/><path d="M720 440h190"/><path d="M700 500h230"/>
+</g>
+<g>
+<rect x="520" y="290" width="170" height="210" rx="26" fill="#0a2240" stroke="#2aa7ff" stroke-width="10"/>
+<text x="605" y="410" font-size="72" text-anchor="middle" fill="#eaf6ff" font-family="Arial, Helvetica, sans-serif">PCB</text>
+</g>
+<g fill="#2aa7ff" opacity="0.9">
+<circle cx="420" cy="560" r="12"/><circle cx="460" cy="560" r="12"/><circle cx="500" cy="560" r="12"/><circle cx="540" cy="560" r="12"/>
+</g>
+</svg>

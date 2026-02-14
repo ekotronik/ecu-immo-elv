@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+<defs>
+<linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+<stop offset="0" stop-color="#061225"/><stop offset="1" stop-color="#0b2b4a"/>
+</linearGradient>
+<linearGradient id="glow" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0" stop-color="#2aa7ff" stop-opacity="0.9"/><stop offset="1" stop-color="#2aa7ff" stop-opacity="0"/>
+</linearGradient>
+</defs>
+<rect width="1200" height="800" fill="url(#bg)"/>
+<circle cx="640" cy="370" r="260" fill="url(#glow)"/>
+<g fill="none" stroke="#2aa7ff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" opacity="0.95">
+<path d="M320 470c60-140 160-210 320-210s260 70 320 210"/>
+<path d="M430 470c40-90 110-135 210-135s170 45 210 135"/>
+<path d="M470 470h340"/>
+<path d="M560 320h160"/>
+</g>
+<g>
+<rect x="210" y="360" width="240" height="200" rx="24" fill="#0a2240" stroke="#2aa7ff" stroke-width="8"/>
+<text x="330" y="455" font-size="64" text-anchor="middle" fill="#eaf6ff" font-family="Arial, Helvetica, sans-serif">ECU</text>
+<g stroke="#2aa7ff" stroke-width="8">
+<line x1="210" y1="400" x2="160" y2="400"/><line x1="210" y1="440" x2="150" y2="440"/><line x1="210" y1="480" x2="160" y2="480"/><line x1="210" y1="520" x2="150" y2="520"/>
+</g>
+</g>
+<g>
+<rect x="470" y="360" width="120" height="200" rx="28" fill="#0a2240" stroke="#2aa7ff" stroke-width="8"/>
+<circle cx="530" cy="410" r="18" fill="#2aa7ff"/><circle cx="530" cy="460" r="18" fill="#2aa7ff"/><circle cx="530" cy="510" r="18" fill="#2aa7ff"/>
+</g>
+<g>
+<rect x="600" y="420" width="170" height="130" rx="28" fill="#0a2240" stroke="#2aa7ff" stroke-width="8"/>
+<path d="M645 470h80" stroke="#eaf6ff" stroke-width="10" stroke-linecap="round"/>
+<rect x="660" y="455" width="60" height="70" rx="10" fill="#ffbf2a"/>
+<path d="M690 455v-22c0-16 24-16 24 0v22" fill="none" stroke="#ffbf2a" stroke-width="12" stroke-linecap="round"/>
+</g>
+</svg>
