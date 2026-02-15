@@ -782,11 +782,124 @@
   opacity:.9;
 }
 
+/* ===== TOPBAR (wariant 1) ===== */
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:1000;
+  border-bottom:1px solid rgba(255,255,255,.10);
+  background: linear-gradient(180deg, rgba(11,13,18,.92), rgba(11,13,18,.72));
+  backdrop-filter: blur(10px);
+}
+.topbar-inner{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding:10px 18px;
+}
+.topbar-brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-width: 220px;
+}
+.topbar-logo{
+  width:44px;
+  height:auto;
+  display:block;
+  filter: drop-shadow(0 10px 18px rgba(0,0,0,.45));
+}
+.topbar-text{display:flex;flex-direction:column;gap:1px}
+.topbar-title{
+  font-weight:900;
+  letter-spacing:.08em;
+  font-size:12px;
+  color:rgba(255,255,255,.90);
+}
+.topbar-sub{
+  font-size:12px;
+  color:rgba(255,255,255,.70);
+}
+.topbar-nav{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  flex-wrap:wrap;
+}
+.topbar-nav a{
+  font-size:13px;
+  font-weight:800;
+  color:rgba(233,236,242,.85);
+  padding:8px 10px;
+  border-radius:999px;
+  border:1px solid transparent;
+}
+.topbar-nav a:hover{
+  background:rgba(255,255,255,.04);
+  border-color:rgba(255,255,255,.14);
+}
+.topbar-actions{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+.topbar-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 12px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.04);
+  font-size:13px;
+  font-weight:900;
+  color:rgba(255,255,255,.92);
+  white-space:nowrap;
+}
+.topbar-chip span{opacity:.92}
+.topbar-chip:hover{
+  background:rgba(255,255,255,.06);
+  border-color:rgba(255,255,255,.20);
+}
+@media (max-width: 980px){
+  .topbar-inner{flex-direction:column;align-items:flex-start}
+  .topbar-nav{gap:10px}
+  .topbar-actions{width:100%;justify-content:flex-start}
+}
+
 </style>
 </head>
 <body class="ignition">
 
 <main id="top">
+  <!-- ===== TOP HEADER (wariant 1) ===== -->
+  <header class="topbar" role="banner">
+    <div class="wrap topbar-inner">
+      <a class="topbar-brand" href="#top" aria-label="Start">
+        <img class="topbar-logo" src="assets_v8/logo/logo_main.png" alt="Logo ECU IMMO ELV" />
+        <div class="topbar-text">
+          <div class="topbar-title">ECU • IMMO • ELV</div>
+          <div class="topbar-sub">Elektronika samochodowa • Trójmiasto</div>
+        </div>
+      </a>
+
+      <nav class="topbar-nav" aria-label="Nawigacja">
+        <a href="#oferta">Oferta</a>
+        <a href="#galeria">Diagnostyka</a>
+        <a href="#faq">FAQ</a>
+        <a href="#kontakt">Kontakt</a>
+      </nav>
+
+      <div class="topbar-actions">
+        <a class="topbar-chip" href="tel:+48504949149" aria-label="Zadzwoń">📞 <span>+48 504 949 149</span></a>
+        <a class="topbar-chip" href="mailto:ekotronik2@wp.pl" aria-label="Napisz e-mail">✉️ <span>ekotronik2@wp.pl</span></a>
+      </div>
+    </div>
+  </header>
+
   <div class="wrap hero">
     <div class="hero-card reveal" id="heroCard">
       <div class="hero-bg" id="heroBg"></div>
@@ -923,10 +1036,6 @@
     <div class="section-title">
       <h2>Diagnostyka i przypadki usterek</h2>
     </div>
-    <p class="section-sub">
-      Przykładowe tematy i obszary pracy — docelowo ta sekcja będzie uzupełniana o Twoje zdjęcia z napraw i krótkie opisy.
-      Na start dodałem spójne grafiki w stylistyce strony, abyś mógł ocenić układ i czytelność.
-    </p>
 
     <div class="gal-filters" aria-label="Filtry galerii">
       <button class="gal-filter-btn active" data-filter="all">Wszystko</button>
