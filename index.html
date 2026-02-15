@@ -244,9 +244,7 @@
     /* (usunęliśmy wariant slow – wszystko miga równo) */
     @keyframes blink{
       0%, 70%, 100%{ opacity: .95; }
-      72%, 74%, 76%{ opacity: .18; }
-      78%{ opacity: .95; }
-    }
+      
       72%, 74%, 76%{ opacity: .18; }
       78%{ opacity: .95; }
     }
@@ -267,7 +265,7 @@
     .eps-stack.ry.shift .eps-yellow{ animation: epsShiftRY 2.4s ease-in-out infinite; }
     .eps-stack.ry.shift .eps-red{ animation: epsShiftRYInv 2.4s ease-in-out infinite; }
     @keyframes epsShiftRY{ 0%,45%{opacity:0} 55%,100%{opacity:1} }
-    @keyframes epsShiftRYInv{ 0%,45%{opacity:1} 55%,100%{opacity:0} } 55%,100%{opacity:0} }
+    @keyframes epsShiftRYInv{ 0%,45%{opacity:1} 55%,100%{opacity:0} }
 
     /* Stat card */
     .info-card{
@@ -466,7 +464,7 @@
 /* ===== Powiększone ikony kontrolek (Zakres + Oferta) ===== */
 .offer-ul li::before{ display:none; }
 .offer-ul li{
-  /* padding-left */:56px;
+  padding-left:56px;
 }
 
 .zakres-icons img,
@@ -1257,7 +1255,6 @@
       <li><a href="https://en.wikipedia.org/wiki/Steering_lock" target="_blank" rel="noopener noreferrer">Steering lock (ELV/ESCL) – opis</a></li>
     </ul>
   </div>
-</section>
 
 </footer>
 </main>
@@ -1276,20 +1273,29 @@
     window.__toastTimer = setTimeout(() => el.classList.remove("show"), 2400);
   };
 
-  document.getElementById("year").textContent = new Date().getFullYear();
-  document.getElementById("contactText").innerHTML = `<img src="assets_v8/phone_icon.png" alt="" style="width:16px;vertical-align:middle;margin-right:6px;"> <a href="tel:+48504949149">+48 504 949 149</a><br/>e-mail: ${EMAIL}`;
+  const yearEl = document.getElementById("year");
+  if (yearEl) yearEl.textContent = new Date().getFullYear();
+  const contactTextEl = document.getElementById("contactText");
+  if (contactTextEl) contactTextEl.innerHTML = `<img src="assets_v8/phone_icon.png" alt="" style="width:16px;vertical-align:middle;margin-right:6px;"> <a href="tel:+48504949149">+48 504 949 149</a><br/>e-mail: ${EMAIL}`;
 
-  document.getElementById("callBtn").addEventListener("click", async () => {
-    try { await navigator.clipboard.writeText(PHONE); toast("Skopiowano numer: " + PHONE); }
-    catch(e){ toast("Nie udało się skopiować. Numer: " + PHONE); }
-  });
+    const callBtnEl = document.getElementById("callBtn");
+  if (callBtnEl){
+    callBtnEl.addEventListener("click", async () => {
+      try { await navigator.clipboard.writeText(PHONE); toast("Skopiowano numer: " + PHONE); }
+      catch(e){ toast("Nie udało się skopiować. Numer: " + PHONE); }
+      try { await hitPhone(); } catch(_){}
+    });
+  }
 
-  document.getElementById("mailBtn").addEventListener("click", async () => {
-    try { await navigator.clipboard.writeText(EMAIL); toast("Skopiowano e-mail: " + EMAIL); }
-    catch(e){ toast("Nie udało się skopiować. E-mail: " + EMAIL); }
-  });
+  const mailBtnEl = document.getElementById("mailBtn");
+  if (mailBtnEl){
+    mailBtnEl.addEventListener("click", async () => {
+      try { await navigator.clipboard.writeText(EMAIL); toast("Skopiowano e-mail: " + EMAIL); }
+      catch(e){ toast("Nie udało się skopiować. E-mail: " + EMAIL); }
+    });
+  }
 
-  // ===== Formularz kontaktowy: Formspree (bez backendu) =====
+// ===== Formularz kontaktowy: Formspree (bez backendu) =====
 // 1) Załóż formularz na Formspree i wklej swój adres do atrybutu action w <form>.
 //    Ma wyglądać tak: https://formspree.io/f/XXXXYYYY
 // 2) Ten kod wysyła AJAX-em i pokazuje komunikat "Wiadomość wysłana ✅" bez przeładowania strony.
@@ -1466,11 +1472,6 @@ async function hitPhone(){
   document.querySelectorAll('a[href^="tel:"]').forEach(a=>{
     a.addEventListener("click", hitPhone);
   });
-
-  const callBtn = document.getElementById("callBtn");
-  if (callBtn){
-    callBtn.addEventListener("click", hitPhone);
-  }
 })();
 
 </script>
