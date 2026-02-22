@@ -2,8 +2,8 @@
 // UZUPEŁNIJ DANYMI Z SUPABASE (Project URL + anon public key)
 // oraz Cloudinary (Cloud name + upload preset)
 window.EKO_CONFIG = {
-  SUPABASE_URL: "https://YOUR-PROJECT-REF.supabase.co",
-  SUPABASE_ANON_KEY: "YOUR_SUPABASE_ANON_PUBLIC_KEY",
+  SUPABASE_URL: https://zcjqjlubarucrjmulekg.supabase.co
+  SUPABASE_ANON_KEY:sb_publishable_0Q3X9ggMMA2WP-X2Zbg9jg_aDEcswea
 
   // używane tylko przez /admin.html do uploadu zdjęć
   CLOUDINARY_CLOUD_NAME: "YOUR_CLOUD_NAME",
