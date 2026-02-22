@@ -1,15 +1,3 @@
-# 🚗 EKOTRONIK — ECU • IMMO • ELV
-
-👉 Strona projektu:
-https://ekotronik.github.io/ecu-immo-elv/
-
-Diagnostyka elektroniki samochodowej:
-- ECU (sterowniki silnika)
-- IMMO (immobiliser)
-- ELV / ESCL (blokada kolumny kierownicy)
-- diagnostyka usterek pojazdów
-
-# ECU • IMMO • ELV
 # ECU • IMMO • ELV
 
 ## Opis
@@ -48,3 +36,42 @@ Projekt w fazie pilotażowej.
 
 ---
 Repozytorium ma charakter informacyjny i dokumentacyjny.
+
+## Szybkie dodawanie zdjęć do galerii (bez edycji HTML)
+
+1. Wrzucaj zdjęcia do folderów (wg kategorii):
+   - `assets_v8/galeria_auto/ECU/`
+   - `assets_v8/galeria_auto/IMMO/`
+   - `assets_v8/galeria_auto/ELV/`
+   - `assets_v8/galeria_auto/DIAG/`
+   - `assets_v8/galeria_auto/PCB/`
+
+2. Po każdym pushu do gałęzi `main` GitHub Actions automatycznie:
+   - przeskanuje powyższe foldery
+   - zaktualizuje `gallery.json`
+   - zrobi commit `Auto-update gallery.json`
+
+3. Na stronie kliknij „Podgląd” w danej kategorii, a lightbox pokaże zdjęcia z tej kategorii.
+
+Uwaga: Nazwy plików sortowane są alfabetycznie. Obsługiwane rozszerzenia: jpg/jpeg/png/webp/gif.
+## Turbo dodawanie zdjęć (bez folderów kategorii)
+
+1) Wrzucasz zdjęcia do jednego folderu:
+   `assets_v8/galeria_auto/`
+
+2) Nazwij pliki prefiksem kategorii (wielkość liter bez znaczenia):
+- `ECU_...jpg`  (albo `ECU-...jpg`)
+- `IMMO_...jpg`
+- `ELV_...jpg`
+- `DIAG_...jpg`
+- `PCB_...jpg`
+
+Przykłady:
+- `ECU_bmw_e60_dde.jpg`
+- `immo-ford_focus_key.webp`
+- `PCB mercedes ecu board.png`
+
+3) Commitujesz (lub uploadujesz przez GitHub z telefonu).
+GitHub Actions automatycznie zaktualizuje `gallery.json`.
+
+> Kompatybilność: jeśli nadal trzymasz podfoldery `assets_v8/galeria_auto/ECU/` itp., to też działa.

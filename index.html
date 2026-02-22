@@ -869,6 +869,254 @@
   .topbar-actions{width:100%;justify-content:flex-start}
 }
 
+
+/* Lightbox navigation */
+.gal-lightbox-media{ position:relative; }
+.gal-nav{
+  position:absolute; top:50%; transform:translateY(-50%);
+  width:44px; height:44px; border-radius:999px;
+  border:1px solid rgba(255,255,255,.18);
+  background: rgba(0,0,0,.35);
+  color:#fff; font-size:28px; line-height:1;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer;
+}
+.gal-nav.prev{ left:10px; }
+.gal-nav.next{ right:10px; }
+.gal-nav[disabled]{ opacity:.35; cursor:default; }
+.gal-counter{
+  position:absolute; left:50%; transform:translateX(-50%);
+  bottom:10px;
+  padding:6px 10px; border-radius:999px;
+  border:1px solid rgba(255,255,255,.16);
+  background: rgba(0,0,0,.35);
+  color:#fff; font-size:12px;
+}
+
+
+/* ===== EKOTRONIK Premium SVG Logo ===== */
+.eko-logo-wrap{ margin-top:12px; max-width:720px; }
+#ekoLogoPremium{ width:100%; height:auto; border-radius:18px; background:rgba(0,0,0,.22); box-shadow:0 0 0 1px rgba(255,255,255,.06) inset, 0 18px 48px rgba(0,0,0,.35); overflow:hidden; }
+#ekoLogoPremium .eko-title{
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-weight: 900;
+  letter-spacing: .18em;
+  font-size: 58px;
+  fill:#00eaff;
+  opacity: 0;
+  transform: translateY(10px);
+}
+#ekoLogoPremium .eko-sub{
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-weight: 800;
+  letter-spacing: .22em;
+  font-size: 18px;
+  fill:#ff6a00;
+  opacity: 0;
+  transform: translateY(8px);
+}
+#ekoLogoPremium .eko-tag{
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-weight: 600;
+  letter-spacing: .06em;
+  font-size: 13px;
+  fill: rgba(255,255,255,.78);
+  opacity: 0;
+  transform: translateY(8px);
+}
+#ekoLogoPremium .eko-trace{
+  stroke:#00eaff;
+  stroke-width:2.2;
+  fill:none;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  opacity:.92;
+}
+#ekoLogoPremium .eko-node{
+  fill:#00eaff;
+  opacity:.82;
+}
+#ekoLogoPremium .eko-ind text{
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: .12em;
+  fill: rgba(255,255,255,.82);
+}
+#ekoLogoPremium .eko-ind circle{
+  fill:#ff6a00;
+  opacity:.85;
+  filter: drop-shadow(0 0 8px rgba(255,106,0,.55));
+}
+#ekoLogoPremium.is-ready .eko-title{ animation: ekoFadeIn .9s ease forwards .25s; }
+#ekoLogoPremium.is-ready .eko-sub{ animation: ekoFadeIn .9s ease forwards .45s; }
+#ekoLogoPremium.is-ready .eko-tag{ animation: ekoFadeIn .9s ease forwards .6s; }
+#ekoLogoPremium.is-ready #ekoIndicators .eko-ind:nth-child(1) circle{ animation: ekoBlink 1.8s infinite .0s; }
+#ekoLogoPremium.is-ready #ekoIndicators .eko-ind:nth-child(2) circle{ animation: ekoBlink 1.8s infinite .25s; }
+#ekoLogoPremium.is-ready #ekoIndicators .eko-ind:nth-child(3) circle{ animation: ekoBlink 1.8s infinite .5s; }
+#ekoLogoPremium.is-ready #ekoIndicators .eko-ind:nth-child(4) circle{ animation: ekoBlink 1.8s infinite .75s; }
+
+#ekoLogoPremium:hover{ transform: translateY(-1px); transition: transform .25s ease; }
+#ekoLogoPremium.glitch .eko-title,
+#ekoLogoPremium.glitch .eko-sub{
+  animation: ekoGlitch .35s linear 1;
+}
+@keyframes ekoFadeIn{
+  to{ opacity:1; transform: translateY(0); filter: drop-shadow(0 0 16px rgba(0,234,255,.42)); }
+}
+@keyframes ekoBlink{
+  0%, 75% { opacity: .35; }
+  80%, 100% { opacity: .95; }
+}
+@keyframes ekoGlitch{
+  0%{ transform: translateY(0) translateX(0); filter: drop-shadow(0 0 18px rgba(0,234,255,.4)); }
+  20%{ transform: translateY(-1px) translateX(2px); }
+  40%{ transform: translateY(1px) translateX(-2px); }
+  60%{ transform: translateY(-1px) translateX(1px); }
+  80%{ transform: translateY(1px) translateX(-1px); }
+  100%{ transform: translateY(0) translateX(0); }
+}
+@media (max-width: 680px){
+  #ekoLogoPremium .eko-title{ font-size: 44px; }
+  #ekoLogoPremium{ border-radius: 14px; }
+}
+/* ===== end EKOTRONIK Premium SVG Logo ===== */
+
+
+/* ===== ECU BOOT SCREEN (EKOTRONIK) ===== */
+#bootScreen{
+  position:fixed;
+  inset:0;
+  z-index:99999;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding: 24px;
+  background:
+    radial-gradient(900px 500px at 50% 10%, rgba(0,234,255,.12), transparent 60%),
+    radial-gradient(900px 500px at 80% 20%, rgba(255,138,29,.12), transparent 55%),
+    #05070c;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity .55s ease, visibility .55s ease;
+}
+#bootScreen.boot-done{
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+}
+.bootCard{
+  width: min(980px, 100%);
+  border-radius: 26px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+  box-shadow: 0 24px 80px rgba(0,0,0,.55);
+  padding: 22px 18px 18px;
+  backdrop-filter: blur(10px);
+  overflow:hidden;
+  position:relative;
+}
+.bootTop{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+  padding: 6px 8px 14px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  margin-bottom: 16px;
+}
+.bootBadge{
+  font-size: 12px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.82);
+  background: rgba(0,234,255,.10);
+  border: 1px solid rgba(0,234,255,.25);
+  padding: 8px 10px;
+  border-radius: 999px;
+  user-select:none;
+  white-space:nowrap;
+}
+.bootHint{
+  color: rgba(167,179,199,.95);
+  font-size: 12.5px;
+  line-height: 1.35;
+  text-align:right;
+}
+.bootHint b{color:#fff}
+.bootMain{
+  display:grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  padding: 4px 10px 12px;
+}
+.bootRow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 12px;
+  color: rgba(255,255,255,.82);
+  font-size: 13px;
+  letter-spacing: .04em;
+}
+.progressWrap{
+  width:100%;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.10);
+  overflow:hidden;
+  position:relative;
+}
+.progressBar{
+  height:100%;
+  width: 0%;
+  background: linear-gradient(90deg, rgba(0,234,255,.95), rgba(0,234,255,.55), rgba(255,138,29,.90));
+  border-radius: 999px;
+  box-shadow: 0 0 18px rgba(0,234,255,.35);
+  transition: width .25s ease;
+}
+.bootLog{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 12px;
+  line-height: 1.55;
+  color: rgba(233,238,248,.84);
+  background: rgba(0,0,0,.25);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 16px;
+  padding: 12px 12px;
+  max-height: 190px;
+  overflow:auto;
+}
+.bootActions{
+  display:flex;
+  justify-content:flex-end;
+  padding: 0 10px 10px;
+}
+.skipBtn{
+  appearance:none;
+  border:none;
+  border-radius: 999px;
+  padding: 10px 14px;
+  color: rgba(255,255,255,.9);
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.10);
+  cursor:pointer;
+  font-weight: 650;
+  letter-spacing: .04em;
+}
+.skipBtn:hover{ background: rgba(255,255,255,.09); }
+#bootLogo{
+  width: min(860px, 100%);
+  height: auto;
+  display:block;
+  margin: 0 auto;
+  user-select:none;
+  pointer-events:none;
+}
+#bootScreen .ok{color: rgba(0,234,255,.9)}
+#bootScreen .dim{color: rgba(167,179,199,.95)}
+
 </style>
 
   <script type="application/ld+json">
@@ -901,6 +1149,132 @@
   </script>
 </head>
 <body class="ignition">
+
+
+
+<!-- ===== ECU BOOT SCREEN (EKOTRONIK) — pokazuje się przy KAŻDYM wejściu ===== -->
+<div id="bootScreen" aria-live="polite" aria-label="Ekran startowy EKOTRONIK">
+  <div class="bootCard">
+    <div class="bootTop">
+      <div class="bootBadge">ECU BOOT • EKOTRONIK</div>
+      <div class="bootHint">
+        Intro 2–3 s → potem przejście do strony (fade-out).<br>
+        <span class="dim">Kliknij</span> <b>Pomiń</b> <span class="dim">jeśli chcesz od razu wejść.</span>
+      </div>
+    </div>
+
+    <svg id="bootLogo" viewBox="0 0 1200 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Logo EKOTRONIK – ECU Boot">
+      <defs>
+        <filter id="bootGlowCyan" x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur stdDeviation="6" result="blur"/>
+          <feColorMatrix in="blur" type="matrix"
+            values="1 0 0 0 0
+                    0 1 0 0 0
+                    0 0 1 0 0
+                    0 0 0 0.85 0" result="glow"/>
+          <feMerge>
+            <feMergeNode in="glow"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+
+        <linearGradient id="bootScanGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="rgba(0,234,255,0)"/>
+          <stop offset="0.46" stop-color="rgba(0,234,255,0.85)"/>
+          <stop offset="0.54" stop-color="rgba(0,234,255,0.85)"/>
+          <stop offset="1" stop-color="rgba(0,234,255,0)"/>
+        </linearGradient>
+
+        <style>
+          .bootPcbLine{
+            stroke: #00eaff;
+            stroke-width: 4;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            filter: url(#bootGlowCyan);
+            opacity: .95;
+            stroke-dasharray: var(--len, 1000);
+            stroke-dashoffset: var(--len, 1000);
+          }
+          .bootNode{
+            fill: #00eaff;
+            filter: url(#bootGlowCyan);
+            opacity: .95;
+          }
+          .bootNodeRing{
+            fill: none;
+            stroke: rgba(0,234,255,.5);
+            stroke-width: 2;
+            opacity: .7;
+          }
+          .bootTitle{
+            font: 800 92px/1 Arial, sans-serif;
+            letter-spacing: 18px;
+            fill: #00eaff;
+            filter: url(#bootGlowCyan);
+            opacity: 0;
+            transform-origin: 50% 50%;
+          }
+          .bootSubtitle{
+            font: 700 26px/1.2 Arial, sans-serif;
+            letter-spacing: 8px;
+            fill: #ff8a1d;
+            opacity: 0;
+          }
+          .bootScanBar{
+            fill: url(#bootScanGrad);
+            opacity: 0;
+          }
+          .bootFrame{
+            fill: rgba(255,255,255,.03);
+            stroke: rgba(255,255,255,.08);
+            stroke-width: 2;
+          }
+        </style>
+      </defs>
+
+      <rect x="34" y="38" width="1132" height="284" rx="28" class="bootFrame"/>
+      <rect id="bootScanBar" x="-260" y="38" width="260" height="284" class="bootScanBar"/>
+
+      <g id="bootPcb">
+        <path class="bootPcbLine" d="M90 250 H260 V120 H460 V70 H690 V160 H910 V100 H1110"/>
+        <path class="bootPcbLine" d="M140 160 H310 V220 H520 V270 H760 V210 H980 V250"/>
+        <path class="bootPcbLine" d="M240 120 V190 H430 V140 H620 V240 H820 V160 H1030 V210"/>
+        <circle class="bootNode" cx="260" cy="120" r="8"/><circle class="bootNodeRing" cx="260" cy="120" r="16"/>
+        <circle class="bootNode" cx="460" cy="70" r="8"/><circle class="bootNodeRing" cx="460" cy="70" r="16"/>
+        <circle class="bootNode" cx="690" cy="160" r="8"/><circle class="bootNodeRing" cx="690" cy="160" r="16"/>
+        <circle class="bootNode" cx="910" cy="100" r="8"/><circle class="bootNodeRing" cx="910" cy="100" r="16"/>
+        <circle class="bootNode" cx="520" cy="270" r="8"/><circle class="bootNodeRing" cx="520" cy="270" r="16"/>
+        <circle class="bootNode" cx="980" cy="250" r="8"/><circle class="bootNodeRing" cx="980" cy="250" r="16"/>
+      </g>
+
+      <g id="bootTitles">
+        <text id="bootTitle" class="bootTitle" x="600" y="205" text-anchor="middle">EKOTRONIK</text>
+        <text id="bootSubtitle" class="bootSubtitle" x="600" y="252" text-anchor="middle">ECU • IMMO • ELV</text>
+      </g>
+    </svg>
+
+    <div class="bootMain">
+      <div class="bootRow">
+        <div class="dim">Initializing modules…</div>
+        <div id="bootPct" class="dim">0%</div>
+      </div>
+
+      <div class="progressWrap" aria-label="Postęp uruchamiania">
+        <div id="bootProgressBar" class="progressBar"></div>
+      </div>
+
+      <div id="bootLog" class="bootLog" aria-label="Log uruchomienia">
+        <div><span class="dim">[BOOT]</span> ECU power-on…</div>
+      </div>
+    </div>
+
+    <div class="bootActions">
+      <button id="bootSkip" class="skipBtn" type="button">Pomiń</button>
+    </div>
+  </div>
+</div>
 
 <main id="top">
   <!-- ===== TOP HEADER (wariant 1) ===== -->
@@ -937,7 +1311,87 @@
         <div class="hero-left">
           <div class="brand">
             <img class="brand-logo" src="assets_v8/logo/logo_main.png" alt="Logo" />
-            <div class="brand-text">
+            
+<!-- EKOTRONIK Premium SVG Logo (animated + scroll reactive) -->
+<div class="eko-logo-wrap" aria-label="EKOTRONIK — animowane logo">
+<svg id="ekoLogoPremium" viewBox="0 0 900 260" role="img" aria-label="EKOTRONIK ECU IMMO ELV — logo">
+  <defs>
+    <filter id="ekoGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feColorMatrix in="blur" type="matrix"
+        values="1 0 0 0 0
+                0 1 0 0 0
+                0 0 1 0 0
+                0 0 0 0.9 0" result="glow"/>
+      <feMerge>
+        <feMergeNode in="glow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <linearGradient id="ekoScanGrad" x1="0" x2="1">
+      <stop offset="0" stop-color="#00eaff" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#00eaff" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#00eaff" stop-opacity="0"/>
+    </linearGradient>
+
+    <pattern id="ekoGrid" width="26" height="26" patternUnits="userSpaceOnUse">
+      <path d="M26 0H0V26" fill="none" stroke="#1a2231" stroke-width="1"/>
+    </pattern>
+
+    <mask id="ekoScanMask">
+      <rect x="-40" y="0" width="980" height="260" fill="black"/>
+      <rect id="ekoScanBar" x="-240" y="0" width="220" height="260" fill="url(#ekoScanGrad)"/>
+    </mask>
+  </defs>
+
+  <!-- subtle grid background -->
+  <rect x="0" y="0" width="900" height="260" fill="url(#ekoGrid)" opacity="0.55"/>
+
+  <!-- PCB / traces -->
+  <g id="ekoPcb" filter="url(#ekoGlow)" opacity="0.95" mask="url(#ekoScanMask)">
+    <path class="eko-trace" d="M60 180 H240 V80 H410 V150 H560 V60 H820" />
+    <path class="eko-trace" d="M90 120 H210 V210 H360 V105 H515 V205 H760" />
+    <path class="eko-trace" d="M120 60 V150 H220 V110 H320 V190 H500" />
+    <path class="eko-trace" d="M520 190 H620 V130 H700 V170 H820" />
+    <circle class="eko-node" cx="240" cy="80" r="7"/>
+    <circle class="eko-node" cx="410" cy="150" r="7"/>
+    <circle class="eko-node" cx="560" cy="60" r="7"/>
+    <circle class="eko-node" cx="360" cy="210" r="7"/>
+    <circle class="eko-node" cx="760" cy="205" r="7"/>
+    <circle class="eko-node" cx="700" cy="170" r="7"/>
+  </g>
+
+  <!-- indicators -->
+  <g id="ekoIndicators" transform="translate(640 26)">
+    <g class="eko-ind">
+      <circle cx="0" cy="10" r="7"/>
+      <text x="18" y="15">ABS</text>
+    </g>
+    <g class="eko-ind" transform="translate(0 34)">
+      <circle cx="0" cy="10" r="7"/>
+      <text x="18" y="15">IMMO</text>
+    </g>
+    <g class="eko-ind" transform="translate(0 68)">
+      <circle cx="0" cy="10" r="7"/>
+      <text x="18" y="15">AIRBAG</text>
+    </g>
+    <g class="eko-ind" transform="translate(0 102)">
+      <circle cx="0" cy="10" r="7"/>
+      <text x="18" y="15">CHECK</text>
+    </g>
+  </g>
+
+  <!-- wordmark -->
+  <g id="ekoWordmark" transform="translate(0 0)">
+    <text x="450" y="120" text-anchor="middle" class="eko-title">EKOTRONIK</text>
+    <text x="450" y="158" text-anchor="middle" class="eko-sub">ECU • IMMO • ELV</text>
+    <text x="450" y="188" text-anchor="middle" class="eko-tag">Diagnostyka elektroniki samochodowej</text>
+  </g>
+</svg>
+</div>
+
+<div class="brand-text">
               <div class="brand-name">ECU • IMMO • ELV</div>
               <div class="brand-tag">Elektronika pojazdowa</div>
             </div>
@@ -1140,7 +1594,7 @@
   <div class="gal-lightbox" id="galLightbox" aria-hidden="true">
     <button class="gal-lightbox-close" type="button" aria-label="Zamknij" id="galClose">×</button>
     <div class="gal-lightbox-inner" role="dialog" aria-modal="true" aria-label="Podgląd zdjęcia">
-      <div class="gal-lightbox-media"><img id="galImg" src="" alt=""></div>
+      <div class="gal-lightbox-media"><button class="gal-nav prev" type="button" aria-label="Poprzednie zdjęcie" id="galPrev">‹</button><button class="gal-nav next" type="button" aria-label="Następne zdjęcie" id="galNext">›</button><div class="gal-counter" id="galCounter" aria-live="polite"></div><img id="galImg" src="" alt=""></div>
       <div class="gal-lightbox-meta">
         <h3 id="galTitle"></h3>
         <p id="galDesc"></p>
@@ -1506,43 +1960,149 @@ async function hitPhone(){
 
 </script>
 
-<script>
-(function(){
+<script>(function(){
   const buttons = Array.from(document.querySelectorAll('.gal-filter-btn'));
   const cards = Array.from(document.querySelectorAll('.gal-card'));
+
   const lb = document.getElementById('galLightbox');
   const closeBtn = document.getElementById('galClose');
   const imgEl = document.getElementById('galImg');
   const titleEl = document.getElementById('galTitle');
   const descEl = document.getElementById('galDesc');
 
+  const prevBtn = document.getElementById('galPrev');
+  const nextBtn = document.getElementById('galNext');
+  const counterEl = document.getElementById('galCounter');
+
+  // --- State for lightbox gallery
+  let galleryData = null;          // loaded from gallery.json
+  let currentList = [];            // array of items (string url or {src,title,desc})
+  let currentIndex = 0;
+  let currentCat = 'all';
+
+  function normalizeItem(item){
+    if(!item) return null;
+    if(typeof item === 'string') return { src: item, title: '', desc: '' };
+    if(typeof item === 'object') return {
+      src: item.src || item.url || '',
+      title: item.title || '',
+      desc: item.desc || item.description || ''
+    };
+    return null;
+  }
+
   function setFilter(filter){
+    currentCat = filter;
     buttons.forEach(b => b.classList.toggle('active', b.dataset.filter === filter));
     cards.forEach(c => {
       const ok = filter === 'all' || c.dataset.cat === filter;
       c.style.display = ok ? '' : 'none';
     });
   }
+
+  // Initial filter from URL: ?cat=ECU#galeria
+  try{
+    const params = new URLSearchParams(window.location.search);
+    const cat = (params.get('cat') || '').toUpperCase();
+    const allowed = ['ECU','IMMO','ELV','DIAG','PCB'];
+    if(allowed.includes(cat)) setFilter(cat); else setFilter('all');
+  }catch(e){
+    setFilter('all');
+  }
+
   buttons.forEach(b => b.addEventListener('click', () => setFilter(b.dataset.filter)));
 
-  function openLightbox(card){
-    const img = card.querySelector('img');
+  async function loadGalleryData(){
+    if(galleryData) return galleryData;
+    try{
+      const res = await fetch('gallery.json', { cache: 'no-store' });
+      if(!res.ok) throw new Error('gallery.json HTTP ' + res.status);
+      const data = await res.json();
+      // Ensure keys exist
+      galleryData = data && typeof data === 'object' ? data : {};
+    }catch(err){
+      // Fail silently – lightbox will fall back to card thumbnail
+      galleryData = {};
+    }
+    return galleryData;
+  }
+
+  function updateNavUI(){
+    const total = currentList.length;
+    const multiple = total > 1;
+
+    if(counterEl){
+      counterEl.textContent = total ? (String(currentIndex + 1) + ' / ' + String(total)) : '';
+      counterEl.style.display = total ? '' : 'none';
+    }
+
+    if(prevBtn) prevBtn.style.display = multiple ? '' : 'none';
+    if(nextBtn) nextBtn.style.display = multiple ? '' : 'none';
+
+    if(prevBtn) prevBtn.disabled = !multiple;
+    if(nextBtn) nextBtn.disabled = !multiple;
+  }
+
+  function showAt(index, fallbackTitle, fallbackDesc){
+    const total = currentList.length;
+    if(!total){
+      imgEl.src = '';
+      updateNavUI();
+      return;
+    }
+    currentIndex = (index + total) % total;
+
+    const item = normalizeItem(currentList[currentIndex]);
+    if(!item || !item.src){
+      imgEl.src = '';
+      updateNavUI();
+      return;
+    }
+
+    imgEl.src = item.src;
+    imgEl.alt = item.title || fallbackTitle || 'Zdjęcie';
+    titleEl.textContent = item.title || fallbackTitle || '';
+    descEl.textContent = item.desc || fallbackDesc || '';
+    updateNavUI();
+  }
+
+  async function openLightbox(card){
+    const thumbImg = card.querySelector('img');
     const title = card.querySelector('.gal-title')?.textContent || '';
     const desc = card.querySelector('.gal-desc')?.textContent || '';
-    imgEl.src = img.currentSrc || img.src;
-    imgEl.alt = img.alt || title;
-    titleEl.textContent = title;
-    descEl.textContent = desc;
+    const cat = (card.dataset.cat || '').toUpperCase();
+
+    const data = await loadGalleryData();
+    const list = Array.isArray(data?.[cat]) ? data[cat] : [];
+
+    // If there are images for this category -> open slideshow
+    if(list.length){
+      currentList = list;
+      showAt(0, title, desc);
+    }else{
+      // Fallback: open thumbnail SVG if no real images yet
+      currentList = [ (thumbImg?.currentSrc || thumbImg?.src || '') ];
+      showAt(0, title, desc);
+    }
+
     lb.classList.add('open');
     lb.setAttribute('aria-hidden','false');
     document.body.style.overflow='hidden';
   }
+
   function closeLightbox(){
     lb.classList.remove('open');
     lb.setAttribute('aria-hidden','true');
     imgEl.src = '';
+    titleEl.textContent = '';
+    descEl.textContent = '';
+    currentList = [];
+    currentIndex = 0;
     document.body.style.overflow='';
   }
+
+  function next(){ if(lb.classList.contains('open')) showAt(currentIndex + 1, titleEl.textContent, descEl.textContent); }
+  function prev(){ if(lb.classList.contains('open')) showAt(currentIndex - 1, titleEl.textContent, descEl.textContent); }
 
   document.addEventListener('click', (e) => {
     const open = e.target.closest('[data-open]');
@@ -1553,8 +2113,241 @@ async function hitPhone(){
     }
     if(e.target === lb) closeLightbox();
   });
+
   closeBtn?.addEventListener('click', closeLightbox);
-  document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape' && lb.classList.contains('open')) closeLightbox(); });
+  prevBtn?.addEventListener('click', (e)=>{ e.stopPropagation(); prev(); });
+  nextBtn?.addEventListener('click', (e)=>{ e.stopPropagation(); next(); });
+
+  document.addEventListener('keydown', (e)=>{
+    if(!lb.classList.contains('open')) return;
+    if(e.key === 'Escape') closeLightbox();
+    if(e.key === 'ArrowRight') next();
+    if(e.key === 'ArrowLeft') prev();
+  });
+})();
+</script>
+
+
+
+<script>
+(function(){
+  const svg = document.getElementById('ekoLogoPremium');
+  if(!svg) return;
+
+  const traces = Array.from(svg.querySelectorAll('.eko-trace'));
+  const scanBar = svg.querySelector('#ekoScanBar');
+
+  // Prepare stroke-dash for draw animation (we will control by progress)
+  const lengths = traces.map(p => {
+    const L = Math.ceil(p.getTotalLength());
+    p.style.strokeDasharray = String(L);
+    p.style.strokeDashoffset = String(L);
+    return L;
+  });
+
+  function setProgress(p){
+    const clamped = Math.max(0, Math.min(1, p));
+    traces.forEach((path, i) => {
+      path.style.strokeDashoffset = String(lengths[i] * (1 - clamped));
+    });
+  }
+
+  // Scan bar animation (CSS-free so it always works)
+  function runScan(){
+    if(!scanBar) return;
+    scanBar.animate(
+      [{ transform: 'translateX(0)' }, { transform: 'translateX(1140px)' }],
+      { duration: 1800, easing: 'linear', iterations: 1 }
+    );
+  }
+
+  // Scroll reactive progress (hero area)
+  const hero = document.getElementById('heroCard') || document.querySelector('.hero-card') || document.querySelector('.hero');
+  function calcProgress(){
+    if(!hero) return 1;
+    const r = hero.getBoundingClientRect();
+    const vh = window.innerHeight || 800;
+    // progress 0 when hero top is near bottom; 1 when hero center is above mid
+    const start = vh * 0.90;
+    const end = vh * 0.25;
+    const pos = r.top + r.height * 0.35;
+    const p = (start - pos) / (start - end);
+    return Math.max(0, Math.min(1, p));
+  }
+
+  // Use IntersectionObserver to start once visible
+  let started = false;
+  const io = new IntersectionObserver((entries)=>{
+    for(const e of entries){
+      if(e.isIntersecting && !started){
+        started = true;
+        svg.classList.add('is-ready');
+        runScan();
+        // smooth ramp to current progress
+        const target = calcProgress();
+        const t0 = performance.now();
+        const dur = 900;
+        (function step(t){
+          const k = Math.min(1, (t - t0)/dur);
+          setProgress(k * target);
+          if(k < 1) requestAnimationFrame(step);
+        })(t0);
+      }
+    }
+  }, { threshold: 0.25 });
+
+  io.observe(svg);
+
+  // Update on scroll (after started)
+  let raf = 0;
+  window.addEventListener('scroll', ()=>{
+    if(!started) return;
+    if(raf) return;
+    raf = requestAnimationFrame(()=>{
+      raf = 0;
+      setProgress(calcProgress());
+    });
+  }, { passive: true });
+
+  window.addEventListener('resize', ()=>{
+    if(!started) return;
+    setProgress(calcProgress());
+  });
+
+  // Glitch on hover/tap
+  function glitchOnce(){
+    svg.classList.add('glitch');
+    setTimeout(()=>svg.classList.remove('glitch'), 380);
+  }
+  svg.addEventListener('mouseenter', glitchOnce);
+  svg.addEventListener('click', glitchOnce);
+
+  // Keyboard: G to glitch (nice for presentations)
+  window.addEventListener('keydown', (ev)=>{
+    if(ev.key && ev.key.toLowerCase() === 'g') glitchOnce();
+  });
+
+})();
+</script>
+
+
+<script>
+/* ===== ECU BOOT SCREEN (EKOTRONIK) — uruchamia się PRZY KAŻDYM wejściu ===== */
+(function(){
+  const boot = document.getElementById('bootScreen');
+  if(!boot) return;
+
+  const skipBtn = document.getElementById('bootSkip');
+  const logEl = document.getElementById('bootLog');
+  const pctEl = document.getElementById('bootPct');
+  const barEl = document.getElementById('bootProgressBar');
+
+  const scanBar = document.getElementById('bootScanBar');
+  const title = document.getElementById('bootTitle');
+  const subtitle = document.getElementById('bootSubtitle');
+  const paths = Array.from(document.querySelectorAll('.bootPcbLine'));
+
+  const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Precompute lengths
+  paths.forEach(p=>{
+    try{
+      const len = p.getTotalLength();
+      p.style.setProperty('--len', len);
+      p.style.strokeDasharray = len;
+      p.style.strokeDashoffset = len;
+    }catch(e){}
+  });
+
+  const steps = [
+    {p: 12,  t: 180, msg: '[BOOT] Loading CAN interface…', cls:'dim'},
+    {p: 28,  t: 280, msg: '[OK]  ECU handshake established', cls:'ok'},
+    {p: 46,  t: 280, msg: '[BOOT] Checking IMMO status…', cls:'dim'},
+    {p: 62,  t: 260, msg: '[OK]  IMMO: synchronized', cls:'ok'},
+    {p: 78,  t: 260, msg: '[BOOT] Initializing ELV module…', cls:'dim'},
+    {p: 90,  t: 240, msg: '[OK]  ELV ready', cls:'ok'},
+    {p: 100, t: 220, msg: '[OK]  System ready', cls:'ok'},
+  ];
+
+  let stopped = false;
+
+  function addLog(text, cls){
+    const div = document.createElement('div');
+    const span = document.createElement('span');
+    span.className = cls || 'dim';
+    span.textContent = text;
+    div.appendChild(span);
+    logEl.appendChild(div);
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+
+  function setProgress(p){
+    pctEl.textContent = p + '%';
+    barEl.style.width = p + '%';
+  }
+
+  function finish(){
+    if(stopped) return;
+    stopped = true;
+    setTimeout(()=> boot.classList.add('boot-done'), 160);
+  }
+
+  // Skip interactions
+  if(skipBtn) skipBtn.addEventListener('click', finish);
+  boot.addEventListener('click', (e)=>{ if(e.target === boot) finish(); });
+
+  // Visual timeline (2–3s total)
+  let start = performance.now();
+  function frame(now){
+    if(stopped) return;
+    const dt = (now - start)/1000;
+
+    // scan sweep
+    if(!reduceMotion){
+      const scanT = clamp((dt - 0.1) / 1.0, 0, 1);
+      scanBar.style.opacity = (scanT > 0 && scanT < 1) ? '0.65' : '0';
+      scanBar.setAttribute('x', String(-260 + (1460 * scanT)));
+    } else {
+      scanBar.style.opacity = '0';
+    }
+
+    // draw pcb
+    const drawP = reduceMotion ? 1 : clamp((dt - 0.05) / 1.15, 0, 1);
+    paths.forEach((p, idx)=>{
+      const len = parseFloat(getComputedStyle(p).getPropertyValue('--len')) || 1000;
+      const local = clamp((drawP*1.05 - idx*0.15), 0, 1);
+      p.style.strokeDashoffset = String(len * (1 - local));
+    });
+
+    // title fade
+    const titleT = easeOut(clamp((dt - 1.0) / 0.7, 0, 1));
+    title.style.opacity = String(titleT);
+    title.style.transform = 'scale(' + (0.98 + 0.02*titleT) + ')';
+
+    // subtitle fade
+    const subT = easeOut(clamp((dt - 1.2) / 0.7, 0, 1));
+    subtitle.style.opacity = String(subT);
+
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  async function run(){
+    setProgress(0);
+    for(const s of steps){
+      if(stopped) return;
+      await wait(reduceMotion ? Math.max(60, s.t*0.5) : s.t);
+      if(stopped) return;
+      setProgress(s.p);
+      addLog(s.msg, s.cls);
+    }
+    finish();
+  }
+  run();
+
+  function clamp(x,a,b){ return Math.max(a, Math.min(b, x)); }
+  function easeOut(t){ return 1 - Math.pow(1 - t, 3); }
+  function wait(ms){ return new Promise(r => setTimeout(r, ms)); }
 })();
 </script>
 
