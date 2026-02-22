@@ -1,42 +1,7 @@
 {
-  "ECU": [
-    {
-      "src": "assets_v8/galeria_auto/ECU_bmw_e60__Brak komunikacji CAN.jpg",
-      "title": "Brak komunikacji CAN",
-      "desc": ""
-    },
-    {
-      "src": "assets_v8/galeria_auto/ECU/ECU_sub__Test.png",
-      "title": "Test",
-      "desc": ""
-    }
-  ],
-  "IMMO": [
-    {
-      "src": "assets_v8/galeria_auto/IMMO_ford_focus__Dopisanie klucza.webp",
-      "title": "Dopisanie klucza",
-      "desc": ""
-    }
-  ],
-  "ELV": [
-    {
-      "src": "assets_v8/galeria_auto/ELV_audi_q7__Brak odblokowania.png",
-      "title": "Brak odblokowania",
-      "desc": ""
-    }
-  ],
-  "DIAG": [
-    {
-      "src": "assets_v8/galeria_auto/DIAG_opel__Odczyt błędów.jpeg",
-      "title": "Odczyt błędów",
-      "desc": ""
-    }
-  ],
-  "PCB": [
-    {
-      "src": "assets_v8/galeria_auto/PCB_mercedes__Naprawa sekcji zasilania.png",
-      "title": "Naprawa sekcji zasilania",
-      "desc": ""
-    }
-  ]
+  "ECU": [],
+  "IMMO": [],
+  "ELV": [],
+  "DIAG": [],
+  "PCB": []
 }

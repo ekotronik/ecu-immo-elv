@@ -45,40 +45,8 @@ def detect_category(file_path: Path) -> str | None:
         return None
     return m.group(1).upper()
 
-
-def humanize_title(filename: str, cat: str) -> str:
-    """Derive a human-friendly title from a filename.
-
-    Supported patterns:
-    - TURBO:  ECU_xxx__Twoj opis.jpg  -> 'Twoj opis'
-    - TURBO:  IMMO-xxx__Dopisanie klucza.webp -> 'Dopisanie klucza'
-    - If no '__' is provided, use the remaining name without prefix.
-    - For subfolder mode (assets_v8/galeria_auto/ECU/...), we also accept optional 'ECU_' prefix but it's not required.
-    """
-    name = filename.rsplit('.', 1)[0]
-
-    # Strip leading category prefix if present
-    # Examples: 'ECU_test__Opis' -> 'test__Opis'
-    prefix_re = re.compile(rf"^({cat})[\s_\-]+", re.IGNORECASE)
-    name2 = prefix_re.sub('', name).strip()
-
-    # Prefer explicit description after '__'
-    if '__' in name2:
-        _, desc = name2.split('__', 1)
-        title = desc.strip()
-    else:
-        title = name2.strip()
-
-    # Cleanup: underscores to spaces, multiple spaces
-    title = title.replace('_', ' ')
-    title = re.sub(r"\s+", " ", title).strip()
-
-    return title
-
-def make_item(rel_posix: str, title: str) -> dict[str, str]:
-    return {"src": rel_posix, "title": title, "desc": ""}
 def main() -> None:
-    data: dict[str, list[dict[str, str]]] = {c: [] for c in CATEGORIES}
+    data: dict[str, list[str]] = {c: [] for c in CATEGORIES}
     if not GAL_DIR.exists():
         OUT.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         print(f"WARNING: {GAL_DIR} not found. Wrote empty {OUT}.")
@@ -99,7 +67,7 @@ def main() -> None:
             ignored += 1
             continue
         rel = f.relative_to(ROOT)
-        data[cat].append(make_item(posix(rel), humanize_title(f.name, cat)))
+        data[cat].append(posix(rel))
 
     OUT.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(

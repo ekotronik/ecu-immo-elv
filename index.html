@@ -1147,6 +1147,7 @@
   ]
 }
   </script>
+  <script src="config.public.js"></script>
 </head>
 <body class="ignition">
 
@@ -2014,6 +2015,41 @@ async function hitPhone(){
 
   async function loadGalleryData(){
     if(galleryData) return galleryData;
+
+    // 1) Prefer Supabase (public read) if configured
+    try{
+      const cfg = window.EKO_CONFIG || {};
+      const sbUrl = cfg.SUPABASE_URL;
+      const sbKey = cfg.SUPABASE_ANON_KEY;
+      if(sbUrl && sbKey){
+        const url = sbUrl.replace(/\/$/, '') + '/rest/v1/gallery_items?select=category,title,description,image_url,created_at&order=created_at.desc';
+        const res = await fetch(url, {
+          cache: 'no-store',
+          headers: {
+            'apikey': sbKey,
+            'Authorization': 'Bearer ' + sbKey
+          }
+        });
+        if(res.ok){
+          const rows = await res.json();
+          const out = { ECU: [], IMMO: [], ELV: [], DIAG: [], PCB: [] };
+          (rows || []).forEach(r=>{
+            const cat = String(r.category || '').toUpperCase();
+            if(!out[cat]) return;
+            const src = r.image_url || '';
+            if(!src) return;
+            out[cat].push({ src, title: r.title || '', desc: r.description || '' });
+          });
+          galleryData = out;
+          return galleryData;
+        }
+        // if Supabase is misconfigured, fall through to gallery.json
+      }
+    }catch(e){
+      // ignore and fall back
+    }
+
+    // 2) Fallback to local gallery.json
     try{
       const res = await fetch('gallery.json', { cache: 'no-store' });
       if(!res.ok) throw new Error('gallery.json HTTP ' + res.status);
