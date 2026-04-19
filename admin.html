@@ -1,23 +1,37 @@
 <!DOCTYPE html>
 <html>
-<head><meta charset="UTF-8"><title>Admin</title></head>
+<head>
+<meta charset="UTF-8">
+<title>Admin PRO+</title>
+<style>
+body{background:#0b1220;color:#fff;font-family:Arial;padding:20px;}
+input,select,textarea{width:100%;margin:10px 0;padding:10px;border-radius:6px;border:none;}
+button{padding:10px;background:#22c55e;border:none;border-radius:8px;cursor:pointer;}
+</style>
+</head>
+
 <body>
 
-<h2>Panel admin</h2>
+<h2>Panel admin – Projekty</h2>
 
 <select>
-<option value="tester">Tester prądu</option>
+<option value="tester">Tester prądu PRO</option>
 <option value="ecu_tool">ECU Tester PRO</option>
 <option value="charging">Analizator ładowania</option>
 <option value="symulator">Symulator</option>
 </select>
 
-<br><br>
+<select>
+<option>W TRAKCIE</option>
+<option>PROTOTYP</option>
+<option>GOTOWY</option>
+</select>
 
-<input type="file"><br><br>
-<textarea placeholder="Opis projektu"></textarea><br><br>
+<input type="file">
 
-<button>Dodaj</button>
+<textarea placeholder="Opis projektu / etap"></textarea>
+
+<button>Dodaj projekt</button>
 
 </body>
 </html>
