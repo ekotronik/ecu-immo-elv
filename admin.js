@@ -227,7 +227,7 @@
         public_id: uploaded.public_id || null
       });
 
-      uploadStatus.textContent = '✅ Dodano. Odśwież stronę i kliknij „Podgląd” w odpowiedniej kategorii.';
+      uploadStatus.textContent = '✅ Dodano. Odśwież stronę i kliknij „Podgląd” w odpowiedniej kategorii projektu.';
       // reset
       fileEl.value = '';
       // keep category

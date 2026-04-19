@@ -48,8 +48,8 @@
     <div class="card">
       <div class="toolbar">
         <div>
-          <h1>Panel admin — Galeria (Supabase + Cloudinary)</h1>
-          <div class="muted">Dodajesz zdjęcie + tytuł + opis → od razu pojawia się w galerii na stronie (bez GitHuba). Ten panel jest w wersji statycznej, a zapis odbywa się przez Supabase.</div>
+          <h1>Panel admin — Projekty (Supabase + Cloudinary)</h1>
+          <div class="muted">Dodajesz zdjęcie + tytuł + opis projektu → od razu pojawia się w sekcji projektów na stronie (bez GitHuba). Zapis odbywa się przez Supabase.</div>
         </div>
         <div class="pill" id="envPill">Sprawdzanie konfiguracji…</div>
       </div>
@@ -78,29 +78,29 @@
       </div>
 
       <div class="card" id="uploadCard">
-        <h2 style="margin:0 0 8px 0;font-size:16px;letter-spacing:.02em">Dodaj zdjęcie do galerii</h2>
-        <div class="muted">Wybierz kategorię, dodaj tytuł/opis, wskaż plik zdjęcia. Po dodaniu odśwież stronę i kliknij „Podgląd” w odpowiedniej kategorii.</div>
+        <h2 style="margin:0 0 8px 0;font-size:16px;letter-spacing:.02em">Dodaj projekt do sekcji</h2>
+        <div class="muted">Wybierz kategorię projektu, dodaj tytuł i opis etapu prac, wskaż zdjęcie. Po dodaniu odśwież stronę i kliknij „Podgląd” w odpowiedniej kategorii.</div>
 
         <label>Kategoria</label>
         <select id="category">
-          <option value="ECU">ECU</option>
-          <option value="IMMO">IMMO</option>
-          <option value="ELV">ELV / ESCL</option>
-          <option value="DIAG">Diagnostyka</option>
-          <option value="PCB">Elektronika / PCB</option>
+          <option value="ECU">Tester prądu</option>
+          <option value="IMMO">ECU Tester PRO</option>
+          <option value="ELV">Analizator ładowania</option>
+          <option value="DIAG">Symulator instalacji</option>
+          <option value="PCB">Inne projekty</option>
         </select>
 
         <label>Tytuł</label>
-        <input id="title" type="text" placeholder="np. Brak komunikacji CAN" maxlength="90" />
+        <input id="title" type="text" placeholder="np. Wersja prototypowa modułu" maxlength="90" />
 
         <label>Opis</label>
-        <textarea id="description" placeholder="Krótko: objawy, diagnoza, rozwiązanie…" maxlength="500"></textarea>
+        <textarea id="description" placeholder="Krótko: założenia projektu, etap prac, planowane funkcje…" maxlength="500"></textarea>
 
         <label>Zdjęcie</label>
         <input id="file" type="file" accept="image/*" />
 
         <div class="toolbar" style="justify-content:flex-start">
-          <button class="btn primary" id="btnUpload" type="button" disabled>Dodaj do galerii</button>
+          <button class="btn primary" id="btnUpload" type="button" disabled>Dodaj do projektów</button>
           <button class="btn" id="btnRefresh" type="button">Odśwież listę</button>
         </div>
 
@@ -108,7 +108,7 @@
         <div class="status" id="uploadStatus">—</div>
 
         <div style="height:12px"></div>
-        <h3 style="margin:0 0 10px 0;font-size:14px;letter-spacing:.02em">Ostatnio dodane</h3>
+        <h3 style="margin:0 0 10px 0;font-size:14px;letter-spacing:.02em">Ostatnio dodane projekty</h3>
         <div class="grid" id="items"></div>
       </div>
     </div>
