@@ -1058,6 +1058,7 @@
   ]
 }
   </script>
+  <script src="config.public.js"></script>
 </head>
 <body class="ignition">
 
@@ -1347,76 +1348,75 @@
 <section id="galeria" class="galeria">
   <div class="container">
     <div class="section-title">
-      <h2>Projekty rozwojowe</h2>
-      <p class="section-sub">Projekty, nad którymi pracuję obecnie oraz kierunki rozwoju planowane na przyszłość.</p>
+      <h2>Diagnostyka i przypadki usterek</h2>
     </div>
 
-    <div class="gal-filters" aria-label="Filtry galerii projektów">
+    <div class="gal-filters" aria-label="Filtry galerii">
       <button class="gal-filter-btn active" data-filter="all">Wszystko</button>
-      <button class="gal-filter-btn" data-filter="ECU">Tester prądu</button>
-      <button class="gal-filter-btn" data-filter="IMMO">ECU Tester PRO</button>
-      <button class="gal-filter-btn" data-filter="ELV">Analizator ładowania</button>
-      <button class="gal-filter-btn" data-filter="DIAG">Symulator instalacji</button>
-      <button class="gal-filter-btn" data-filter="PCB">Inne projekty</button>
+      <button class="gal-filter-btn" data-filter="ECU">ECU</button>
+      <button class="gal-filter-btn" data-filter="IMMO">IMMO</button>
+      <button class="gal-filter-btn" data-filter="ELV">ELV / ESCL</button>
+      <button class="gal-filter-btn" data-filter="DIAG">Diagnostyka</button>
+      <button class="gal-filter-btn" data-filter="PCB">Elektronika / PCB</button>
     </div>
 
     <div class="gal-grid">
       <article class="gal-card" data-cat="ECU">
         <div class="gal-thumb">
-          <span class="gal-badge">Tester prądu</span>
-          <img src="assets_v8/gallery/g_ecu.svg" alt="Projekt testera prądu – rozwój funkcji i interfejsu" loading="lazy">
+          <span class="gal-badge">ECU</span>
+          <img src="assets_v8/gallery/g_ecu.svg" alt="Sterownik silnika ECU – diagnostyka i naprawa" loading="lazy">
         </div>
         <div class="gal-body">
-          <h3 class="gal-title">Tester prądu PRO</h3>
-          <p class="gal-desc">Rozwijany projekt analizatora poboru prądu z wizualizacją, trendami i funkcjami diagnostycznymi dla pojazdów.</p>
+          <h3 class="gal-title">Sterownik ECU – diagnostyka i naprawa</h3>
+          <p class="gal-desc">Analiza komunikacji, zasilania i sygnałów, identyfikacja przyczyn braku startu / błędów oraz prace serwisowe w elektronice.</p>
           <a class="gal-open" href="#" data-open>Podgląd</a>
         </div>
       </article>
 
       <article class="gal-card" data-cat="IMMO">
         <div class="gal-thumb">
-          <span class="gal-badge">ECU Tester PRO</span>
-          <img src="assets_v8/gallery/g_immo.svg" alt="Projekt ECU Tester PRO – funkcje i etapy rozwoju" loading="lazy">
+          <span class="gal-badge">IMMO</span>
+          <img src="assets_v8/gallery/g_immo.svg" alt="Immobilizer – klucze, adaptacje, procedury serwisowe" loading="lazy">
         </div>
         <div class="gal-body">
-          <h3 class="gal-title">ECU Tester PRO</h3>
-          <p class="gal-desc">Autorski projekt urządzenia do testów i analizy pracy sterowników oraz wybranych podzespołów wykonawczych.</p>
+          <h3 class="gal-title">Immobilizer – adaptacje i procedury</h3>
+          <p class="gal-desc">Obsługa typowych scenariuszy serwisowych: dopisanie klucza, synchronizacja, diagnostyka błędów autoryzacji.</p>
           <a class="gal-open" href="#" data-open>Podgląd</a>
         </div>
       </article>
 
       <article class="gal-card" data-cat="ELV">
         <div class="gal-thumb">
-          <span class="gal-badge">Ładowanie</span>
-          <img src="assets_v8/gallery/g_elv.svg" alt="Projekt analizatora ładowania – rozwój funkcji pomiarowych" loading="lazy">
+          <span class="gal-badge">ELV / ESCL</span>
+          <img src="assets_v8/gallery/g_elv.svg" alt="Blokada kolumny kierownicy ELV/ESCL – diagnostyka" loading="lazy">
         </div>
         <div class="gal-body">
-          <h3 class="gal-title">Analizator ładowania</h3>
-          <p class="gal-desc">Projekt narzędzia do badania układów ładowania, zachowania napięcia i parametrów pracy podczas testów.</p>
+          <h3 class="gal-title">ELV/ESCL – typowe usterki i rozwiązania</h3>
+          <p class="gal-desc">Weryfikacja mechaniki/elektroniki modułu, testy komunikacji oraz rozwiązania serwisowe zależnie od platformy pojazdu.</p>
           <a class="gal-open" href="#" data-open>Podgląd</a>
         </div>
       </article>
 
       <article class="gal-card" data-cat="DIAG">
         <div class="gal-thumb">
-          <span class="gal-badge">Symulator</span>
-          <img src="assets_v8/gallery/g_diag.svg" alt="Projekt symulatora instalacji – etapy budowy i testów" loading="lazy">
+          <span class="gal-badge">Diagnostyka</span>
+          <img src="assets_v8/gallery/g_diag.svg" alt="Diagnostyka komputerowa – odczyt błędów i parametrów" loading="lazy">
         </div>
         <div class="gal-body">
-          <h3 class="gal-title">Symulator instalacji</h3>
-          <p class="gal-desc">Rozwijany symulator do testów układów i scenariuszy pracy instalacji, z naciskiem na praktyczne zastosowanie warsztatowe.</p>
+          <h3 class="gal-title">Diagnostyka komputerowa</h3>
+          <p class="gal-desc">Odczyt kodów usterek, analiza parametrów bieżących, testy elementów wykonawczych — punkt startu do trafnej naprawy.</p>
           <a class="gal-open" href="#" data-open>Podgląd</a>
         </div>
       </article>
 
       <article class="gal-card" data-cat="PCB">
         <div class="gal-thumb">
-          <span class="gal-badge">Inne</span>
-          <img src="assets_v8/gallery/g_pcb.svg" alt="Pozostałe projekty elektroniczne i przyszłe koncepcje" loading="lazy">
+          <span class="gal-badge">Elektronika / PCB</span>
+          <img src="assets_v8/gallery/g_pcb.svg" alt="Elektronika PCB – pomiary i prace serwisowe" loading="lazy">
         </div>
         <div class="gal-body">
-          <h3 class="gal-title">Inne projekty i koncepcje</h3>
-          <p class="gal-desc">Miejsce na kolejne rozwiązania, prototypy, eksperymenty i pomysły rozwijane równolegle lub planowane na przyszłość.</p>
+          <h3 class="gal-title">Elektronika / PCB</h3>
+          <p class="gal-desc">Pomiary, lokalizacja uszkodzeń, prace lutownicze i weryfikacja torów zasilania/sygnałowych w modułach samochodowych.</p>
           <a class="gal-open" href="#" data-open>Podgląd</a>
         </div>
       </article>
@@ -1425,7 +1425,7 @@
 
   <div class="gal-lightbox" id="galLightbox" aria-hidden="true">
     <button class="gal-lightbox-close" type="button" aria-label="Zamknij" id="galClose">×</button>
-    <div class="gal-lightbox-inner" role="dialog" aria-modal="true" aria-label="Podgląd projektu">
+    <div class="gal-lightbox-inner" role="dialog" aria-modal="true" aria-label="Podgląd zdjęcia">
       <div class="gal-lightbox-media"><button class="gal-nav prev" type="button" aria-label="Poprzednie zdjęcie" id="galPrev">‹</button><button class="gal-nav next" type="button" aria-label="Następne zdjęcie" id="galNext">›</button><div class="gal-counter" id="galCounter" aria-live="polite"></div><img id="galImg" src="" alt=""></div>
       <div class="gal-lightbox-meta">
         <h3 id="galTitle"></h3>
@@ -1846,6 +1846,41 @@ async function hitPhone(){
 
   async function loadGalleryData(){
     if(galleryData) return galleryData;
+
+    // 1) Prefer Supabase (public read) if configured
+    try{
+      const cfg = window.EKO_CONFIG || {};
+      const sbUrl = cfg.SUPABASE_URL;
+      const sbKey = cfg.SUPABASE_ANON_KEY;
+      if(sbUrl && sbKey){
+        const url = sbUrl.replace(/\/$/, '') + '/rest/v1/gallery_items?select=category,title,description,image_url,created_at&order=created_at.desc';
+        const res = await fetch(url, {
+          cache: 'no-store',
+          headers: {
+            'apikey': sbKey,
+            'Authorization': 'Bearer ' + sbKey
+          }
+        });
+        if(res.ok){
+          const rows = await res.json();
+          const out = { ECU: [], IMMO: [], ELV: [], DIAG: [], PCB: [] };
+          (rows || []).forEach(r=>{
+            const cat = String(r.category || '').toUpperCase();
+            if(!out[cat]) return;
+            const src = r.image_url || '';
+            if(!src) return;
+            out[cat].push({ src, title: r.title || '', desc: r.description || '' });
+          });
+          galleryData = out;
+          return galleryData;
+        }
+        // if Supabase is misconfigured, fall through to gallery.json
+      }
+    }catch(e){
+      // ignore and fall back
+    }
+
+    // 2) Fallback to local gallery.json
     try{
       const res = await fetch('gallery.json', { cache: 'no-store' });
       if(!res.ok) throw new Error('gallery.json HTTP ' + res.status);
