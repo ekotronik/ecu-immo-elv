@@ -23,6 +23,8 @@
   const uploadStatus = document.getElementById('uploadStatus');
   const itemsEl = document.getElementById('items');
 
+  const CATEGORY_LABELS = { ECU: 'Tester prądu', IMMO: 'ECU Tester PRO', ELV: 'Analizator ładowania', DIAG: 'Symulator instalacji', PCB: 'LAB / przyszłe projekty' };
+
   function setPill(text, ok){
     envPill.textContent = text;
     envPill.style.borderColor = ok ? 'rgba(0,234,255,.35)' : 'rgba(255,106,0,.35)';
@@ -146,7 +148,8 @@
       const meta = document.createElement('div');
       meta.className = 'meta';
       const b = document.createElement('b');
-      b.textContent = `[${row.category}] ${row.title || '(bez tytułu)'}`;
+      const label = CATEGORY_LABELS[row.category] || row.category;
+      b.textContent = `[${label}] ${row.title || '(bez tytułu)'}`;
       const p = document.createElement('p');
       p.textContent = row.description || '';
       const small = document.createElement('div');
@@ -227,7 +230,7 @@
         public_id: uploaded.public_id || null
       });
 
-      uploadStatus.textContent = '✅ Dodano. Odśwież stronę i kliknij „Podgląd” w odpowiedniej kategorii projektu.';
+      uploadStatus.textContent = '✅ Dodano. Odśwież stronę i kliknij „Podgląd” w odpowiednim projekcie LAB.';
       // reset
       fileEl.value = '';
       // keep category

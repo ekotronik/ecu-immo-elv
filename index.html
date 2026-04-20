@@ -1117,6 +1117,22 @@
 #bootScreen .ok{color: rgba(0,234,255,.9)}
 #bootScreen .dim{color: rgba(167,179,199,.95)}
 
+
+/* ===== LAB / Projekty ===== */
+.lab-grid{display:grid;gap:16px;grid-template-columns:repeat(12,1fr)}
+.lab-card{grid-column:span 4;background:rgba(7,18,33,.55);border:1px solid rgba(255,255,255,.10);border-radius:18px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.25);transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+.lab-card:hover{transform:translateY(-2px);border-color:rgba(42,167,255,.45);box-shadow:0 14px 40px rgba(0,0,0,.35)}
+.lab-thumb{position:relative;aspect-ratio:3/2;background:radial-gradient(circle at 30% 30%, rgba(42,167,255,.25), transparent 55%),linear-gradient(135deg, rgba(6,18,37,.95), rgba(11,43,74,.75))}
+.lab-thumb img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1.05) contrast(1.02)}
+.lab-badge{position:absolute;left:12px;top:12px;padding:6px 10px;border-radius:999px;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.14);color:rgba(255,255,255,.9);font-size:.78rem;font-weight:700;letter-spacing:.3px}
+.lab-body{padding:14px 14px 16px}
+.lab-title{margin:0 0 6px;font-size:1.02rem;color:#eaf6ff}
+.lab-desc{margin:0;color:rgba(255,255,255,.74);line-height:1.45;font-size:.95rem}
+.lab-open{margin-top:12px;display:inline-flex;align-items:center;gap:8px;color:#eaf6ff;font-weight:700;font-size:.92rem;text-decoration:none;opacity:.92}
+.lab-open:hover{opacity:1;text-decoration:underline}
+@media (max-width:1024px){.lab-card{grid-column:span 6}}
+@media (max-width:640px){.lab-card{grid-column:span 12}}
+
 </style>
 
   <script type="application/ld+json">
@@ -1232,7 +1248,23 @@
             stroke: rgba(255,255,255,.08);
             stroke-width: 2;
           }
-        </style>
+        
+/* ===== LAB / Projekty ===== */
+.lab-grid{display:grid;gap:16px;grid-template-columns:repeat(12,1fr)}
+.lab-card{grid-column:span 4;background:rgba(7,18,33,.55);border:1px solid rgba(255,255,255,.10);border-radius:18px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.25);transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+.lab-card:hover{transform:translateY(-2px);border-color:rgba(42,167,255,.45);box-shadow:0 14px 40px rgba(0,0,0,.35)}
+.lab-thumb{position:relative;aspect-ratio:3/2;background:radial-gradient(circle at 30% 30%, rgba(42,167,255,.25), transparent 55%),linear-gradient(135deg, rgba(6,18,37,.95), rgba(11,43,74,.75))}
+.lab-thumb img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1.05) contrast(1.02)}
+.lab-badge{position:absolute;left:12px;top:12px;padding:6px 10px;border-radius:999px;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.14);color:rgba(255,255,255,.9);font-size:.78rem;font-weight:700;letter-spacing:.3px}
+.lab-body{padding:14px 14px 16px}
+.lab-title{margin:0 0 6px;font-size:1.02rem;color:#eaf6ff}
+.lab-desc{margin:0;color:rgba(255,255,255,.74);line-height:1.45;font-size:.95rem}
+.lab-open{margin-top:12px;display:inline-flex;align-items:center;gap:8px;color:#eaf6ff;font-weight:700;font-size:.92rem;text-decoration:none;opacity:.92}
+.lab-open:hover{opacity:1;text-decoration:underline}
+@media (max-width:1024px){.lab-card{grid-column:span 6}}
+@media (max-width:640px){.lab-card{grid-column:span 12}}
+
+</style>
       </defs>
 
       <rect x="34" y="38" width="1132" height="284" rx="28" class="bootFrame"/>
@@ -1514,81 +1546,80 @@
   </section>
 
   
-
 <section id="galeria" class="galeria">
   <div class="container">
     <div class="section-title">
-      <h2>Projekty, nad którymi pracuję</h2>
+      <h2>LAB / Projekty rozwojowe</h2>
     </div>
-    <p class="section-sub">Autorskie projekty rozwijane obecnie oraz kolejne koncepcje, które będą realizowane w przyszłości. Ta sekcja pokazuje kierunek rozwoju, etapy prac i planowane rozwiązania.</p>
+    <p class="section-sub">Autorskie projekty, nad którymi pracuję obecnie, rozwijam etapami lub planuję je w ramach własnego laboratorium rozwojowego.</p>
 
-    <div class="gal-filters" aria-label="Filtry galerii projektów">
+    <div class="gal-filters" aria-label="Filtry sekcji LAB">
       <button class="gal-filter-btn active" data-filter="all">Wszystko</button>
       <button class="gal-filter-btn" data-filter="ECU">Tester prądu</button>
       <button class="gal-filter-btn" data-filter="IMMO">ECU Tester PRO</button>
       <button class="gal-filter-btn" data-filter="ELV">Analizator ładowania</button>
       <button class="gal-filter-btn" data-filter="DIAG">Symulator instalacji</button>
-      <button class="gal-filter-btn" data-filter="PCB">Inne projekty</button>
+      <button class="gal-filter-btn" data-filter="PCB">LAB / przyszłe projekty</button>
     </div>
 
-    <div class="gal-grid">
-      <article class="gal-card" data-cat="ECU">
-        <div class="gal-thumb">
-          <span class="gal-badge">Tester prądu</span>
-          <img src="assets_v8/gallery/g_ecu.svg" alt="Projekt testera prądu" loading="lazy">
+    <div class="lab-grid gal-grid">
+      <article class="lab-card gal-card" data-cat="ECU">
+        <div class="lab-thumb gal-thumb">
+          <span class="lab-badge gal-badge">LAB / prąd</span>
+          <img src="assets_v8/projects/lab_tester.svg" alt="Projekt testera prądu PRO" loading="lazy">
         </div>
-        <div class="gal-body">
-          <h3 class="gal-title">Tester prądu PRO</h3>
-          <p class="gal-desc">Projekt analizatora poboru prądu z wizualizacją trendów, trybami pomiarowymi i rozbudowanym interfejsem diagnostycznym.</p>
-          <a class="gal-open" href="#" data-open>Podgląd</a>
-        </div>
-      </article>
-
-      <article class="gal-card" data-cat="IMMO">
-        <div class="gal-thumb">
-          <span class="gal-badge">ECU Tester PRO</span>
-          <img src="assets_v8/gallery/g_immo.svg" alt="Projekt ECU Tester PRO" loading="lazy">
-        </div>
-        <div class="gal-body">
-          <h3 class="gal-title">ECU Tester PRO</h3>
-          <p class="gal-desc">Autorskie narzędzie do testów sterowników i podzespołów wykonawczych, rozwijane modułowo pod kątem praktycznych zastosowań.</p>
-          <a class="gal-open" href="#" data-open>Podgląd</a>
+        <div class="lab-body gal-body">
+          <h3 class="lab-title gal-title">Tester prądu PRO</h3>
+          <p class="lab-desc gal-desc">Projekt analizatora poboru prądu, trybów uśpienia, rozruchu i zachowania instalacji elektrycznej pojazdu w czasie rzeczywistym.</p>
+          <a class="lab-open gal-open" href="#" data-open>Podgląd</a>
         </div>
       </article>
 
-      <article class="gal-card" data-cat="ELV">
-        <div class="gal-thumb">
-          <span class="gal-badge">Ładowanie</span>
-          <img src="assets_v8/gallery/g_elv.svg" alt="Projekt analizatora ładowania" loading="lazy">
+      <article class="lab-card gal-card" data-cat="IMMO">
+        <div class="lab-thumb gal-thumb">
+          <span class="lab-badge gal-badge">LAB / ECU</span>
+          <img src="assets_v8/projects/lab_ecu.svg" alt="Projekt ECU Tester PRO" loading="lazy">
         </div>
-        <div class="gal-body">
-          <h3 class="gal-title">Analizator ładowania</h3>
-          <p class="gal-desc">Projekt systemu do badania układów ładowania, napięcia i zachowania instalacji podczas pracy oraz w warunkach testowych.</p>
-          <a class="gal-open" href="#" data-open>Podgląd</a>
-        </div>
-      </article>
-
-      <article class="gal-card" data-cat="DIAG">
-        <div class="gal-thumb">
-          <span class="gal-badge">Symulator</span>
-          <img src="assets_v8/gallery/g_diag.svg" alt="Projekt symulatora instalacji" loading="lazy">
-        </div>
-        <div class="gal-body">
-          <h3 class="gal-title">Symulator instalacji</h3>
-          <p class="gal-desc">Rozwijany symulator do testów układów i scenariuszy pracy instalacji, tworzony z myślą o praktycznym zastosowaniu warsztatowym.</p>
-          <a class="gal-open" href="#" data-open>Podgląd</a>
+        <div class="lab-body gal-body">
+          <h3 class="lab-title gal-title">ECU Tester PRO</h3>
+          <p class="lab-desc gal-desc">Autorskie urządzenie do testowania sterowników i podzespołów wykonawczych: zaworów, przepustnic, pomp oraz wybranych układów elektronicznych.</p>
+          <a class="lab-open gal-open" href="#" data-open>Podgląd</a>
         </div>
       </article>
 
-      <article class="gal-card" data-cat="PCB">
-        <div class="gal-thumb">
-          <span class="gal-badge">Inne</span>
-          <img src="assets_v8/gallery/g_pcb.svg" alt="Inne projekty i koncepcje" loading="lazy">
+      <article class="lab-card gal-card" data-cat="ELV">
+        <div class="lab-thumb gal-thumb">
+          <span class="lab-badge gal-badge">LAB / charging</span>
+          <img src="assets_v8/projects/lab_charging.svg" alt="Projekt analizatora ładowania" loading="lazy">
         </div>
-        <div class="gal-body">
-          <h3 class="gal-title">Inne projekty i koncepcje</h3>
-          <p class="gal-desc">Miejsce na kolejne urządzenia, eksperymenty, warianty rozwojowe i przyszłe projekty planowane w ramach rozwoju EKOTRONIK.</p>
-          <a class="gal-open" href="#" data-open>Podgląd</a>
+        <div class="lab-body gal-body">
+          <h3 class="lab-title gal-title">Analizator ładowania</h3>
+          <p class="lab-desc gal-desc">Rozwijane narzędzie do badania napięcia, trendów ładowania i zachowania nowoczesnych układów zarządzania energią w pojeździe.</p>
+          <a class="lab-open gal-open" href="#" data-open>Podgląd</a>
+        </div>
+      </article>
+
+      <article class="lab-card gal-card" data-cat="DIAG">
+        <div class="lab-thumb gal-thumb">
+          <span class="lab-badge gal-badge">LAB / symulator</span>
+          <img src="assets_v8/projects/lab_simulator.svg" alt="Projekt symulatora instalacji" loading="lazy">
+        </div>
+        <div class="lab-body gal-body">
+          <h3 class="lab-title gal-title">Symulator instalacji</h3>
+          <p class="lab-desc gal-desc">Projekt stanowiska do symulacji scenariuszy pracy instalacji i sterowników, przygotowany pod testy rozwojowe i diagnostyczne.</p>
+          <a class="lab-open gal-open" href="#" data-open>Podgląd</a>
+        </div>
+      </article>
+
+      <article class="lab-card gal-card" data-cat="PCB">
+        <div class="lab-thumb gal-thumb">
+          <span class="lab-badge gal-badge">LAB / future</span>
+          <img src="assets_v8/projects/lab_future.svg" alt="Przyszłe projekty LAB" loading="lazy">
+        </div>
+        <div class="lab-body gal-body">
+          <h3 class="lab-title gal-title">Przyszłe projekty i koncepcje</h3>
+          <p class="lab-desc gal-desc">Sekcja dla kolejnych urządzeń, eksperymentów i koncepcji, które są w planie lub dopiero wchodzą na etap projektowania i testów.</p>
+          <a class="lab-open gal-open" href="#" data-open>Podgląd</a>
         </div>
       </article>
     </div>
