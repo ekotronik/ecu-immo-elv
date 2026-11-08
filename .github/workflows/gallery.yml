@@ -1,0 +1,38 @@
+name: Aktualizacja galerii
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "assets_v8/galeria_auto/**"
+      - "tools_generate_gallery.py"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gallery
+  cancel-in-progress: false
+
+jobs:
+  gallery:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Wygeneruj gallery.json
+        run: python3 tools_generate_gallery.py
+      - name: Zapisz zmiany
+        run: |
+          if git diff --quiet -- gallery.json; then
+            echo "gallery.json bez zmian"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898699+github-actions[bot]@users.noreply.github.com"
+          git add gallery.json
+          git commit -m "Auto-update gallery.json"
+          git push
