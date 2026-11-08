@@ -1402,6 +1402,7 @@ html.boot-seen #bootScreen{display:none!important}
 
       <nav class="topbar-nav" aria-label="Nawigacja">
         <a href="#oferta">Oferta</a>
+        <a href="#artykuly">Artykuły</a>
         <a href="#galeria">LAB</a>
         <a href="#faq">FAQ</a>
         <a href="#kontakt">Kontakt</a>
@@ -1517,6 +1518,7 @@ html.boot-seen #bootScreen{display:none!important}
           </p>
           <div class="actions">
             <a class="btn primary" href="#oferta">Zobacz zakres</a>
+            <a class="btn" href="#artykuly">Artykuły techniczne</a>
             <button class="btn" id="callBtn" type="button">Skopiuj telefon</button>
             <button class="btn" id="mailBtn" type="button">Skopiuj e-mail</button>
           </div>
@@ -1625,6 +1627,23 @@ html.boot-seen #bootScreen{display:none!important}
   </section>
 
   
+<section id="artykuly" class="artykuly">
+  <div class="container">
+    <div class="section-title">
+      <h2>Artykuły techniczne</h2>
+    </div>
+    <p class="section-sub">Rzetelne, praktyczne teksty o pomiarach i systemach pojazdu: jak mierzyć, jak czytać wynik i czego dany pomiar nie pokazuje. Każdy artykuł ma powiązane okno symulacji w LAB.</p>
+    <div class="art-grid">
+      <a class="art-card" href="artykuly/prad-spoczynkowy.html"><i class="art-tag">POMIAR · AKUMULATOR</i><b>Jak czytać prąd spoczynkowy auta</b><span>uśpienie, pomiar cęgami, wykres w skali logarytmicznej</span><em class="art-go">Czytaj artykuł →</em></a>
+      <a class="art-card" href="artykuly/cegi-dryf-zera.html"><i class="art-tag">POMIAR · CĘGI</i><b>Cęgi prądowe i dryf zera</b><span>czujnik Halla, offset, pomiar dwukierunkowy</span><em class="art-go">Czytaj artykuł →</em></a>
+      <a class="art-card" href="artykuly/magistrala-can.html"><i class="art-tag">MAGISTRALA · CAN</i><b>Jak działa magistrala CAN</b><span>poziomy napięć, terminatory, budowa ramki</span><em class="art-go">Czytaj artykuł →</em></a>
+      <a class="art-card" href="artykuly/kompresja-wzgledna.html"><i class="art-tag">POMIAR · SILNIK</i><b>Pomiar kompresji względnej prądem rozrusznika</b><span>porównanie cylindrów, odczyt szczytów prądu, ograniczenia metody</span><em class="art-go">Czytaj artykuł →</em></a>
+    </div>
+    <p class="art-all"><a class="btn primary" href="artykuly/">Wszystkie artykuły techniczne →</a></p>
+  </div>
+</section>
+<style>.artykuly{padding:34px 0 10px}.art-grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}.art-card{display:flex;flex-direction:column;gap:6px;background:linear-gradient(180deg,rgba(214,168,82,.10),rgba(255,255,255,.03));border:1px solid var(--border);border-top:3px solid var(--accent);border-radius:var(--radius);padding:18px 20px;text-decoration:none;color:var(--text);min-height:190px}.art-card:hover{border-color:var(--accent);transform:translateY(-2px)}.art-card b{display:block;font-size:1.2rem;line-height:1.3}.art-card span{color:var(--muted);line-height:1.45}.art-tag{font-style:normal;font-size:.75rem;font-weight:800;letter-spacing:.1em;color:var(--accent)}.art-go{margin-top:auto;font-style:normal;font-weight:800;color:var(--accent);padding-top:8px}.art-all{text-align:center;margin:18px 0 0}.art-all .btn{display:inline-flex;align-items:center;justify-content:center;min-height:52px;padding:0 24px;text-decoration:none}.lab-art{display:block;margin-top:10px;text-align:center;font-weight:700;color:#ffd9ad;text-decoration:none;padding:6px}.lab-art:hover{text-decoration:underline}</style>
+
 <section id="galeria" class="galeria">
   <div class="container">
     <div class="section-title">
@@ -1651,6 +1670,7 @@ html.boot-seen #bootScreen{display:none!important}
           <p class="lab-desc gal-desc">Wykrywa moment uśpienia auta, mierzy pobór prądu cęgami i znajduje odbiornik, który rozładowuje akumulator.</p>
           <p class="lab-goal">Cel: znaleźć nocny pobór prądu bez wyjmowania bezpieczników.</p>
           <a class="lab-open lab-btn" href="lab/prad-spoczynkowy.html">Otwórz okno symulacji →</a>
+          <a class="lab-art" href="artykuly/prad-spoczynkowy.html">📖 Powiązany artykuł: Jak czytać prąd spoczynkowy auta</a>
         </div>
       </article>
 
@@ -1664,6 +1684,7 @@ html.boot-seen #bootScreen{display:none!important}
           <p class="lab-desc gal-desc">Ocenia sygnał fizyczny magistrali (oscylogram, oko, opór terminacji) i dane (ramki, błędy) z werdyktem OK / UWAGA / BŁĄD.</p>
           <p class="lab-goal">Cel: odpowiedzieć, czy magistrala CAN jest sprawna i gdzie jest usterka.</p>
           <a class="lab-open lab-btn" href="lab/analizator-can.html">Otwórz okno symulacji →</a>
+          <a class="lab-art" href="artykuly/magistrala-can.html">📖 Powiązany artykuł: Jak działa magistrala CAN</a>
         </div>
       </article>
 
@@ -1677,6 +1698,7 @@ html.boot-seen #bootScreen{display:none!important}
           <p class="lab-desc gal-desc">Porównuje cylindry silnika na podstawie prądu rozrusznika i znacznika cylindra 1, bez wykręcania świec.</p>
           <p class="lab-goal">Cel: wskazać cylinder o obniżonej kompresji przed rozbiórką silnika.</p>
           <a class="lab-open lab-btn" href="lab/kompresja-wzgledna.html">Otwórz okno symulacji →</a>
+          <a class="lab-art" href="artykuly/kompresja-wzgledna.html">📖 Powiązany artykuł: Pomiar kompresji względnej prądem rozrusznika</a>
         </div>
       </article>
 
@@ -1707,22 +1729,6 @@ html.boot-seen #bootScreen{display:none!important}
     </div>
   </div>
 </section>
-
-<section id="artykuly" class="artykuly">
-  <div class="container">
-    <div class="section-title">
-      <h2>Artykuły techniczne</h2>
-    </div>
-    <p class="section-sub">Krótkie teksty o pomiarach i systemach pojazdu.</p>
-    <div class="art-grid">
-      <a class="art-card" href="artykuly/prad-spoczynkowy.html"><b>Jak czytać prąd spoczynkowy auta</b><span>uśpienie, pomiar cęgami, wykres w skali logarytmicznej</span></a>
-      <a class="art-card" href="artykuly/cegi-dryf-zera.html"><b>Cęgi prądowe i dryf zera</b><span>czujnik Halla, offset, pomiar dwukierunkowy</span></a>
-      <a class="art-card" href="artykuly/magistrala-can.html"><b>Jak działa magistrala CAN</b><span>poziomy napięć, terminatory, budowa ramki</span></a>
-      <a class="art-card" href="artykuly/kompresja-wzgledna.html"><b>Pomiar kompresji względnej prądem rozrusznika</b><span>porównanie cylindrów, odczyt szczytów prądu, ograniczenia metody</span></a>
-    </div>
-  </div>
-</section>
-<style>.art-grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}.art-card{display:block;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;text-decoration:none;color:var(--text)}.art-card:hover{border-color:var(--accent)}.art-card b{display:block;font-size:1.1rem;margin-bottom:4px}.art-card span{color:var(--muted)}</style>
 
 <section id="faq">
     <div class="faq-wrap">

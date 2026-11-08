@@ -29,8 +29,9 @@
      '<a class="brand" href="../index.html#galeria" aria-label="EKOTRONIK SYSTEM – wróć do LAB"><img src="img/logo-emblem.png" alt="Logo EKOTRONIK SYSTEM"><div><div class="w1">EKOTRONIK</div><div class="w2">SYSTEM</div></div></a>'+
      '<div class="symbox" role="img" aria-label="Symbol: '+o.sym+'">'+LAB.ICONS[o.icon]+'<div><div class="st">'+o.sym+'</div><div class="sd">'+o.symd+'</div></div></div>'+
      '<div class="pill"><b>● SYMULACJA · emulator</b><br><span>Sprzęt i pojazd: niesprawdzone</span></div>';
-    document.getElementById('crumb').innerHTML='<a class="btn back" href="../index.html#galeria">← Powrót do LAB</a><div class="path">LAB › ANALIZATORY › <b>'+o.title+'</b></div>';
+    var art=LAB.ART[o.icon];document.getElementById('crumb').innerHTML='<a class="btn back" href="../index.html#galeria">← Powrót do LAB</a><div class="path">LAB › ANALIZATORY › <b>'+o.title+'</b></div>'+(art?'<a class="btn" style="margin-left:auto" href="../artykuly/'+art[0]+'.html">📖 Artykuł: '+art[1]+'</a>':'')+'<a class="btn" href="../artykuly/">Wszystkie artykuły</a>';
   };
+  LAB.ART={prad:['prad-spoczynkowy','prąd spoczynkowy'],can:['magistrala-can','magistrala CAN'],komp:['kompresja-wzgledna','kompresja względna']};
   window.LAB=LAB;
 })();
 /* kanwa wypełniająca rodzica (ekrany pomiaru na pełny ekran) */
