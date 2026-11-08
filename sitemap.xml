@@ -6,4 +6,46 @@
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
   </url>
+  <url>
+    <loc>https://ekotronik.github.io/ecu-immo-elv/immobilizer/</loc>
+    <lastmod>2026-11-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ekotronik.github.io/ecu-immo-elv/elv-escl/</loc>
+    <lastmod>2026-11-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ekotronik.github.io/ecu-immo-elv/ecu/</loc>
+    <lastmod>2026-11-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ekotronik.github.io/ecu-immo-elv/lab/prad-spoczynkowy.html</loc>
+    <lastmod>2026-11-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ekotronik.github.io/ecu-immo-elv/lab/analizator-can.html</loc>
+    <lastmod>2026-11-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ekotronik.github.io/ecu-immo-elv/lab/kompresja-wzgledna.html</loc>
+    <lastmod>2026-11-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ekotronik.github.io/ecu-immo-elv/lab/kontrola-rozrzadu.html</loc>
+    <lastmod>2026-11-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>
