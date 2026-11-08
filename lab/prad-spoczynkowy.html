@@ -10,7 +10,32 @@
 <meta property="og:url" content="https://ekotronik.github.io/ecu-immo-elv/lab/prad-spoczynkowy.html"><meta property="og:title" content="Analizator prądu spoczynkowego – symulacja | EKOTRONIK SYSTEM"><meta property="og:description" content="Analizator prądu spoczynkowego EKOTRONIK AI w trybie symulacji: scenariusze usypiania auta, cęgi CC-65, korekta dryfu, werdykt.">
 <meta property="og:image" content="https://ekotronik.github.io/ecu-immo-elv/assets_v8/og_ekotronik_system.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Logo EKOTRONIK SYSTEM">
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Analizator prądu spoczynkowego – symulacja | EKOTRONIK SYSTEM"><meta name="twitter:description" content="Analizator prądu spoczynkowego EKOTRONIK AI w trybie symulacji: scenariusze usypiania auta, cęgi CC-65, korekta dryfu, werdykt."><meta name="twitter:image" content="https://ekotronik.github.io/ecu-immo-elv/assets_v8/og_ekotronik_system.png">
-<link rel="stylesheet" href="lab.css">
+<link rel="stylesheet" href="lab.css"><style>
+.mz{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;gap:8px;padding:8px;background:linear-gradient(180deg,#0b1a2a,#040a11);color:var(--text)}
+.mz.hidden{display:none}
+.mz-bar{display:flex;align-items:center;gap:14px;min-height:48px;padding:6px 14px;background:var(--panel);border:1px solid var(--border);border-radius:10px}
+.mz-bar b{color:var(--gold);font-size:18px;letter-spacing:.02em;white-space:nowrap}
+.mz-bar .st{flex:1;font-weight:700;font-size:16px;line-height:1.2;color:#7fd0ff}
+.mz-net{background:#1b5e20;color:#c8f7cc;border:2px solid #66bb6a;border-radius:8px;padding:6px 12px;font-weight:800;font-size:13px;white-space:nowrap}
+.mz-tabs{display:flex;gap:8px}.mz-tabs button,.mz-btns button{font:inherit;font-weight:800;letter-spacing:.02em;color:var(--text);background:var(--raised);border:2px solid #3a4f7a;border-radius:12px;cursor:pointer;flex:1;min-height:46px;padding:0 8px}
+.mz-tabs button.sel{background:linear-gradient(180deg,#f0d28f,#c9a04d 55%,#9a7634);color:#0e0c08;border-color:var(--gold-l)}
+.mz-tabs #mzFull{border-color:var(--gold)}
+.mz-main{flex:1;display:flex;gap:8px;min-height:0}
+.mz-ch{flex:1 1 auto;display:flex;flex-direction:column;gap:4px;min-width:0;min-height:0}
+.mz-ch>div{position:relative;min-height:0;background:#000;border:1px solid #1d2c3c;border-radius:8px;overflow:hidden}
+.mz-ch canvas{position:absolute;left:0;top:0}
+.mz-side{flex:0 0 30%;display:none;overflow:auto;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:8px 12px}
+.mz.norm .mz-side{display:block}
+.mz-vals{display:none;font-size:14px;color:var(--muted);padding:2px 4px}.mz.norm .mz-vals{display:block}
+.mz-vals b{color:var(--text)}
+.mz-q{display:none;align-items:center;gap:10px;min-height:46px;padding:6px 14px;background:var(--raised);border:2px solid var(--gold-l);border-radius:10px;font-weight:700}
+.mz-q.on{display:flex}.mz-q span{flex:1}.mz-q button{font:inherit;font-weight:800;min-height:38px;border-radius:10px;border:2px solid var(--gold);background:var(--panel);color:var(--text);padding:0 14px;cursor:pointer}
+.mz-btns{display:flex;gap:8px;min-height:62px}
+.mz-btns button{font-size:16px;min-height:62px}
+.mz-btns .r{border-color:var(--fail)}.mz-btns .g{border-color:var(--gold)}.mz-btns .b{border-color:#5b8def;color:#cfe0ff}.mz-btns .f{background:linear-gradient(180deg,#f0d28f,#c9a04d 55%,#9a7634);color:#0e0c08}
+@media (max-width:700px){.mz-bar{flex-wrap:wrap;gap:4px 10px;padding:4px 10px}.mz-bar b{font-size:15px}.mz-bar .st{flex:1 1 100%;order:3;font-size:12px}.mz-net{margin-left:auto;font-size:11px;padding:3px 8px}.mz-tabs{flex-wrap:wrap;gap:6px}.mz-tabs button{flex:1 1 40%;min-height:38px;font-size:12px}.mz-btns{flex-wrap:wrap;gap:6px;min-height:0}.mz-btns button{flex:1 1 30%;min-height:44px;font-size:12px}.mz-side{display:none!important}}
+.mz>*{min-width:0}.mz{overflow:hidden}
+</style>
 </head><body><div class="wrap">
 <div class="hdr" id="hdr"></div><div class="crumb" id="crumb"></div>
 <div class="row" id="topBtns">
@@ -25,7 +50,7 @@
 <div data-p="pom"><div class="two">
  <div class="panel">
   <div class="pt"><i>01 /</i>Analizator prądu spoczynkowego</div>
-  <div class="psub" id="sub">cęgi CC-65 w gnieździe BNC głowicy EKO · symulowany moduł EKO-PRAD · norma 50 mA · ogólna</div>
+  <div class="psub" id="sub">ekran pomiaru z wykresami otwiera się na pełny ekran po START POMIARU · cęgi CC-65 w gnieździe BNC głowicy EKO · symulowany moduł EKO-PRAD · norma 50 mA · ogólna</div>
   <div class="kpis">
    <div class="kpi"><span class="lbl">Prąd teraz</span><div class="v cy" id="kNow">—</div></div>
    <div class="kpi"><span class="lbl">Prąd bazowy</span><div class="v cy" id="kBase">—</div></div>
@@ -35,10 +60,7 @@
    <div class="kpi"><span class="lbl">Magistrala CAN</span><div class="v" id="kCan">—</div></div>
    <div class="kpi"><span class="lbl">Wybudzenia kontrolne</span><div class="v warn" id="kWk">0</div></div>
   </div>
-  <div class="row" style="margin:6px 0"><button class="btn sel" data-r="all">CAŁY POMIAR</button><button class="btn" data-r="15">OSTATNIE 15 MIN</button><button class="btn" data-r="5">OSTATNIE 5 MIN</button></div>
-  <div class="cwrap"><canvas id="cv" aria-label="Prąd w skali logarytmicznej"></canvas></div>
-  <div class="cwrap" style="margin-top:8px"><canvas id="cvC" aria-label="Monitor magistrali CAN: stan i wybudzenia kontrolne"></canvas></div>
-  <div class="cwrap" style="margin-top:8px"><canvas id="cvV" aria-label="Napięcie akumulatora"></canvas></div>
+  <div class="row" style="margin:6px 0"><button class="btn gold" id="bMz">OTWÓRZ EKRAN POMIARU (jak w aplikacji)</button></div>
   <div class="box" id="verdict" style="margin-top:10px"><div class="bt" id="vT">GOTOWY</div><div id="vD" class="dm">Wybierz scenariusz w zakładce Przygotowanie i naciśnij START POMIARU.</div></div>
  </div>
  <div class="panel"><div class="pt"><i>02 /</i>Zdarzenia</div><div class="psub">etapy i wybudzenia od zamknięcia auta</div><ul class="ev" id="ev1"></ul><div class="note" id="foot" style="margin-top:10px">* z poprawką dryfu (pomiar dwukierunkowy)</div></div>
@@ -63,6 +85,15 @@
 <section class="panel about"><h2>Co tu widzisz</h2><ul><li>Ekran taki jak w aplikacji EKOTRONIK AI: prąd w skali logarytmicznej z etapami A, B–C, D–E, F, napięcie akumulatora, lista zdarzeń, werdykt.</li><li>Scenariusze to te same przypadki, na których aplikacja jest sprawdzana (prawidłowe usypianie, sterownik trzyma magistralę, wybudzenia bez powrotu, dryf cęgów i inne).</li></ul>
 <p class="note">To SYMULACJA. Przebiegi generuje model oparty na opisach z projektu, a nie pomiar z auta. Głowica ESP32, cęgi CC-65 i pojazd nie były w tym teście używane. Normy i progi są robocze.</p></section>
 </div></div>
+<div class="mz hidden" id="mz">
+ <div class="mz-bar"><b>ANALIZATOR PRĄDU</b><span class="st" id="mzSt">Gotowy do pomiaru · SYMULACJA</span><span class="mz-net">DOSTĘP DO SIECI</span></div>
+ <div class="mz-tabs"><button data-r="all" class="sel">CAŁY POMIAR</button><button data-r="15">OSTATNIE 15 MIN</button><button data-r="2">OSTATNIE 2 MIN</button><button id="mzFull">ZWYKŁY WIDOK</button></div>
+ <div class="mz-vals" id="mzVals"></div>
+ <div class="mz-main"><div class="mz-ch" id="mzCh"><div style="flex:1.45"><canvas id="cv" aria-label="Prąd w skali logarytmicznej"></canvas></div><div style="flex:.42"><canvas id="cvV" aria-label="Napięcie akumulatora"></canvas></div><div style="flex:1.25"><canvas id="cvC" aria-label="Magistrala CAN: napięcia i oscylogram ramki"></canvas></div></div>
+ <div class="mz-side"><div class="lbl">Zdarzenia</div><ul class="ev" id="mzEv"></ul></div></div>
+ <div class="mz-q" id="mzQ"><span id="mzQt"></span><button id="mzQb" class="hidden"></button></div>
+ <div class="mz-btns" id="mzBtns"></div>
+</div>
 <script src="lab.js"></script>
 <script>
 (function(){
@@ -85,8 +116,9 @@ const SC=[
  {id:'za_krotki',n:'Pomiar za krótki',d:'pomiar przerwany po 25 minutach',dur:25,I:prof,can:t=>t<21,flips:[]},
  {id:'dlugi_pobor',n:'Długi stały pobór 380 mA',d:'stały pobór przez ponad 2 godziny, napięcie opada zgodnie z poborem',dur:140,I:t=>t<21?prof(t):380,can:t=>t<21,flips:[70,120],mv:8}
 ];
-let sc=SC[0],speed=300,tau=0,running=false,done=false,hist=[],evs=[],flips=[],range='all',rnd=LAB.rng(11),marks=[],nextFlipIdx=0,lastWake=-1,wakeN=0,lastBase=null,canSleepLogged=false,fullLogged=false,usypLogged=false;
-const cv=LAB.canvas(document.getElementById('cv'),w=>w>700?.42:.62),cvC=LAB.canvas(document.getElementById('cvC'),w=>w>700?.36:.7),cvV=LAB.canvas(document.getElementById('cvV'),w=>w>700?.1:.2);
+let mzOn=false,pelny=true,active=false,freeze=false,msg=null,sc=SC[0],speed=300,tau=0,running=false,done=false,hist=[],evs=[],flips=[],range='all',rnd=LAB.rng(11),marks=[],nextFlipIdx=0,lastWake=-1,wakeN=0,lastBase=null,canSleepLogged=false,fullLogged=false,usypLogged=false;
+const cv=LAB.canvas(document.getElementById('cv'),.4),cvC=LAB.canvas(document.getElementById('cvC'),.4),cvV=LAB.canvas(document.getElementById('cvV'),.1);
+[cv,cvC,cvV].forEach(o=>{o.fit=function(){const p=o.el.parentElement,w=p.clientWidth,h=p.clientHeight;if(w<=0||h<=0)return;const tw=Math.round(w*o.dpr),th=Math.round(h*o.dpr);if(o.el.width===tw&&o.el.height===th)return;o.el.style.width=w+'px';o.el.style.height=h+'px';o.el.width=tw;o.el.height=th}});
 const driftRate=()=>(sc.drift||120)/60; // mA na minutę
 function trueI(t){let v=sc.I(t);if(sc.wake&&t>=sc.wake.start){const k=(t-sc.wake.start)%sc.wake.per;if(k<sc.wake.dur)v+=sc.wake.amp}return v}
 function resid(tt){ // pozostały dryf po korektach
@@ -95,11 +127,12 @@ function resid(tt){ // pozostały dryf po korektach
   if(flips.length===1)return d(tt)-d(flips[0].t);
   return LAB.gauss(rnd)*0.8;
 }
-function stage(t){ // t: czas od zamknięcia
-  if(t<0)return 'A';const can=sc.can(t);
-  if(can)return 'B–C';const base=sc.I(t);
-  return base<=60?'F':'D–E';
+function stage(t){ // etapy jak w aplikacji: B zamknięcie (2 min), C stopniowe wyłączanie, D–E magistrala uśpiona, F uśpiony
+  if(t<0)return 'A';if(t<2)return 'B';
+  if(sc.can(t))return 'C';
+  return sc.I(t)<=60?'F':'D–E';
 }
+const STN={'A':'przed zamknięciem','B':'zamknięcie i uzbrojenie','C':'stopniowe wyłączanie','D–E':'magistrala uśpiona, opóźnione wyłączenia','F':'uśpiony'};
 function wakeWin(t){return !!(sc.wake&&t>=sc.wake.start&&(t-sc.wake.start)%sc.wake.per<sc.wake.dur)} // jak wybudzenieW() w aplikacji
 function canOn(t){return !sc.noCan&&(sc.can(t)||wakeWin(t))} // ramki CAN w tej minucie (jak canTeraz w aplikacji)
 function canState(t){ // stan magistrali w minucie t od zamknięcia
@@ -110,7 +143,7 @@ function canState(t){ // stan magistrali w minucie t od zamknięcia
 }
 function canIdent(cs){return cs==='wybudzenie'?{id:sc.wakeId||0x5C0,ext:!!sc.wakeExt}:{id:sc.netId||0x5C0,ext:false}}
 function ev(t,txt,cls){evs.push({t,txt,cls:cls||''});}
-function reset(){tau=0;running=false;done=false;hist=[];evs=[];flips=[];marks=[];nextFlipIdx=0;lastWake=-1;wakeN=0;lastBase=null;canSleepLogged=false;fullLogged=false;usypLogged=false;rnd=LAB.rng(11);
+function reset(){active=false;freeze=false;msg=null;tau=0;running=false;done=false;hist=[];evs=[];flips=[];marks=[];nextFlipIdx=0;lastWake=-1;wakeN=0;lastBase=null;canSleepLogged=false;fullLogged=false;usypLogged=false;rnd=LAB.rng(11);
  document.getElementById('bGo').textContent='START POMIARU';document.getElementById('bFlip').disabled=true;document.getElementById('bMark').disabled=true;ui();draw()}
 function step(){
  tau+=DT;const t=tau-T0,V0=12.70,mv=(sc.mv||6)/1000/60;
@@ -129,7 +162,7 @@ function step(){
  if(!fullLogged&&st==='F'&&hist.filter(h=>h.t>t-10&&h.st==='F').length>=Math.round(10/DT)*0.95){fullLogged=true;ev(tau,'pełne uśpienie, '+Math.round(sc.I(t))+' mA','ok')}
  if(sc.flips[nextFlipIdx]!==undefined&&tau>=sc.flips[nextFlipIdx]&&document.getElementById('auto').checked){doFlip()}
  else if(sc.flips[nextFlipIdx]!==undefined&&tau>=sc.flips[nextFlipIdx])nextFlipIdx=nextFlipIdx;
- if(tau>=sc.dur+T0){running=false;done=true;document.getElementById('bGo').textContent='START POMIARU'}
+ if(tau>=sc.dur+T0){running=false;done=true;active=false;document.getElementById('bGo').textContent='START POMIARU'}
 }
 function doFlip(){
  if(done||tau<T0)return;const d=driftRate()*(flips.length?tau-flips[flips.length-1].t:tau);
@@ -159,25 +192,58 @@ function ui(){
  LAB.set('kNow',h?Math.round(h.i)+' mA':'—');
  const b=hist.length?base():null;LAB.set('kBase',b===null?'—':Math.round(b)+' mA'+(flips.length?'*':''));
  {const CT={aktywna:['AKTYWNA','ok'],usypia:['USYPIA','warn'],spi:['ŚPI','dm'],wybudzenie:['WYBUDZENIE','warn'],brak:['BRAK CAN','dm']};const k=h?CT[h.cs]:null;const el=document.getElementById('kCan');el.textContent=k?k[0]:'—';el.className='v '+(k?k[1]:'');LAB.set('kWk',String(wakeN))}
- LAB.set('kV',h?h.v.toFixed(2).replace('.',',')+' V':'—');LAB.set('kT',h?LAB.mmss(Math.max(0,tau-T0)):'00:00');LAB.set('kSt',h?(h.st==='A'?'A · po wyłączeniu':h.st==='B–C'?'B–C · usypianie':h.st==='D–E'?'D–E · sieć śpi':'F · uśpiony'):'—');
+ LAB.set('kV',h?h.v.toFixed(2).replace('.',',')+' V':'—');LAB.set('kT',h?LAB.mmss(Math.max(0,tau-T0)):'00:00');LAB.set('kSt',h?(h.st==='A'?'przed zamknięciem':h.st+' · '+STN[h.st]):'—');
  const box=document.getElementById('verdict');box.className='box '+(e?e.l:'');
  if(e){LAB.set('vT',e.t);LAB.set('vD',e.d)}
  const list=evs.map(x=>'<li><time>'+LAB.mmss(x.t)+'</time><span class="'+(x.cls||'')+'">'+x.txt+'</span></li>').join('')||'<li class="dm">brak zdarzeń</li>';
  LAB.html('ev1',list);LAB.html('ev2',list);
- document.getElementById('bFlip').disabled=!(running&&tau>T0);document.getElementById('bMark').disabled=!running;
+ document.getElementById('bFlip').disabled=!(active&&tau>T0);document.getElementById('bMark').disabled=!active;
+ mzUi(h,e);
  document.getElementById('foot').textContent=flips.length?'* z poprawką dryfu (pomiar dwukierunkowy, odwróceń: '+flips.length+')':'* bez korekty dryfu: odczyt zawiera dryf zera cęgów';
 }
+
+function mzUi(h,e){
+ const st=!active&&!done&&!hist.length?'Gotowy do pomiaru':done?'Pomiar zakończony':freeze?'Obraz zatrzymany · pomiar trwa':active?(running?'Pomiar trwa':'Pomiar wstrzymany'):'Pomiar zatrzymany';
+ const parts=[st];if(h){if(pelny)parts.push('prąd '+Math.round(h.i)+' mA',h.v.toFixed(2).replace('.',',')+' V');parts.push(h.st==='A'?'przed zamknięciem':h.st+' · '+STN[h.st]);if(h.t>=0)parts.push('od zamknięcia '+LAB.mmss(h.t))}
+ parts.push('SYMULACJA');LAB.set('mzSt',parts.join(' · '));
+ const b=hist.length?Math.round(base()):null,CN={aktywna:'AKTYWNA',usypia:'USYPIA',spi:'ŚPI',wybudzenie:'WYBUDZENIE',brak:'BRAK CAN'};
+ LAB.html('mzVals',h?'prąd teraz <b>'+Math.round(h.i)+' mA</b> · bazowy <b>'+b+' mA'+(flips.length?'*':'')+'</b> · napięcie <b>'+h.v.toFixed(2).replace('.',',')+' V</b> · CAN <b>'+CN[h.cs]+'</b> · wybudzenia <b>'+wakeN+'</b> · '+(e?'<b>'+e.t+'</b>':''):'wybierz scenariusz w zakładce Przygotowanie i naciśnij START POMIARU');
+ LAB.html('mzEv',document.getElementById('ev1').innerHTML);
+ // wiersz polecenia / komunikatu
+ let q=null,qb=null;const due=active&&!document.getElementById('auto').checked&&sc.flips[nextFlipIdx]!==undefined&&tau>=sc.flips[nextFlipIdx];
+ if(due)q=['Auto zasnęło: odwróć cęgi (pomiar dwukierunkowy), bez tego wynik będzie WSTĘPNY.',['ODWRÓĆ CĘGI','flip']];
+ else if(done)q=['Pomiar zakończony: raport jest gotowy.',['RAPORT','rep']];
+ else if(msg)q=[msg,null];
+ const qe=document.getElementById('mzQ');qe.classList.toggle('on',!!q);if(q){LAB.set('mzQt',q[0]);const bt=document.getElementById('mzQb');bt.classList.toggle('hidden',!q[1]);if(q[1]){bt.textContent=q[1][0];bt.dataset.a=q[1][1]}}
+ // dolny rząd przycisków
+ const key=[active,freeze,running].join();const bx=document.getElementById('mzBtns');
+ if(bx.dataset.k!==key){bx.dataset.k=key;bx.innerHTML=active?'<button class="r" data-a="stop">■ STOP</button><button class="r" data-a="mark">ZNACZNIK</button><button class="g" data-a="probe">SONDA</button><button class="g" data-a="freeze">'+(freeze?'WZNÓW OBRAZ':'PAUZA OBRAZU')+'</button><button class="g" data-a="ask">ZAPYTAJ</button><button class="b" data-a="back">← POWRÓT (pomiar trwa)</button>':'<button class="f g" data-a="start">▶ START POMIARU</button><button class="b" data-a="back">← POWRÓT</button>'}
+}
+function openMz(){mzOn=true;document.getElementById('mz').classList.remove('hidden');document.body.style.overflow='hidden';document.getElementById('mz').classList.toggle('norm',!pelny);ui();draw()}
+function closeMz(){mzOn=false;document.getElementById('mz').classList.add('hidden');document.body.style.overflow=''}
+function startMeasure(){if(done)reset();if(!active){active=true;running=true;msg=null}openMz();document.getElementById('bGo').textContent='PAUZA'}
+function mzAction(a){
+ if(a==='start')startMeasure();
+ else if(a==='back')closeMz();
+ else if(a==='stop'){running=false;active=false;freeze=false;msg=null;document.getElementById('bGo').textContent='START POMIARU';closeMz();document.querySelector('[data-t=rap]').click()}
+ else if(a==='mark'){marks.push(tau);ev(tau,'znacznik diagnosty','gd');msg='Znacznik dodany w '+LAB.mmss(Math.max(0,tau-T0))+' od zamknięcia.'}
+ else if(a==='probe')msg='Sonda bezpieczników jest niedostępna w symulacji (sprzęt nietestowany).';
+ else if(a==='freeze'){freeze=!freeze}
+ else if(a==='ask'){const e=evaluate();msg='Asystent AI (symulacja): '+(e?e.t+'. '+e.d:'brak danych, naciśnij START POMIARU.')}
+ else if(a==='flip'){doFlip()}
+ else if(a==='rep'){closeMz();document.querySelector('[data-t=rap]').click()}
+ ui();draw()}
 function drawChart(){
  const c=cv.ctx,d=cv.dpr,W=cv.W,H=cv.H,L=62*d,R=12*d,T=12*d,B=30*d,pw=W-L-R,ph=H-T-B;
  c.fillStyle='#000';c.fillRect(0,0,W,H);
  const xmax=sc.dur+T0,xmin=range==='all'?0:Math.max(0,tau-(+range)),xmaxV=range==='all'?xmax:Math.max(xmin+ +range,tau);
- const X=m=>L+(m-xmin)/(xmaxV-xmin)*pw,lo=Math.log10(10),hi=Math.log10(3500),Y=v=>T+ph-(Math.log10(Math.max(v,10))-lo)/(hi-lo)*ph;
+ const X=m=>L+(m-xmin)/(xmaxV-xmin)*pw,lo=Math.log10(10),hi=Math.log10(10000),Y=v=>T+ph-(Math.log10(Math.max(v,10))-lo)/(hi-lo)*ph;
  // pasma etapów
- const bands={'A':'rgba(214,168,82,.10)','B–C':'rgba(214,168,82,.14)','D–E':'rgba(110,120,160,.16)','F':'rgba(214,168,82,.10)'};
- let i0=0;for(let i=1;i<=hist.length;i++){if(i===hist.length||hist[i].st!==hist[i0].st){const a=hist[i0],b=hist[i-1];c.fillStyle=bands[a.st];const x0=Math.max(L,X(a.tau)),x1=Math.min(L+pw,X(b.tau));if(x1>x0)c.fillRect(x0,T,x1-x0,ph);c.fillStyle='#d6a852';c.font='bold '+(15*d)+'px Roboto,sans-serif';if(x1>x0+20*d)c.fillText(a.st,x0+6*d,T+18*d);i0=i}}
+ const bands={'A':'rgba(0,0,0,0)','B':'rgba(80,90,110,.28)','C':'rgba(40,80,200,.30)','D–E':'rgba(110,120,160,.22)','F':'rgba(214,168,82,.14)'};
+ let i0=0;for(let i=1;i<=hist.length;i++){if(i===hist.length||hist[i].st!==hist[i0].st){const a=hist[i0],b=hist[i-1];c.fillStyle=bands[a.st];const x0=Math.max(L,X(a.tau)),x1=Math.min(L+pw,X(b.tau));if(x1>x0)c.fillRect(x0,T,x1-x0,ph);c.fillStyle='#d6a852';c.font='bold '+(15*d)+'px Roboto,sans-serif';if(x1>x0+20*d&&a.st!=='A')c.fillText(a.st,x0+6*d,T+18*d);i0=i}}
  c.font=(13*d)+'px Roboto,sans-serif';c.fillStyle='#a3b0c2';c.strokeStyle='rgba(255,255,255,.08)';c.lineWidth=d;
- [[10,'10 mA'],[30,'30 mA'],[50,'50 mA'],[100,'100 mA'],[300,'300 mA'],[1000,'1 A'],[3000,'3 A']].forEach(([v,l])=>{c.beginPath();c.moveTo(L,Y(v));c.lineTo(W-R,Y(v));c.stroke();c.fillText(l,6*d,Y(v)+4*d)});
- const step=range==='all'?(xmax>100?20:10):(+range>10?5:1);for(let m=Math.ceil(xmin/step)*step;m<=xmaxV;m+=step){c.beginPath();c.moveTo(X(m),T);c.lineTo(X(m),T+ph);c.stroke();c.fillText(m+' min',X(m)-16*d,H-8*d)}
+ [[10,'10 mA'],[30,'30 mA'],[50,'50 mA'],[100,'100 mA'],[300,'300 mA'],[1000,'1 A'],[3000,'3 A'],[10000,'10 A']].forEach(([v,l])=>{c.beginPath();c.moveTo(L,Y(v));c.lineTo(W-R,Y(v));c.stroke();c.fillText(l,6*d,Y(v)+4*d)});
+ const step=range==='all'?(xmax>100?20:10):(+range>10?5:1);let lx2=-1e9;for(let m=Math.ceil((xmin-T0)/step)*step;m+T0<=xmaxV;m+=step){c.beginPath();c.moveTo(X(m+T0),T);c.lineTo(X(m+T0),T+ph);c.stroke();if(X(m+T0)-lx2>62*d&&X(m+T0)+34*d<=W){c.fillText(m+' min',X(m+T0)-16*d,H-8*d);lx2=X(m+T0)}}
  // norma (zadana) i pomiar nakładają się na jednym polu
  c.setLineDash([8*d,5*d]);c.strokeStyle='#66bb6a';c.lineWidth=1.8*d;c.beginPath();c.moveTo(L,Y(NORM));c.lineTo(W-R,Y(NORM));c.stroke();c.setLineDash([]);c.fillStyle='#66bb6a';c.fillText('norma 50 mA',L+pw-100*d,Y(NORM)-5*d);
  c.save();c.beginPath();c.rect(L,T,pw,ph);c.clip();
@@ -188,7 +254,7 @@ function drawChart(){
   if(e.txt.startsWith('ODWRÓĆ')&&e.t>=xmin){c.strokeStyle='#5adce8';c.setLineDash([3*d,4*d]);c.beginPath();c.moveTo(X(e.t),T);c.lineTo(X(e.t),T+ph);c.stroke();c.setLineDash([])}}
  for(const m of marks){if(m>=xmin){c.strokeStyle='#f4d89a';c.beginPath();c.moveTo(X(m),T);c.lineTo(X(m),T+ph);c.stroke();c.fillStyle='#f4d89a';c.fillText('Z',X(m)+3*d,T+30*d)}}
  if(!hist.length){c.fillStyle='#a3b0c2';c.font=(17*d)+'px Roboto,sans-serif';c.fillText('Brak danych: naciśnij START POMIARU (symulacja)',L+20*d,T+ph/2)}
- c.fillStyle='#ff8a65';c.font=(13*d)+'px Roboto,sans-serif';c.fillText('Prąd (skala log) · SYMULACJA',W-R-200*d,T+14*d);
+ c.fillStyle='#ff8a65';c.font=(13*d)+'px Roboto,sans-serif';c.fillText('Prąd (skala log) · SYMULACJA',W-R-190*d,T+14*d);
  c._geo={X,xmin,xmaxV,L,pw,st:step};
 }
 // ===== Monitor magistrali CAN: port WykresCan + MagistralaCan z aplikacji (SYMULACJA) =====
@@ -215,7 +281,7 @@ function drawCan(){
  if(!hist.length){c.fillStyle=TX;c.font=(14*d)+'px Roboto,sans-serif';c.fillText('Magistrala CAN: wybierz scenariusz i naciśnij START',lewy,H/2);return}
  // --- góra: napięcia CAN-H/L w czasie pomiaru ---
  {const gora=18*d,dol=podzial-16*d,y=siatka(gora,dol),xmin=g.xmin,xmax=g.xmaxV,X=g.X;
-  let lx=-1e9;for(let m=Math.ceil(xmin/g.st)*g.st;m<=xmax;m+=g.st){c.strokeStyle=GR;c.beginPath();c.moveTo(X(m),gora);c.lineTo(X(m),dol);c.stroke();c.fillStyle=TX;c.font=(12*d)+'px Roboto,sans-serif';if(X(m)-lx>66*d){c.fillText(m+' min',X(m)-16*d,dol+13*d);lx=X(m)}}
+  let lx=-1e9;for(let m=Math.ceil((xmin-T0)/g.st)*g.st;m+T0<=xmax;m+=g.st){const xm=X(m+T0);c.strokeStyle=GR;c.beginPath();c.moveTo(xm,gora);c.lineTo(xm,dol);c.stroke();c.fillStyle=TX;c.font=(12*d)+'px Roboto,sans-serif';if(xm-lx>66*d&&xm+34*d<=W){c.fillText(m+' min',xm-16*d,dol+13*d);lx=xm}}
   c.fillStyle=WB;c.font='bold '+(12*d)+'px Roboto,sans-serif';c.fillText(narrow?'CAN w czasie pomiaru · SYMULACJA':'Magistrala CAN w czasie pomiaru · SYMULACJA',lewy,gora-5*d);legenda(gora-5*d,c.measureText('CAN w czasie pomiaru · SYMULACJA').width);
   const kol=1.5*d,los=LAB.rng(hist.length);let i=0,last=null;const pH=[],pL=[],bH=[],bL=[];
   for(let x=lewy;x<prawy&&i<hist.length;x+=kol){const tDo=xmin+(x+kol-lewy)/(prawy-lewy)*(xmax-xmin);let akt=null;
@@ -244,13 +310,16 @@ function drawCan(){
 }
 function trueNear(t){const h=hist.find(x=>x.tau>=t);return h?h.i:100}
 function drawV(){
- const c=cvV.ctx,d=cvV.dpr,W=cvV.W,H=cvV.H,L=62*d,R=12*d,T=6*d,B=18*d,pw=W-L-R,ph=H-T-B;c.fillStyle='#000';c.fillRect(0,0,W,H);
- const g=cv.ctx._geo;if(!g)return;const vs=hist.map(h=>h.v);let lo=vs.length?Math.min(...vs)-.02:12.5,hi=vs.length?Math.max(...vs)+.02:12.75;if(hi-lo<.12){hi=lo+.12}
- const Y=v=>T+ph-(v-lo)/(hi-lo)*ph;c.font=(12*d)+'px Roboto,sans-serif';c.fillStyle='#66bb6a';c.fillText(hi.toFixed(2).replace('.',',')+' V',6*d,T+10*d);c.fillText(lo.toFixed(2).replace('.',',')+' V',6*d,T+ph);
- c.fillStyle='#a3b0c2';c.fillText('Napięcie akumulatora',L+4*d,H-4*d);
- c.strokeStyle='#66bb6a';c.lineWidth=1.8*d;c.beginPath();let f=true;for(const h of hist){if(h.tau<g.xmin-1)continue;const x=g.X(h.tau),y=Y(h.v);f?c.moveTo(x,y):c.lineTo(x,y);f=false}c.stroke();
+ const c=cvV.ctx,d=cvV.dpr,W=cvV.W,H=cvV.H,g=cv.ctx._geo;c.fillStyle='#000';c.fillRect(0,0,W,H);if(!g)return;
+ const L=g.L,R=12*d,T=14*d,B=6*d,pw=g.pw,ph=H-T-B,RED='#ef5350';
+ const vis=hist.filter(h=>h.tau>=g.xmin-1);const vs=vis.map(h=>h.v);
+ c.font=(12*d)+'px Roboto,sans-serif';c.fillStyle=RED;c.fillText('Napięcie akumulatora',L+pw-150*d,T-3*d);
+ if(vs.length<2)return;const lo=Math.min(...vs)-.03,hi=Math.max(...vs)+.03,Y=v=>T+ph-(v-lo)/(hi-lo)*ph;
+ c.strokeStyle='rgba(255,255,255,.10)';c.lineWidth=d;c.beginPath();c.moveTo(L,T);c.lineTo(L+pw,T);c.moveTo(L,T+ph);c.lineTo(L+pw,T+ph);c.stroke();
+ c.fillText(hi.toFixed(2).replace('.',',')+' V',4*d,T+10*d);c.fillText(lo.toFixed(2).replace('.',',')+' V',4*d,T+ph);
+ c.strokeStyle=RED;c.lineWidth=1.6*d;c.beginPath();let f=true;for(const h of vis){const x=g.X(h.tau),y=Y(h.v);f?c.moveTo(x,y):c.lineTo(x,y);f=false}c.stroke();
 }
-function draw(){drawChart();drawCan();drawV()}
+function draw(){if(!mzOn||freeze)return;cv.fit();cvC.fit();cvV.fit();drawChart();drawCan();drawV()}
 function report(){
  const e=evaluate(),b=hist.length?Math.round(base()):null;
  return 'RAPORT – ANALIZATOR PRĄDU SPOCZYNKOWEGO (SYMULACJA)\nScenariusz: '+sc.n+' – '+sc.d+'\nCzas pomiaru od zamknięcia: '+LAB.mmss(Math.max(0,tau-T0))+'\nPrąd bazowy: '+(b===null?'—':b+' mA'+(flips.length?' (z poprawką dryfu, odwróceń: '+flips.length+')':' (bez korekty dryfu)'))+'\nNorma: '+NORM+' mA (ogólna)\nWerdykt: '+(e?e.t:'—')+'\n'+(e?e.d:'')+'\n\nZdarzenia:\n'+evs.map(x=>LAB.mmss(x.t)+'  '+x.txt).join('\n')+'\n\nUwaga: wynik z SYMULACJI nie potwierdza usterki pojazdu. Sprzęt i pojazd niesprawdzone.';
@@ -259,16 +328,20 @@ function setSc(i){sc=SC[i];document.querySelectorAll('#scBtns .btn').forEach((b,
 document.getElementById('scBtns').innerHTML=SC.map((s,i)=>'<button class="btn" data-i="'+i+'">'+(i+1)+'  '+s.n+'</button>').join('');
 document.getElementById('scBtns').addEventListener('click',e=>{const b=e.target.closest('[data-i]');if(b){setSc(+b.dataset.i)}});
 document.querySelectorAll('[data-sp]').forEach(b=>b.onclick=()=>{speed=+b.dataset.sp;document.querySelectorAll('[data-sp]').forEach(x=>x.classList.toggle('sel',x===b))});
-document.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{range=b.dataset.r;document.querySelectorAll('[data-r]').forEach(x=>x.classList.toggle('sel',x===b))});
+document.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{range=b.dataset.r;document.querySelectorAll('[data-r]').forEach(x=>x.classList.toggle('sel',x.dataset.r===range));draw()});
+document.getElementById('mzBtns').addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(b)mzAction(b.dataset.a)});
+document.getElementById('mzQb').onclick=()=>mzAction(document.getElementById('mzQb').dataset.a);
+document.getElementById('mzFull').onclick=()=>{pelny=!pelny;document.getElementById('mzFull').textContent=pelny?'ZWYKŁY WIDOK':'⛶ PEŁNY EKRAN';document.getElementById('mz').classList.toggle('norm',!pelny);ui();draw()};
+document.getElementById('bMz').onclick=openMz;
 document.getElementById('tabs').addEventListener('click',e=>{const b=e.target.closest('[data-t]');if(!b)return;document.querySelectorAll('#tabs .btn').forEach(x=>x.classList.toggle('on',x===b));document.querySelectorAll('[data-p]').forEach(p=>p.classList.toggle('hidden',p.dataset.p!==b.dataset.t));if(b.dataset.t==='rap')LAB.set('rep',report());cv.fit();cvC.fit();cvV.fit();draw()});
-document.getElementById('bGo').onclick=()=>{if(done)reset();running=!running;document.getElementById('bGo').textContent=running?'PAUZA':'WZNÓW'};
+document.getElementById('bGo').onclick=()=>{if(!active){startMeasure();return}running=!running;document.getElementById('bGo').textContent=running?'PAUZA':'WZNÓW'};
 document.getElementById('bRes').onclick=reset;
 document.getElementById('bFlip').onclick=()=>{doFlip();ui()};
 document.getElementById('bMark').onclick=()=>{marks.push(tau);ev(tau,'znacznik diagnosty','gd');ui()};
 document.getElementById('bRep').onclick=()=>{document.querySelector('[data-t=rap]').click()};
 window.addEventListener('resize',()=>{cv.fit();cvC.fit();cvV.fit();draw()});
 let acc=0;LAB.loop(dt=>{if(running){acc+=dt*speed/60;let n=Math.floor(acc/DT);acc-=n*DT;while(n-->0&&running)step();ui()}draw()});
-window.__sim={setSc,reset,get tau(){return tau},get hist(){return hist},eval:evaluate,get flips(){return flips},run(min){running=true;while(tau<min&&!done){step()}running=false;ui();draw();return evaluate()},flip(){doFlip()},auto:v=>document.getElementById('auto').checked=v,SC};
+window.__sim={openMz,closeMz,start:startMeasure,setSc,reset,get tau(){return tau},get hist(){return hist},eval:evaluate,get flips(){return flips},run(min){active=true;running=true;while(tau<min&&!done){step()}running=false;ui();draw();return evaluate()},flip(){doFlip()},auto:v=>document.getElementById('auto').checked=v,SC};
 setSc(0);
 })();
 </script></body></html>
