@@ -272,7 +272,7 @@ function drawMain(){
    const ri=!frozen&&browse===null&&!narrow?runInfo(S.A):null;if(ri){const lab='utrzymuje się: '+ri.n+' kolejnych pomiarów ('+sg(ri.min)+'…'+sg(ri.max)+'°)';c.font=(12*d)+'px Roboto,sans-serif';const w3=c.measureText(lab).width+18*d,lx3=Math.max(L+4*d,Math.min(lx,W-R-w3-4*d));c.fillStyle='rgba(5,12,20,.92)';c.strokeStyle=col;c.lineWidth=1.4*d;rr(c,lx3,yM0+32*d,w3,22*d,8*d);c.fill();c.stroke();c.fillStyle='#fff';c.fillText(lab,lx3+9*d,yM0+48*d)}}}
  // kursory A–B
  ['A','B'].forEach(n=>{const a=cur[n];if(a===null||a<x0||a>x1)return;c.strokeStyle=n==='A'?'#fff':'#ffd54f';c.lineWidth=1.6*d;c.setLineDash([4*d,3*d]);c.beginPath();c.moveTo(X(a),top);c.lineTo(X(a),H-axH);c.stroke();c.setLineDash([]);c.fillStyle=n==='A'?'#fff':'#ffd54f';c.font='bold '+(14*d)+'px Roboto,sans-serif';c.textAlign='left';c.fillText('K'+n+' '+Math.round(a)+'°',X(a)+4*d,top+12*d)});
- if(!V){c.fillStyle='#d6a852';c.font='bold '+(16*d)+'px Roboto,sans-serif';c.textAlign='center';c.fillText('Czekam na pierwsze zdarzenie CMP · podgląd wzorcowy · SYMULACJA',L+pw/2,yM0+hM*.5)}
+ if(!V){c.fillStyle='#d6a852';c.font='bold '+(16*d)+'px Roboto,sans-serif';c.textAlign='center';{const tx=['Czekam na pierwsze zdarzenie CMP','podgląd wzorcowy · SYMULACJA'];let fs=16*d;while(fs>9*d&&Math.max(c.measureText(tx[0]).width,c.measureText(tx[1]).width)>pw-10*d){fs-=d;c.font='bold '+fs+'px Roboto,sans-serif'}c.fillText(tx[0],L+pw/2,yM0+hM*.3-fs*.6);c.fillText(tx[1],L+pw/2,yM0+hM*.3+fs*.7)}}
  cvM.geo={X,x0,x1,L,pw,top,H,axH}
 }
 function verdictKind(){const v=nowV();return v?v.kind:''}

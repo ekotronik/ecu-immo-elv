@@ -31,3 +31,5 @@ th{color:var(--muted);font-weight:600;font-size:.88rem}
 .card b{display:block;color:var(--gold);font-size:1.1rem;margin-bottom:4px}
 .card span{color:var(--muted);font-size:.95rem}
 @media (max-width:600px){body{font-size:17px}article,.list{padding:16px}h1{font-size:1.5rem}}
+
+@media(max-width:480px){table{font-size:.88rem}th,td{padding:6px 5px;overflow-wrap:anywhere}}
