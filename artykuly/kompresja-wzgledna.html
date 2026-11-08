@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pomiar kompresji względnej prądem rozrusznika | EKOTRONIK</title>
+<meta name="description" content="Metoda względnego porównania cylindrów na podstawie prądu rozrusznika: zasada, wykonanie pomiaru, odczyt przebiegu i ograniczenia metody.">
+<link rel="canonical" href="https://ekotronik.github.io/ecu-immo-elv/artykuly/kompresja-wzgledna.html">
+<meta name="robots" content="index,follow">
+<link rel="icon" type="image/png" sizes="64x64" href="../assets_v8/favicon.png">
+<meta property="og:type" content="article"><meta property="og:locale" content="pl_PL"><meta property="og:site_name" content="EKOTRONIK">
+<meta property="og:url" content="https://ekotronik.github.io/ecu-immo-elv/artykuly/kompresja-wzgledna.html"><meta property="og:title" content="Pomiar kompresji względnej prądem rozrusznika | EKOTRONIK"><meta property="og:description" content="Metoda względnego porównania cylindrów na podstawie prądu rozrusznika: zasada, wykonanie pomiaru, odczyt przebiegu i ograniczenia metody.">
+<meta property="og:image" content="https://ekotronik.github.io/ecu-immo-elv/assets_v8/og_ekotronik_system.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Pomiar kompresji względnej prądem rozrusznika | EKOTRONIK"><meta name="twitter:description" content="Metoda względnego porównania cylindrów na podstawie prądu rozrusznika: zasada, wykonanie pomiaru, odczyt przebiegu i ograniczenia metody.">
+<link rel="stylesheet" href="art.css">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Pomiar kompresji względnej prądem rozrusznika", "description": "Metoda względnego porównania cylindrów na podstawie prądu rozrusznika: zasada, wykonanie pomiaru, odczyt przebiegu i ograniczenia metody.", "inLanguage": "pl", "datePublished": "2026-11-08", "mainEntityOfPage": "https://ekotronik.github.io/ecu-immo-elv/artykuly/kompresja-wzgledna.html"}</script></head><body><div class="wrap">
+<header class="top"><a class="brand" href="../index.html" aria-label="EKOTRONIK SYSTEM – strona główna"><img src="../lab/img/logo-emblem.png" alt="Logo EKOTRONIK SYSTEM"><div><b>EKOTRONIK</b><span>SYSTEM</span></div></a><nav><a class="btn" href="index.html">Artykuły</a><a class="btn" href="../index.html#galeria">LAB</a></nav></header>
+<article>
+<h1>Pomiar kompresji względnej prądem rozrusznika</h1>
+<div class="meta">EKOTRONIK · artykuły techniczne · 8 listopada 2026</div>
+<p><b>Kompresja względna</b> to metoda porównania cylindrów silnika między sobą na podstawie prądu pobieranego przez rozrusznik podczas kręcenia silnika. Nie wymaga wykręcania świec ani wkręcania manometru w otwory cylindrów.</p>
+
+<h2>Zasada metody</h2>
+<ul>
+<li>W suwie sprężania tłok spręża powietrze w cylindrze, a siła potrzebna do jego sprężenia rośnie.</li>
+<li>Rozrusznik pokonuje tę siłę, więc w każdym suwie sprężania pobiera większy prąd.</li>
+<li>Prąd rozrusznika zawiera więc kolejne szczyty, po jednym na suw sprężania kolejnego cylindra, w kolejności zapłonu.</li>
+<li>Wysokość szczytu zależy od kompresji w danym cylindrze: słabiej sprężający cylinder daje niższy szczyt.</li>
+</ul>
+<p>Przy stałym napięciu zasilania prąd silnika prądu stałego jest proporcjonalny do jego obciążenia, dlatego wysokość szczytu prądu odzwierciedla obciążenie rozrusznika w danym suwie.</p>
+
+<h2>Wykonanie pomiaru</h2>
+<ol>
+<li>Silnik unieruchamia się tak, aby kręcił się rozrusznikiem, ale nie uruchomił: wyłącza się zasilanie paliwem albo zapłon.</li>
+<li>Cęgi prądowe o odpowiednio dużym zakresie zakłada się na przewód akumulatora, zgodnie z kierunkiem prądu oznaczonym na cęgach, i zeruje się je jak do każdego pomiaru prądu stałego.</li>
+<li>Rejestruje się prąd w czasie kręcenia silnika rozrusznikiem.</li>
+</ol>
+
+<h2>Odczyt przebiegu</h2>
+<ul>
+<li><b>Pierwszy szczyt</b> po włączeniu rozrusznika wynika z pokonania tarcia i bezwładności silnika w chwili ruszenia. Nie jest szczytem sprężania cylindra.</li>
+<li><b>Kolejne szczyty</b> odpowiadają suwom sprężania cylindrów. W silniku, w którym suwy sprężania następują w równych odstępach, szczyty są równo rozmieszczone w czasie.</li>
+<li><b>Porównanie</b> polega na zestawieniu wysokości szczytów kolejnych cylindrów. Szczyt wyraźnie niższy od pozostałych wskazuje cylinder, który spręża słabiej niż pozostałe.</li>
+<li><b>Przyporządkowanie szczytów do cylindrów</b> wymaga odniesienia do kolejności zapłonu, na przykład przez zarejestrowanie równolegle sygnału zapłonu lub wtrysku jednego cylindra.</li>
+</ul>
+
+<h2>Charakter wyniku</h2>
+<p>Wynik jest względny: pokazuje cylindry w porównaniu z pozostałymi cylindrami tego samego silnika, a nie wartość ciśnienia sprężania. Charakterystyka prądu i prędkości rozrusznika może zniekształcać porównanie cylindrów.</p>
+<p>Metoda wskazuje, który cylinder odbiega od pozostałych, a nie przyczynę odchylenia. Gdy przebieg wskazuje problem, sprawdza się go pomiarem sprężania manometrem.</p>
+
+<p class="see">Zobacz też: <a href="../lab/kompresja-wzgledna.html">symulacja testera kompresji względnej</a> · <a href="cegi-dryf-zera.html">Cęgi prądowe i dryf zera</a></p>
+</article></div></body></html>
