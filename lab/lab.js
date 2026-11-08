@@ -33,3 +33,15 @@
   };
   window.LAB=LAB;
 })();
+/* kanwa wypełniająca rodzica (ekrany pomiaru na pełny ekran) */
+(function(){
+  LAB.fillCanvas=function(el){
+    const dpr=Math.min(window.devicePixelRatio||1,2);
+    const o={ctx:el.getContext('2d'),dpr,el};
+    o.fit=function(){const p=el.parentElement,w=p.clientWidth,h=p.clientHeight;if(w<=0||h<=0)return false;const tw=Math.round(w*dpr),th=Math.round(h*dpr);if(el.width===tw&&el.height===th)return true;el.style.width=w+'px';el.style.height=h+'px';el.width=tw;el.height=th;return true};
+    Object.defineProperty(o,'W',{get(){return el.width}});Object.defineProperty(o,'H',{get(){return el.height}});
+    o.fit();return o;
+  };
+  LAB.f1=function(x,n){return (n===undefined?x.toFixed(1):x.toFixed(n)).replace('.',',')};
+  LAB.sg=function(x,n){return (x>=0?'+':'−')+LAB.f1(Math.abs(x),n)};
+})();
