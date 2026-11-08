@@ -6,7 +6,8 @@
     <meta name="robots" content="index,follow" />
 <title>EKOTRONIK — ECU • IMMO • ELV/ESCL | Diagnostyka elektroniki samochodowej</title>
   
-  <link rel="icon" type="image/png" href="assets_v8/favicon.png" />
+  <link rel="icon" type="image/png" sizes="64x64" href="assets_v8/favicon.png" />
+  <link rel="apple-touch-icon" href="assets_v8/apple-touch-icon.png" />
 <meta name="description" content="EKOTRONIK to projekt/portfolio z obszaru elektroniki samochodowej: diagnostyka ECU, immobilizer (IMMO) oraz ELV/ESCL. Materiały techniczne, zakres prac i przykładowe realizacje (bez oferty handlowej)." />
   
   <meta name="keywords" content="elektronika samochodowa, diagnostyka ECU, sterownik silnika ECU, immobilizer samochodowy, IMMO, blokada kierownicy ELV, ESCL, ESL, CAN BUS, LIN, programowanie modułów, naprawa modułów, brak komunikacji ECU, auto nie odpala immobilizer, analiza usterek, automotive electronics" />
@@ -17,6 +18,9 @@
   <meta property="og:title" content="EKOTRONIK — ECU • IMMO • ELV/ESCL | Diagnostyka elektroniki samochodowej" />
   <meta property="og:description" content="EKOTRONIK to projekt/portfolio z obszaru elektroniki samochodowej: diagnostyka ECU, immobilizer (IMMO) oraz ELV/ESCL. Materiały techniczne, zakres prac i przykładowe realizacje (bez oferty handlowej)." />
   <meta property="og:image" content="https://ekotronik.github.io/ecu-immo-elv/assets_v8/hero_bg.jpg" />
+  <meta property="og:image:width" content="1776" />
+  <meta property="og:image:height" content="1124" />
+  <meta property="og:site_name" content="EKOTRONIK" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="EKOTRONIK — ECU • IMMO • ELV/ESCL | Diagnostyka elektroniki samochodowej" />
   <meta name="twitter:description" content="EKOTRONIK to projekt/portfolio z obszaru elektroniki samochodowej: diagnostyka ECU, immobilizer (IMMO) oraz ELV/ESCL. Materiały techniczne, zakres prac i przykładowe realizacje (bez oferty handlowej)." />
@@ -86,6 +90,8 @@
     .brand-tag{font-size:13px;color:rgba(255,255,255,.72)}
     @media (max-width: 720px){
       .brand-logo{width:130px}
+      .brand{flex-wrap:wrap}
+      .brand .eko-logo-wrap{order:3;flex:1 1 100%;margin-top:4px}
     }
 
     .hero{padding:28px 0 18px}
@@ -781,6 +787,7 @@
   opacity:.9;
 }
 
+
 /* ===== TOPBAR (wariant 1) ===== */
 .topbar{
   position:sticky;
@@ -804,7 +811,7 @@
   min-width: 220px;
 }
 .topbar-logo{
-  width:44px;
+  width:76px;
   height:auto;
   display:block;
   filter: drop-shadow(0 10px 18px rgba(0,0,0,.45));
@@ -868,6 +875,27 @@
   .topbar-nav{gap:10px}
   .topbar-actions{width:100%;justify-content:flex-start}
 }
+
+/* ===== Mobile: kompaktowy nagłówek + stały pasek kontaktu ===== */
+.mobile-cta{display:none}
+@media (max-width: 640px){
+  .topbar-inner{flex-direction:row;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:8px 14px}
+  .topbar-brand{min-width:0}
+  .topbar-nav{width:100%;gap:2px;justify-content:space-between}
+  .topbar-nav a{padding:6px 8px}
+  .topbar-actions{display:none}
+  body{padding-bottom:calc(74px + env(safe-area-inset-bottom))}
+  .mobile-cta{display:grid;grid-template-columns:1fr 1fr;gap:10px;position:fixed;left:0;right:0;bottom:0;z-index:1200;
+    padding:10px 14px calc(10px + env(safe-area-inset-bottom));
+    background:linear-gradient(180deg,rgba(11,13,18,.70),rgba(11,13,18,.96));backdrop-filter:blur(10px);
+    border-top:1px solid rgba(255,255,255,.10)}
+  .mobile-cta a{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;border-radius:14px;
+    font-weight:900;font-size:15px;color:#0b0d12;text-decoration:none}
+  .mobile-cta .cta-call{background:linear-gradient(90deg,#ff8a1d,#7ee787)}
+  .mobile-cta .cta-write{background:rgba(255,255,255,.08);color:#eaf6ff;border:1px solid rgba(255,255,255,.16)}
+  .toast{bottom:calc(84px + env(safe-area-inset-bottom))!important}
+}
+
 
 
 /* Lightbox navigation */
@@ -984,6 +1012,7 @@
 
 
 /* ===== ECU BOOT SCREEN (EKOTRONIK) ===== */
+html.boot-seen #bootScreen{display:none!important}
 #bootScreen{
   position:fixed;
   inset:0;
@@ -1163,9 +1192,106 @@
   ]
 }
   </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "AutoRepair",
+  "name": "EKOTRONIK — elektronika samochodowa ECU • IMMO • ELV",
+  "url": "https://ekotronik.github.io/ecu-immo-elv/",
+  "image": "https://ekotronik.github.io/ecu-immo-elv/assets_v8/hero_bg.jpg",
+  "logo": "https://ekotronik.github.io/ecu-immo-elv/assets_v8/logo/logo_main.png",
+  "telephone": "+48504949149",
+  "email": "ekotronik2@wp.pl",
+  "areaServed": [
+    {
+      "@type": "City",
+      "name": "Rumia"
+    },
+    {
+      "@type": "City",
+      "name": "Reda"
+    },
+    {
+      "@type": "City",
+      "name": "Gdynia"
+    },
+    {
+      "@type": "City",
+      "name": "Gdańsk"
+    },
+    {
+      "@type": "City",
+      "name": "Sopot"
+    }
+  ],
+  "knowsAbout": [
+    "Sterowniki silnika ECU",
+    "Immobilizer IMMO",
+    "Blokada kolumny kierowniczej ELV/ESCL",
+    "Diagnostyka elektroniki samochodowej"
+  ]
+}
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Dlaczego samochód nie odpala mimo sprawnego akumulatora?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Najczęściej to problem z autoryzacją (immobilizer, transponder w kluczyku, antena/stacyjka) albo komunikacją modułów. W diagnostyce sprawdza się status IMMO (Authorized/Denied), błędy w ECU/IMMO oraz synchronizację kluczy."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Co to jest immobilizer i kiedy ulega awarii?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Immobilizer blokuje uruchomienie silnika bez poprawnego klucza. Awarie wynikają m.in. z uszkodzeń pamięci/EEPROM, problemów z kluczem, zalania modułu, spadków napięcia lub błędów w oprogramowaniu po nieudanych naprawach."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Na czym polega awaria blokady kierownicy ELV/ESCL?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Objawia się m.in. brakiem odblokowania kolumny, komunikatami o blokadzie kierownicy lub brakiem zapłonu. Przyczyną bywa zużyty silnik/zębatki, zimne luty, uszkodzenie elektroniki lub błędy synchronizacji z innymi modułami."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Czy można naprawić ECU zamiast wymieniać na nowe?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "W wielu przypadkach tak – zależy od rodzaju usterki. Naprawia się m.in. sekcje zasilania, sterowanie wtryskami, komunikację CAN, a w niektórych przypadkach przywraca/aktualizuje oprogramowanie."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Kiedy naprawa ECU zamienia się na „klonowanie”?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Gdy stary sterownik ma uszkodzenia pamięci/CPU lub poważne zwarcia i nie daje się stabilnie uruchomić – wtedy przenosi się dane (np. flash/eeprom) do sprawnego sterownika-dawcy, zachowując dopasowanie do auta."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Kiedy warto zgłosić się do elektronika samochodowego?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Gdy problem jest powtarzalny, pojawiają się błędy komunikacji, auto nie odpala mimo sprawnych podzespołów mechanicznych albo po wymianie modułu potrzebna jest adaptacja/programowanie."
+      }
+    }
+  ]
+}
+  </script>
   <script src="config.public.js"></script>
 </head>
 <body class="ignition">
+<script>try{if(sessionStorage.getItem("eko_boot_seen")==="1")document.documentElement.classList.add("boot-seen");sessionStorage.setItem("eko_boot_seen","1")}catch(e){}</script>
 
 
 
@@ -1250,19 +1376,7 @@
           }
         
 /* ===== LAB / Projekty ===== */
-.lab-grid{display:grid;gap:16px;grid-template-columns:repeat(12,1fr)}
-.lab-card{grid-column:span 4;background:rgba(7,18,33,.55);border:1px solid rgba(255,255,255,.10);border-radius:18px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.25);transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
-.lab-card:hover{transform:translateY(-2px);border-color:rgba(42,167,255,.45);box-shadow:0 14px 40px rgba(0,0,0,.35)}
-.lab-thumb{position:relative;aspect-ratio:3/2;background:radial-gradient(circle at 30% 30%, rgba(42,167,255,.25), transparent 55%),linear-gradient(135deg, rgba(6,18,37,.95), rgba(11,43,74,.75))}
-.lab-thumb img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1.05) contrast(1.02)}
-.lab-badge{position:absolute;left:12px;top:12px;padding:6px 10px;border-radius:999px;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.14);color:rgba(255,255,255,.9);font-size:.78rem;font-weight:700;letter-spacing:.3px}
-.lab-body{padding:14px 14px 16px}
-.lab-title{margin:0 0 6px;font-size:1.02rem;color:#eaf6ff}
-.lab-desc{margin:0;color:rgba(255,255,255,.74);line-height:1.45;font-size:.95rem}
-.lab-open{margin-top:12px;display:inline-flex;align-items:center;gap:8px;color:#eaf6ff;font-weight:700;font-size:.92rem;text-decoration:none;opacity:.92}
-.lab-open:hover{opacity:1;text-decoration:underline}
-@media (max-width:1024px){.lab-card{grid-column:span 6}}
-@media (max-width:640px){.lab-card{grid-column:span 12}}
+
 
 </style>
       </defs>
@@ -1314,7 +1428,7 @@
   <header class="topbar" role="banner">
     <div class="wrap topbar-inner">
       <a class="topbar-brand" href="#top" aria-label="Start">
-        <img class="topbar-logo" src="assets_v8/logo/logo_main.png" alt="Logo ECU IMMO ELV" />
+        <img class="topbar-logo" src="assets_v8/logo/logo_main.png" width="480" height="173" alt="Logo ECU IMMO ELV" />
         <div class="topbar-text">
           <div class="topbar-title">ECU • IMMO • ELV</div>
           <div class="topbar-sub">Elektronika samochodowa • Trójmiasto</div>
@@ -1323,7 +1437,7 @@
 
       <nav class="topbar-nav" aria-label="Nawigacja">
         <a href="#oferta">Oferta</a>
-        <a href="#galeria">Diagnostyka</a>
+        <a href="#galeria">LAB</a>
         <a href="#faq">FAQ</a>
         <a href="#kontakt">Kontakt</a>
       </nav>
@@ -1343,7 +1457,7 @@
       <div class="hero-inner">
         <div class="hero-left">
           <div class="brand">
-            <img class="brand-logo" src="assets_v8/logo/logo_main.png" alt="Logo" />
+            <img class="brand-logo" src="assets_v8/logo/logo_main.png" width="480" height="173" alt="Logo EKOTRONIK" />
             
 <!-- EKOTRONIK Premium SVG Logo (animated + scroll reactive) -->
 <div class="eko-logo-wrap" aria-label="EKOTRONIK — animowane logo">
@@ -1478,7 +1592,7 @@
               <div class="stat"><b><img class="mini-ico blink-immo" src="assets_v8/icon_immo.png" alt="Kontrolka immo">Immobilizer</b><span>diagnoza • naprawa</span></div>
               <div class="stat"><b><span class="mini-eps ry" aria-hidden="true"><img class="eps-red" src="assets_v8/icon_eps_red.png" alt=""><img class="eps-yellow" src="assets_v8/icon_eps_yellow.png" alt=""></span>ELV / ESCL</b><span>naprawa blokady kolumny</span></div>
             </div>
-            <div class="small" id="contactText">tel: +48 000 000 000<br/>e-mail: ekotronik2@wp.pl</div>
+            <div class="small" id="contactText">tel: +48 504 949 149<br/>e-mail: ekotronik2@wp.pl</div>
           </div>
         </div>
       </div>
@@ -1533,11 +1647,11 @@
         <div class="section-title" style="margin-bottom:12px;">PCB / elektronika</div>
         <div class="pcb-grid">
           <div class="pcb-shot">
-            <img src="assets_v8/pcb1.jpg" alt="Płytka sterownika – PCB (zbliżenie)">
+            <img src="assets_v8/pcb1.jpg" width="1400" height="1050" loading="lazy" decoding="async" alt="Płytka sterownika – PCB (zbliżenie)">
             <div class="cap">Sterownik ECU – elektronika, ścieżki, układy scalone.</div>
           </div>
           <div class="pcb-shot">
-            <img src="assets_v8/pcb2.jpg" alt="Płytka sterownika – PCB (zbliżenie)">
+            <img src="assets_v8/pcb2.jpg" width="1400" height="655" loading="lazy" decoding="async" alt="Płytka sterownika – PCB (zbliżenie)">
             <div class="cap">Diagnoza i naprawa elektroniki modułów samochodowych.</div>
           </div>
         </div>
@@ -1718,27 +1832,9 @@
   </section>
 
   
-<section class="section stats-section">
-  <div class="wrap">
-    <div class="card reveal">
-      <div class="section-title">Statystyki</div>
-      <div class="cols3">
-        <div class="feature">
-          <h3>Odwiedzin strony</h3>
-          <p style="font-size:32px;font-weight:900" id="counterViews">—</p>
-        </div>
-        <div class="feature">
-          <h3>Kliknięć numeru telefonu</h3>
-          <p style="font-size:32px;font-weight:900" id="counterPhone">—</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
 <footer>
     <div class="wrap footer-inner">
-      <img class="footer-logo" src="assets_v8/logo/logo_main.png" alt="Logo" />
+      <img class="footer-logo" src="assets_v8/logo/logo_main.png" width="480" height="173" alt="Logo EKOTRONIK" loading="lazy" decoding="async" />
       <div>© <span id="year"></span> • Elektronika pojazdowa</div>
     </div>
   <section id="seo-lokalne">
@@ -1777,6 +1873,11 @@
 </footer>
 </main>
 
+<nav class="mobile-cta" aria-label="Szybki kontakt">
+  <a class="cta-call" href="tel:+48504949149">📞 Zadzwoń</a>
+  <a class="cta-write" href="#kontakt">✉️ Napisz</a>
+</nav>
+
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -1801,7 +1902,6 @@
     callBtnEl.addEventListener("click", async () => {
       try { await navigator.clipboard.writeText(PHONE); toast("Skopiowano numer: " + PHONE); }
       catch(e){ toast("Nie udało się skopiować. Numer: " + PHONE); }
-      try { await hitPhone(); } catch(_){}
     });
   }
 
@@ -1819,6 +1919,8 @@
 // 2) Ten kod wysyła AJAX-em i pokazuje komunikat "Wiadomość wysłana ✅" bez przeładowania strony.
 
 const contactForm = document.getElementById("contactForm");
+const formTsEl = document.getElementById("formTs");
+if (formTsEl) formTsEl.value = String(Date.now());
 if (contactForm) {
   contactForm.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -1904,93 +2006,6 @@ if (contactForm) {
 
   offerLists.forEach((ul) => offerIO.observe(ul));
 
-
-// ===== LICZNIKI (stabilne) =====
-// CountAPI bywa czasem niedostępne / blokowane. Dlatego mamy fallback do localStorage,
-// żeby liczniki zawsze coś pokazały.
-
-const NS = "ekotronik-ghpages"; // unikalna przestrzeń nazw (możesz zmienić)
-const LS_PREFIX = "ekotronik_stats_";
-
-async function countApiHit(key){
-  const r = await fetch(`https://api.countapi.xyz/hit/${NS}/${key}`, { cache: "no-store" });
-  const j = await r.json();
-  return j.value;
-}
-async function countApiGet(key){
-  const r = await fetch(`https://api.countapi.xyz/get/${NS}/${key}`, { cache: "no-store" });
-  const j = await r.json();
-  return j.value;
-}
-
-function lsGet(key){
-  const v = Number(localStorage.getItem(LS_PREFIX + key) || "0");
-  return Number.isFinite(v) ? v : 0;
-}
-function lsHit(key){
-  const v = lsGet(key) + 1;
-  localStorage.setItem(LS_PREFIX + key, String(v));
-  return v;
-}
-function setText(id, val){
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.textContent = String(val ?? 0);
-}
-
-// 1) ODWIEDZINY — licz tylko raz na sesję (żeby odświeżanie nie nabijało)
-(async () => {
-  const sessionKey = "ekotronik_viewed_session";
-  const already = sessionStorage.getItem(sessionKey) === "1";
-  try{
-    if (!already){
-      const v = await countApiHit("views");
-      setText("counterViews", v);
-      sessionStorage.setItem(sessionKey, "1");
-    } else {
-      const v = await countApiGet("views");
-      setText("counterViews", v);
-    }
-  }catch(e){
-    const v = already ? lsGet("views") : lsHit("views");
-    setText("counterViews", v);
-    sessionStorage.setItem(sessionKey, "1");
-  }
-})();
-
-// 2) KLIKNIĘCIA TELEFONU — klik w tel: + klik w przycisk kopiowania numeru (callBtn)
-async function hitPhone(){
-  // Na urządzeniach mobilnych klik w tel: może natychmiast przełączyć do dialera
-  // i przerwać zapytanie sieciowe. Dlatego:
-  // 1) zwiększamy licznik lokalnie od razu (UI + localStorage),
-  // 2) dopiero potem próbujemy uaktualnić CountAPI (fetch z keepalive).
-  const local = lsHit("phone");
-  setText("counterPhone", local);
-
-  try{
-    const r = await fetch(`https://api.countapi.xyz/hit/${NS}/phone`, { cache: "no-store", keepalive: true });
-    const j = await r.json();
-    setText("counterPhone", j.value);
-    // synchronizacja localStorage
-    localStorage.setItem(LS_PREFIX + "phone", String(j.value));
-  }catch(e){
-    // zostaje wartość lokalna
-  }
-}
-
-(async () => {
-  // pokaż stan początkowy
-  try{
-    const v = await countApiGet("phone");
-    setText("counterPhone", v);
-  }catch(e){
-    setText("counterPhone", lsGet("phone"));
-  }
-
-  document.querySelectorAll('a[href^="tel:"]').forEach(a=>{
-    a.addEventListener("click", hitPhone);
-  });
-})();
 
 </script>
 
@@ -2304,7 +2319,7 @@ async function hitPhone(){
 /* ===== ECU BOOT SCREEN (EKOTRONIK) — uruchamia się PRZY KAŻDYM wejściu ===== */
 (function(){
   const boot = document.getElementById('bootScreen');
-  if(!boot) return;
+  if(!boot || document.documentElement.classList.contains('boot-seen')) return;
 
   const skipBtn = document.getElementById('bootSkip');
   const logEl = document.getElementById('bootLog');

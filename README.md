@@ -53,6 +53,8 @@ Repozytorium ma charakter informacyjny i dokumentacyjny.
 
 3. Na stronie kliknij „Podgląd” w danej kategorii, a lightbox pokaże zdjęcia z tej kategorii.
 
+Workflow: `.github/workflows/gallery.yml` (uruchamia `tools_generate_gallery.py`). W ustawieniach repozytorium: Settings → Actions → General → Workflow permissions → „Read and write permissions”.
+
 Uwaga: Nazwy plików sortowane są alfabetycznie. Obsługiwane rozszerzenia: jpg/jpeg/png/webp/gif.
 ## Turbo dodawanie zdjęć (bez folderów kategorii)
 
