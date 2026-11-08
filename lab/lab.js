@@ -24,7 +24,7 @@
   };
   /* nagłówek aplikacji: logo EKOTRONIK AI + symbol analizatora + status symulacji */
   LAB.header=function(o){
-    try{var bg=new URLSearchParams(location.search).get('bg');if(bg==='A'||bg==='B'){document.body.dataset.bg=bg;document.body.dataset.theme=o.icon}}catch(e){}
+    document.body.dataset.theme=o.icon;
     document.getElementById('hdr').innerHTML=
      '<a class="brand" href="../index.html#galeria" aria-label="EKOTRONIK SYSTEM – wróć do LAB"><img src="img/logo-emblem.png" alt="Logo EKOTRONIK SYSTEM"><div><div class="w1">EKOTRONIK</div><div class="w2">SYSTEM</div></div></a>'+
      '<div class="symbox" role="img" aria-label="Symbol: '+o.sym+'">'+LAB.ICONS[o.icon]+'<div><div class="st">'+o.sym+'</div><div class="sd">'+o.symd+'</div></div></div>'+
