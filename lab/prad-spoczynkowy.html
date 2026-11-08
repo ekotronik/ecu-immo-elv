@@ -1,15 +1,15 @@
 <!doctype html>
 <html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Analizator prądu spoczynkowego – symulacja | EKOTRONIK SYSTEM</title>
-<meta name="description" content="Analizator prądu spoczynkowego EKOTRONIK AI w trybie symulacji: scenariusze usypiania auta, cęgi CC-65, korekta dryfu, werdykt.">
+<meta name="description" content="Analizator prądu spoczynkowego EKOTRONIK w trybie symulacji: scenariusze usypiania auta, cęgi CC-65, korekta dryfu, werdykt.">
 <link rel="canonical" href="https://ekotronik.github.io/ecu-immo-elv/lab/prad-spoczynkowy.html">
 <meta name="robots" content="index,follow">
 <link rel="icon" type="image/png" sizes="64x64" href="../assets_v8/favicon.png">
 <link rel="apple-touch-icon" href="../assets_v8/apple-touch-icon.png">
 <meta property="og:type" content="website"><meta property="og:locale" content="pl_PL"><meta property="og:site_name" content="EKOTRONIK SYSTEM">
-<meta property="og:url" content="https://ekotronik.github.io/ecu-immo-elv/lab/prad-spoczynkowy.html"><meta property="og:title" content="Analizator prądu spoczynkowego – symulacja | EKOTRONIK SYSTEM"><meta property="og:description" content="Analizator prądu spoczynkowego EKOTRONIK AI w trybie symulacji: scenariusze usypiania auta, cęgi CC-65, korekta dryfu, werdykt.">
+<meta property="og:url" content="https://ekotronik.github.io/ecu-immo-elv/lab/prad-spoczynkowy.html"><meta property="og:title" content="Analizator prądu spoczynkowego – symulacja | EKOTRONIK SYSTEM"><meta property="og:description" content="Analizator prądu spoczynkowego EKOTRONIK w trybie symulacji: scenariusze usypiania auta, cęgi CC-65, korekta dryfu, werdykt.">
 <meta property="og:image" content="https://ekotronik.github.io/ecu-immo-elv/assets_v8/og_ekotronik_system.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Logo EKOTRONIK SYSTEM">
-<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Analizator prądu spoczynkowego – symulacja | EKOTRONIK SYSTEM"><meta name="twitter:description" content="Analizator prądu spoczynkowego EKOTRONIK AI w trybie symulacji: scenariusze usypiania auta, cęgi CC-65, korekta dryfu, werdykt."><meta name="twitter:image" content="https://ekotronik.github.io/ecu-immo-elv/assets_v8/og_ekotronik_system.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Analizator prądu spoczynkowego – symulacja | EKOTRONIK SYSTEM"><meta name="twitter:description" content="Analizator prądu spoczynkowego EKOTRONIK w trybie symulacji: scenariusze usypiania auta, cęgi CC-65, korekta dryfu, werdykt."><meta name="twitter:image" content="https://ekotronik.github.io/ecu-immo-elv/assets_v8/og_ekotronik_system.png">
 <link rel="stylesheet" href="lab.css"><style>
 .mz{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;gap:8px;padding:8px;background:linear-gradient(180deg,#0b1a2a,#040a11);color:var(--text)}
 .mz.hidden{display:none}
@@ -82,7 +82,7 @@
 
 <div class="about">
 <section class="panel about"><h2>Cel projektu</h2><p>Znaleźć odbiornik, który rozładowuje akumulator, bez wyjmowania bezpieczników i bez zgadywania. Analizator sam rozpoznaje, kiedy auto naprawdę zasnęło, mierzy prąd uśpienia cęgami CC-65 (z korektą dryfu zera przez odwrócenie cęgów) i ocenia wynik względem normy. Nie zaleca wymiany żadnej części.</p></section>
-<section class="panel about"><h2>Co tu widzisz</h2><ul><li>Ekran taki jak w aplikacji EKOTRONIK AI: prąd w skali logarytmicznej z etapami A, B–C, D–E, F, napięcie akumulatora, lista zdarzeń, werdykt.</li><li>Scenariusze to te same przypadki, na których aplikacja jest sprawdzana (prawidłowe usypianie, sterownik trzyma magistralę, wybudzenia bez powrotu, dryf cęgów i inne).</li></ul>
+<section class="panel about"><h2>Co tu widzisz</h2><ul><li>Ekran taki jak w aplikacji EKOTRONIK: prąd w skali logarytmicznej z etapami A, B–C, D–E, F, napięcie akumulatora, lista zdarzeń, werdykt.</li><li>Scenariusze to te same przypadki, na których aplikacja jest sprawdzana (prawidłowe usypianie, sterownik trzyma magistralę, wybudzenia bez powrotu, dryf cęgów i inne).</li></ul>
 <p class="note">To SYMULACJA. Przebiegi generuje model oparty na opisach z projektu, a nie pomiar z auta. Głowica ESP32, cęgi CC-65 i pojazd nie były w tym teście używane. Normy i progi są robocze.</p></section>
 </div></div>
 <div class="mz hidden" id="mz">

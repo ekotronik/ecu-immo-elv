@@ -1,4 +1,4 @@
-/* EKOTRONIK AI – styl panelu aplikacji (motyw czarno-złoty, wartości z Theme.kt) */
+/* EKOTRONIK – styl panelu aplikacji (motyw czarno-złoty, wartości z Theme.kt) */
 :root{--gold:#d6a852;--gold-l:#f4d89a;--gold-d:#8e6b2c;--bg:#07111c;--bg-deep:#040a11;--top:#0b1a2a;--panel:#0b1827;--raised:#0f2135;--border:#6b5a33;--text:#eceff3;--muted:#a3b0c2;--ok:#66bb6a;--fail:#ef5350;--warn:#ffca28;--demo:#e65100;--cyan:#5adce8;--hdr:#050608;--wave:#07090c;--canh:#4de3f5;--canl:#6be36b}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;background:#040a11}

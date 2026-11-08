@@ -22,7 +22,7 @@
    komp:'<svg viewBox="0 0 54 44" fill="none" stroke="#d6a852" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="14" y="6" width="26" height="16" rx="2"/><path d="M18 22v6h18v-6M24 28v8M30 28v8M20 36h14"/><path d="M4 40c4 0 4-6 7-6s3 6 6 6" stroke="#5adce8"/></svg>',
    roz:'<svg viewBox="0 0 54 44" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="19" cy="22" r="13" stroke="#d6a852"/><circle cx="19" cy="22" r="4" stroke="#d6a852"/><path d="M19 9v-4M31 14l3-3M7 14l-3-3M32 22h4M6 22H2M31 30l3 3M7 30l-3 3" stroke="#d6a852"/><path d="M38 38h4V26h5V14" stroke="#5adce8"/></svg>'
   };
-  /* nagłówek aplikacji: logo EKOTRONIK AI + symbol analizatora + status symulacji */
+  /* nagłówek aplikacji: logo EKOTRONIK + symbol analizatora + status symulacji */
   LAB.header=function(o){
     document.body.dataset.theme=o.icon;
     document.getElementById('hdr').innerHTML=
