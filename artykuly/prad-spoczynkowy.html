@@ -18,7 +18,7 @@
 <p><b>Prąd spoczynkowy</b> to prąd pobierany z akumulatora przez zaparkowany, zamknięty pojazd, gdy jego układy przeszły w stan uśpienia. Podaje się go w miliamperach (mA).</p>
 
 <h2>Pojazd nie zasypia od razu</h2>
-<p>Po zamknięciu pojazdu sterowniki przechodzą w stan uśpienia stopniowo, a nie jednocześnie. Dlatego tuż po zamknięciu prąd jest wyższy i maleje w kolejnych etapach. Czas dojścia do pełnego uśpienia zależy od pojazdu; w praktyce warsztatowej podaje się od kilkunastu do kilkudziesięciu minut.</p>
+<p>Po zamknięciu pojazdu sterowniki przechodzą w stan uśpienia stopniowo, a nie jednocześnie. Dlatego tuż po zamknięciu prąd jest wyższy i maleje w kolejnych etapach. Czas dojścia do pełnego uśpienia zależy od pojazdu; w praktyce warsztatowej podaje się od ok. 20 minut do ponad godziny, zależnie od pojazdu.</p>
 <div class="def">Odczyt wykonany przed pełnym uśpieniem opisuje stan przejściowy, a nie prąd spoczynkowy. Wynik czyta się dopiero wtedy, gdy prąd przestał maleć i utrzymuje się na stałym poziomie.</div>
 
 <h2>Pomiar cęgami prądowymi</h2>
@@ -34,7 +34,7 @@
 <p>Cęgi z czujnikiem Halla mają offset, czyli niezerowy odczyt przy zerowym prądzie, a właściwości czujnika zmieniają się wraz z temperaturą. Offset dodaje się do wyniku niezależnie od wartości prądu, dlatego najsilniej wpływa na pomiary małych prądów, takich jak prąd spoczynkowy.</p>
 <p>Offset eliminuje się pomiarem w dwóch ustawieniach cęgów: normalnym i odwróconym o 180°. Jeśli <code>I</code> jest prądem, a <code>o</code> offsetem:</p>
 <div class="eq">odczyt 1 = I + o<br>odczyt 2 = −I + o<br>I = (odczyt 1 − odczyt 2) ÷ 2</div>
-<p>Przykład: odczyt 1 = +212 mA, odczyt 2 = −188 mA, więc I = (212 − (−188)) ÷ 2 = 200 mA, a offset wynosi (212 + (−188)) ÷ 2 = 12 mA. Metoda usuwa offset tylko wtedy, gdy nie zmienia się między dwoma odczytami, a prąd jest w tym czasie stały.</p>
+<p>Przykład: odczyt 1 = +212 mA, odczyt 2 = −188 mA, więc I = (212 − (−188)) ÷ 2 = 200 mA, a offset wynosi (212 + (−188)) ÷ 2 = 12 mA. Metoda usuwa offset tylko wtedy, gdy nie zmienia się między dwoma odczytami, prąd jest w tym czasie stały, czułość cęgów jest równa w obu kierunkach, a w rdzeniu nie ma pozostałości magnetycznej po dużym prądzie stałym.</p>
 
 <h2>Wykres w skali logarytmicznej</h2>
 <p>W skali logarytmicznej równe odstępy na osi pionowej odpowiadają równym stosunkom prądów. Dzięki temu na jednym wykresie widać jednocześnie prądy rzędu setek miliamperów tuż po zamknięciu i dziesiątek miliamperów po uśpieniu.</p>
