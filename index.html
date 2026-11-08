@@ -1149,7 +1149,7 @@ html.boot-seen #bootScreen{display:none!important}
 
 /* ===== LAB / Projekty ===== */
 .lab-grid{display:grid;gap:16px;grid-template-columns:repeat(12,1fr)}
-.lab-card{grid-column:span 4;background:rgba(7,18,33,.55);border:1px solid rgba(255,255,255,.10);border-radius:18px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.25);transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+.lab-card{grid-column:span 6;background:rgba(7,18,33,.55);border:1px solid rgba(255,255,255,.10);border-radius:18px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.25);transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
 .lab-card:hover{transform:translateY(-2px);border-color:rgba(42,167,255,.45);box-shadow:0 14px 40px rgba(0,0,0,.35)}
 .lab-thumb{position:relative;aspect-ratio:3/2;background:radial-gradient(circle at 30% 30%, rgba(42,167,255,.25), transparent 55%),linear-gradient(135deg, rgba(6,18,37,.95), rgba(11,43,74,.75))}
 .lab-thumb img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1.05) contrast(1.02)}
@@ -1160,6 +1160,8 @@ html.boot-seen #bootScreen{display:none!important}
 .lab-open{margin-top:12px;display:inline-flex;align-items:center;gap:8px;color:#eaf6ff;font-weight:700;font-size:.92rem;text-decoration:none;opacity:.92}
 .lab-open:hover{opacity:1;text-decoration:underline}
 @media (max-width:1024px){.lab-card{grid-column:span 6}}
+.lab-goal{margin:10px 0 0;color:#ffd9ad;font-weight:700;font-size:1rem;line-height:1.4}
+.lab-btn{min-height:48px;padding:0 18px;border-radius:14px;background:var(--accent);color:#1a0f00!important;font-size:1.02rem;text-decoration:none!important;opacity:1!important}
 @media (max-width:640px){.lab-card{grid-column:span 12}}
 
 </style>
@@ -1663,79 +1665,71 @@ html.boot-seen #bootScreen{display:none!important}
 <section id="galeria" class="galeria">
   <div class="container">
     <div class="section-title">
-      <h2>LAB / Projekty rozwojowe</h2>
+      <h2>LAB / Analizatory EKOTRONIK AI</h2>
     </div>
-    <p class="section-sub">Autorskie projekty, nad którymi pracuję obecnie, rozwijam etapami lub planuję je w ramach własnego laboratorium rozwojowego.</p>
+    <p class="section-sub">Cztery analizatory z asystenta EKOTRONIK AI. Każdy ma własne okno z interaktywną symulacją, opisem i celem projektu. To symulacje: sprzęt i pojazd nie były jeszcze sprawdzane.</p>
 
     <div class="gal-filters" aria-label="Filtry sekcji LAB">
       <button class="gal-filter-btn active" data-filter="all">Wszystko</button>
-      <button class="gal-filter-btn" data-filter="ECU">Tester prądu</button>
-      <button class="gal-filter-btn" data-filter="IMMO">ECU Tester PRO</button>
-      <button class="gal-filter-btn" data-filter="ELV">Analizator ładowania</button>
-      <button class="gal-filter-btn" data-filter="DIAG">Symulator instalacji</button>
-      <button class="gal-filter-btn" data-filter="PCB">LAB / przyszłe projekty</button>
+      <button class="gal-filter-btn" data-filter="PRAD">Prąd</button>
+      <button class="gal-filter-btn" data-filter="CAN">CAN</button>
+      <button class="gal-filter-btn" data-filter="KOMP">Kompresja</button>
+      <button class="gal-filter-btn" data-filter="ROZ">Rozrząd</button>
     </div>
 
     <div class="lab-grid gal-grid">
-      <article class="lab-card gal-card" data-cat="ECU">
+      <article class="lab-card gal-card" data-cat="PRAD">
         <div class="lab-thumb gal-thumb">
-          <span class="lab-badge gal-badge">LAB / prąd</span>
-          <img src="assets_v8/projects/lab_tester.svg" alt="Projekt testera prądu PRO" loading="lazy">
+          <span class="lab-badge gal-badge">SYMULACJA</span>
+          <img src="assets_v8/projects/lab_prad.svg" alt="Analizator prądu spoczynkowego – podgląd" loading="lazy">
         </div>
         <div class="lab-body gal-body">
-          <h3 class="lab-title gal-title">Tester prądu PRO</h3>
-          <p class="lab-desc gal-desc">Projekt analizatora poboru prądu, trybów uśpienia, rozruchu i zachowania instalacji elektrycznej pojazdu w czasie rzeczywistym.</p>
-          <a class="lab-open gal-open" href="#" data-open>Podgląd</a>
+          <h3 class="lab-title gal-title">Analizator prądu spoczynkowego</h3>
+          <p class="lab-desc gal-desc">Wykrywa moment uśpienia auta, mierzy pobór prądu cęgami i znajduje odbiornik, który rozładowuje akumulator.</p>
+          <p class="lab-goal">Cel: znaleźć nocny pobór prądu bez wyjmowania bezpieczników.</p>
+          <a class="lab-open lab-btn" href="lab/prad-spoczynkowy.html">Otwórz okno symulacji →</a>
         </div>
       </article>
 
-      <article class="lab-card gal-card" data-cat="IMMO">
+      <article class="lab-card gal-card" data-cat="CAN">
         <div class="lab-thumb gal-thumb">
-          <span class="lab-badge gal-badge">LAB / ECU</span>
-          <img src="assets_v8/projects/lab_ecu.svg" alt="Projekt ECU Tester PRO" loading="lazy">
+          <span class="lab-badge gal-badge">SYMULACJA</span>
+          <img src="assets_v8/projects/lab_can.svg" alt="Analizator CAN (EKO-CAN) – podgląd" loading="lazy">
         </div>
         <div class="lab-body gal-body">
-          <h3 class="lab-title gal-title">ECU Tester PRO</h3>
-          <p class="lab-desc gal-desc">Autorskie urządzenie do testowania sterowników i podzespołów wykonawczych: zaworów, przepustnic, pomp oraz wybranych układów elektronicznych.</p>
-          <a class="lab-open gal-open" href="#" data-open>Podgląd</a>
+          <h3 class="lab-title gal-title">Analizator CAN (EKO-CAN)</h3>
+          <p class="lab-desc gal-desc">Ocenia sygnał fizyczny magistrali (oscylogram, oko, opór terminacji) i dane (ramki, błędy) z werdyktem OK / UWAGA / BŁĄD.</p>
+          <p class="lab-goal">Cel: odpowiedzieć, czy magistrala CAN jest sprawna i gdzie jest usterka.</p>
+          <a class="lab-open lab-btn" href="lab/analizator-can.html">Otwórz okno symulacji →</a>
         </div>
       </article>
 
-      <article class="lab-card gal-card" data-cat="ELV">
+      <article class="lab-card gal-card" data-cat="KOMP">
         <div class="lab-thumb gal-thumb">
-          <span class="lab-badge gal-badge">LAB / charging</span>
-          <img src="assets_v8/projects/lab_charging.svg" alt="Projekt analizatora ładowania" loading="lazy">
+          <span class="lab-badge gal-badge">SYMULACJA</span>
+          <img src="assets_v8/projects/lab_kompresja.svg" alt="Analizator kompresji względnej – podgląd" loading="lazy">
         </div>
         <div class="lab-body gal-body">
-          <h3 class="lab-title gal-title">Analizator ładowania</h3>
-          <p class="lab-desc gal-desc">Rozwijane narzędzie do badania napięcia, trendów ładowania i zachowania nowoczesnych układów zarządzania energią w pojeździe.</p>
-          <a class="lab-open gal-open" href="#" data-open>Podgląd</a>
+          <h3 class="lab-title gal-title">Analizator kompresji względnej</h3>
+          <p class="lab-desc gal-desc">Porównuje cylindry silnika na podstawie prądu rozrusznika i znacznika cylindra 1, bez wykręcania świec.</p>
+          <p class="lab-goal">Cel: wskazać cylinder o obniżonej kompresji przed rozbiórką silnika.</p>
+          <a class="lab-open lab-btn" href="lab/kompresja-wzgledna.html">Otwórz okno symulacji →</a>
         </div>
       </article>
 
-      <article class="lab-card gal-card" data-cat="DIAG">
+      <article class="lab-card gal-card" data-cat="ROZ">
         <div class="lab-thumb gal-thumb">
-          <span class="lab-badge gal-badge">LAB / symulator</span>
-          <img src="assets_v8/projects/lab_simulator.svg" alt="Projekt symulatora instalacji" loading="lazy">
+          <span class="lab-badge gal-badge">SYMULACJA</span>
+          <img src="assets_v8/projects/lab_rozrzad.svg" alt="Analizator rozrządu – podgląd" loading="lazy">
         </div>
         <div class="lab-body gal-body">
-          <h3 class="lab-title gal-title">Symulator instalacji</h3>
-          <p class="lab-desc gal-desc">Projekt stanowiska do symulacji scenariuszy pracy instalacji i sterowników, przygotowany pod testy rozwojowe i diagnostyczne.</p>
-          <a class="lab-open gal-open" href="#" data-open>Podgląd</a>
+          <h3 class="lab-title gal-title">Analizator rozrządu</h3>
+          <p class="lab-desc gal-desc">Mierzy kąt wałka rozrządu względem luki koła wału korbowego (60-2) i podaje odchyłkę w stopniach OWK.</p>
+          <p class="lab-goal">Cel: sprawdzić ustawienie rozrządu i wykryć dryft łańcucha.</p>
+          <a class="lab-open lab-btn" href="lab/kontrola-rozrzadu.html">Otwórz okno symulacji →</a>
         </div>
       </article>
 
-      <article class="lab-card gal-card" data-cat="PCB">
-        <div class="lab-thumb gal-thumb">
-          <span class="lab-badge gal-badge">LAB / future</span>
-          <img src="assets_v8/projects/lab_future.svg" alt="Przyszłe projekty LAB" loading="lazy">
-        </div>
-        <div class="lab-body gal-body">
-          <h3 class="lab-title gal-title">Przyszłe projekty i koncepcje</h3>
-          <p class="lab-desc gal-desc">Sekcja dla kolejnych urządzeń, eksperymentów i koncepcji, które są w planie lub dopiero wchodzą na etap projektowania i testów.</p>
-          <a class="lab-open gal-open" href="#" data-open>Podgląd</a>
-        </div>
-      </article>
     </div>
   </div>
 
@@ -2053,7 +2047,7 @@ if (contactForm) {
   try{
     const params = new URLSearchParams(window.location.search);
     const cat = (params.get('cat') || '').toUpperCase();
-    const allowed = ['ECU','IMMO','ELV','DIAG','PCB'];
+    const allowed = ['PRAD','CAN','KOMP','ROZ'];
     if(allowed.includes(cat)) setFilter(cat); else setFilter('all');
   }catch(e){
     setFilter('all');

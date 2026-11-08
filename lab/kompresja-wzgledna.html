@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Analizator kompresji względnej – symulacja | EKOTRONIK SYSTEM</title>
+<meta name="description" content="Tester kompresji względnej EKOTRONIK AI w trybie symulacji: prąd rozrusznika, znacznik cylindra 1, panel radar, wykres, ocena i kontrole, 12 scenariuszy z aplikacji.">
+<link rel="stylesheet" href="lab.css">
+<style>
+.titlebar{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:baseline;border:1px solid var(--border);border-radius:14px;padding:10px 16px;background:var(--panel);margin:8px 0}
+.titlebar b{color:var(--gold);font-size:1.2rem;letter-spacing:.03em}
+.big{border:2px solid var(--fail);border-radius:14px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;background:rgba(239,83,80,.12)}
+.big .t{font-size:1.6rem;font-weight:900;line-height:1.1}.big .s{font-size:.98rem;color:var(--text)}.big .p{font-size:2.6rem;font-weight:900}
+.big.ok{border-color:var(--ok);background:rgba(102,187,106,.12)}.big.warn{border-color:var(--warn);background:rgba(255,202,40,.10)}.big.none{border-color:var(--border);background:var(--panel)}
+.big.ok .t,.big.ok .p{color:var(--ok)}.big.fail .t,.big.fail .p{color:var(--fail)}.big.warn .t,.big.warn .p{color:var(--warn)}
+.crow{display:flex;align-items:center;gap:10px;border:2px solid var(--ok);border-radius:12px;padding:6px 12px;margin-bottom:8px;background:var(--panel)}
+.crow.fail{border-color:var(--fail)}.crow.warn{border-color:var(--warn)}
+.crow .n{font-size:1.4rem;font-weight:900;min-width:38px}
+.crow .bar{flex:1;height:30px;background:#173a35;border-radius:6px;position:relative;overflow:hidden}
+.crow .zone{position:absolute;top:0;bottom:0;background:rgba(150,40,50,.45)}
+.crow .zw{position:absolute;top:0;bottom:0;background:rgba(180,140,30,.4)}
+.crow .fill{position:absolute;top:0;bottom:0;left:0;background:#66bb6a}.crow.fail .fill{background:#ef5350}.crow.warn .fill{background:#ffca28}
+.crow .mk{position:absolute;top:0;bottom:0;width:4px;background:#f4d89a}
+.crow .pc{font-size:1.5rem;font-weight:900;min-width:76px;text-align:right}
+.crow .dv{font-size:.95rem;color:var(--muted);min-width:46px;text-align:right}
+.ctile{border:2px solid var(--ok);border-radius:12px;background:var(--panel);overflow:hidden;text-align:center}
+.ctile.fail{border-color:var(--fail)}.ctile.warn{border-color:var(--warn)}
+.ctile .h{font-weight:900;font-size:1.2rem;padding:4px}
+.ctile .bw{position:relative;height:90px;background:rgba(70,40,55,.7)}
+.ctile .bf{position:absolute;left:25%;right:25%;bottom:0;background:#66bb6a}.ctile.fail .bf{background:#ef5350}.ctile.warn .bf{background:#ffca28}
+.ctile .ln{position:absolute;left:0;right:0;border-top:3px dashed #f4d89a}
+.ctile .pv{font-weight:900;font-size:1.5rem;padding-top:4px}
+.dev{display:flex;align-items:center;gap:12px;border:2px solid var(--gold);border-radius:12px;padding:8px 12px;background:var(--panel)}
+.dev .tag{background:var(--gold);color:#0e0c08;font-weight:900;font-size:.78rem;border-radius:6px;padding:3px 8px;line-height:1.1;text-align:center}
+.dev .tr{flex:1;height:18px;border-radius:9px;background:linear-gradient(90deg,#5a2c36 0 35%,#2d4a40 35% 100%);position:relative}
+.dev .kn{position:absolute;top:-3px;width:24px;height:24px;border-radius:50%;background:#ef5350;transform:translateX(-50%)}
+.dev .ref{position:absolute;top:-6px;bottom:-6px;width:4px;background:#f4d89a;left:92%}
+.chk{display:flex;gap:12px;align-items:flex-start;border:2px solid var(--ok);border-radius:12px;padding:10px 14px;margin-bottom:8px;background:var(--panel)}
+.chk.warn{border-color:var(--warn)}.chk.fail{border-color:var(--fail)}.chk .ic{font-size:1.3rem;font-weight:900}
+.card4{border:1px solid var(--border);border-radius:14px;padding:10px 14px;background:var(--panel);margin-bottom:10px}
+.card4 .k{color:var(--gold);font-weight:800;font-size:.82rem;letter-spacing:.08em}
+.card4.st{border-width:2px}.card4.fail{border-color:var(--fail)}.card4.ok{border-color:var(--ok)}.card4.warn{border-color:var(--warn)}
+</style></head><body><div class="wrap">
+<div class="hdr" id="hdr"></div><div class="crumb" id="crumb"></div>
+<div class="titlebar"><b>KOMPRESJA WZGLĘDNA</b><span class="ok" id="tbSt">SYMULACJA • gotowy</span></div>
+<div class="tabs" id="tabs"><button class="btn on" data-t="prz">PRZYGOTOWANIE</button><button class="btn" data-t="radar">RADAR</button><button class="btn" data-t="wyk">WYKRES</button><button class="btn" data-t="ocena">OCENA</button><button class="btn" data-t="kontr">KONTROLE</button></div>
+
+<div data-p="prz"><div class="panel"><div class="pt"><i>●</i>Scenariusz (symulacja)</div><div class="psub">Wartości wzorowane na typowych silnikach i rozruchu (publikowane parametry). To nie są zapisy z konkretnego auta.</div>
+ <div class="scn" id="scBtns"></div>
+ <div class="card4" style="margin-top:10px"><div class="k">OPIS PRZYPADKU</div><div id="scD"></div></div>
+ <div class="kpis" id="scU"></div>
+ <button class="btn gold" id="bStart" style="width:100%;min-height:64px;font-size:1.2rem">START ROZRUCHU (6 s)</button></div></div>
+
+<div data-p="radar" class="hidden"><div class="two" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr)"><div>
+ <div class="big none" id="bigV"><div><div class="t" id="bgT">—</div><div class="s" id="bgS"></div></div><div class="p" id="bgP"></div></div>
+ <div class="cwrap" style="margin-top:10px;position:relative"><div style="position:absolute;left:8px;top:8px;background:var(--gold);color:#0e0c08;font-weight:800;font-size:.8rem;padding:4px 10px;border-radius:6px">WSKAŹNIK ODCHYLKI: odległość od złotego pierścienia</div><canvas id="cRadar" aria-label="Radar cylindrów"></canvas></div></div>
+ <div><div id="bars"></div><div class="cwrap"><canvas id="cWaveS" aria-label="Prąd rozrusznika"></canvas></div><div class="three" style="grid-template-columns:repeat(4,1fr);margin-top:10px" id="tiles"></div></div></div></div>
+
+<div data-p="wyk" class="hidden"><div class="cwrap"><canvas id="cWaveB" aria-label="Prąd rozrusznika i cylindry"></canvas></div><div class="three" id="ctiles" style="grid-template-columns:repeat(auto-fit,minmax(130px,1fr));margin-top:10px"></div><div class="dev" style="margin-top:10px"><div class="tag">WSKAŹNIK<br>ODCHYLKI</div><div class="tr"><div class="ref"></div><div class="kn" id="devKn" style="left:50%"></div></div><b id="devT" style="font-size:1.3rem">—</b></div></div>
+
+<div data-p="ocena" class="hidden"><div class="card4"><div class="k">WNIOSEK</div><div id="oW" style="font-size:1.15rem"></div></div><div class="card4"><div class="k">DOWÓD</div><div id="oD"></div></div><div class="card4 st" id="oStC"><div class="k">STATUS</div><div id="oSt" style="font-weight:900;font-size:1.2rem"></div></div><div class="card4"><div class="k">NASTĘPNY KROK</div><div id="oN"></div></div></div>
+<div data-p="kontr" class="hidden"><div id="kontr"></div></div>
+
+<div class="row" style="margin-top:12px"><button class="btn" id="bAgain">POWTÓRZ</button><button class="btn" id="bRep">RAPORT</button><a class="btn" href="../index.html#galeria">← POWRÓT DO LAB</a></div>
+<div class="panel" id="repBox" style="margin-top:10px"><div class="pt"><i>●</i>Raport</div><pre id="rep" style="white-space:pre-wrap;font:inherit;margin:6px 0 0">Raport pojawi się po rozruchu.</pre></div>
+
+<div class="about"><section class="panel about"><h2>Cel projektu</h2><p>Wskazać cylinder o obniżonej kompresji, zanim ktokolwiek rozbierze silnik. Test jest względny: porównuje cylindry między sobą na podstawie prądu rozrusznika (cęgi CC-650) i znacznika cylindra 1, więc nie potrzebuje normy producenta, ale też nie zastępuje manometru ani testu szczelności. Gdy nie ma pewności (brak znacznika, mało cykli, słaba powtarzalność), tester mówi „brak wniosku”, zamiast zgadywać.</p></section>
+<section class="panel about"><h2>Co tu widzisz</h2><ul><li>Ekrany jak w aplikacji EKOTRONIK AI: PRZYGOTOWANIE, RADAR (wskaźnik odchyłki od złotego pierścienia), WYKRES (prąd z podziałem na cylindry), OCENA (wniosek, dowód, status, następny krok) i KONTROLE.</li><li>Dwanaście scenariuszy z aplikacji: zdrowy silnik, zużyty cylinder, diesel z nieszczelnym zaworem, dwa cylindry (uszczelka), słaby akumulator, R6, odwrócone cęgi i znacznik aktywny niski, znacznik dwa razy na cykl, brak znacznika, V8, równomiernie obniżona kompresja, zero cęgów i opóźnienie toru.</li><li>Analiza działa na wygenerowanym przebiegu prądu: znajduje szczyty, przypisuje je do cylindrów od znacznika i liczy odchyłkę od wzorca (mediana lepszej połowy). Progi robocze: −10 % uwaga, −15 % niska kompresja.</li></ul>
+<p class="note">To SYMULACJA. Przebieg generuje model fizyki rozruchu, nie silnik z auta. Cęgi CC-650, głowica ESP32 i pojazd nie były w tym teście używane.</p></section></div>
+</div>
+<script src="lab.js"></script>
+<script>
+(function(){
+LAB.header({icon:'komp',sym:'KOMPRESJA WZGLĘDNA',symd:'prąd rozrusznika · znacznik cyl. 1',title:'Analizator kompresji względnej'});
+const TH_W=-10,TH_L=-15,DUR=6,FS=400;
+const ORD={4:[1,3,4,2],6:[1,5,3,6,2,4],8:[1,8,4,3,6,5,7,2]};
+const SC=[
+ {n:'Zdrowy silnik benzynowy 1.6',pr:'Rzędowy 4-cyl. 1,6 l, stopień sprężania 10,5, kolejność 1-3-4-2, wtrysk pośredni; rozruch ok. 250 obr/min, ok. 190 A (typowe wartości).',N:4,type:'BENZYNA',kat:380,leak:{},i0:190,rpm:250,exp:'none'},
+ {n:'Zużyty cylinder 3 (pierścienie/gładź)',pr:'Jak 1, cylinder 3 z nieszczelnością odpowiadającą ok. 20 % niższemu ciśnieniu końca sprężania.',N:4,type:'BENZYNA',kat:380,leak:{3:.08},i0:190,rpm:262,exp:[3]},
+ {n:'Diesel 2.0 CR: nieszczelny zawór cyl. 2',pr:'Rzędowy 4-cyl. diesel 2,0 l, stopień sprężania 16,5, wtrysk pilotujący i główny; cylinder 2 wyraźnie nieszczelny (zawór).',N:4,type:'DIESEL',kat:18,leak:{2:.12},i0:230,rpm:215,exp:[2]},
+ {n:'Dwa cylindry niżej (2 i 3)',pr:'Turbo benzyna 4-cyl., oba środkowe cylindry z podobną nieszczelnością (podejrzenie uszczelki głowicy między cylindrami 2 i 3).',N:4,type:'BENZYNA',kat:380,leak:{2:.09,3:.09},i0:200,rpm:255,exp:[2,3]},
+ {n:'Słaby akumulator, zdrowy silnik',pr:'Zdrowy 1,6 l; akumulator 11,4 V spadający w czasie rozruchu, wyższa rezystancja obwodu. Nie może dać fałszywej usterki.',N:4,type:'BENZYNA',kat:380,leak:{},i0:175,rpm:205,exp:'none',weakBat:true},
+ {n:'Benzyna 3.0 R6: cylinder 5 niżej',pr:'Rzędowy 6-cyl. 3,0 l, kolejność 1-5-3-6-2-4, impuls peak & hold; cylinder 5 z nieszczelnością.',N:6,type:'BENZYNA',kat:380,leak:{5:.12},i0:263,rpm:211,exp:[5]},
+ {n:'Diesel: znacznik aktywny niski, cęgi odwrócone',pr:'Diesel 2,0 l, cylinder 4 niżej (zawór dolotowy); impuls mierzony od strony masy (aktywny niski), cęgi założone odwrotnie (prąd ujemny).',N:4,type:'DIESEL',kat:18,leak:{4:.12},i0:230,rpm:215,exp:[4],rev:true},
+ {n:'Znacznik dwa razy na cykl',pr:'Benzyna 1,6 l, wtrysk grupowy: impuls cyl. 1 co 360°; cylinder 3 niżej. Pozycja niskiego szczytu jest wiarygodna, numer wymaga potwierdzenia.',N:4,type:'BENZYNA',kat:380,leak:{3:.08},i0:190,rpm:250,exp:[3],twice:true},
+ {n:'Brak impulsu cylindra 1',pr:'Jak 2, ale na wejściu znacznika są tylko zakłócenia (zły przewód, wyłączony wtrysk): brak wniosku zamiast zgadywania.',N:4,type:'BENZYNA',kat:380,leak:{3:.08},i0:190,rpm:250,exp:'nomark',nomark:true},
+ {n:'V8 5.0: cylinder 6 niżej',pr:'V8 5,0 l, kolejność 1-8-4-3-6-5-7-2, impuls nasycony; cylinder 6 z nieszczelnością.',N:8,type:'BENZYNA',kat:380,leak:{6:.08},i0:285,rpm:190,exp:[6]},
+ {n:'Równomiernie obniżona kompresja',pr:'Zużyty silnik 1,6 l: wszystkie cylindry z jednakową niewielką nieszczelnością. Metoda względna nie pokaże różnic i ma to jasno powiedzieć.',N:4,type:'BENZYNA',kat:380,leak:{1:.05,2:.05,3:.05,4:.05},i0:185,rpm:250,exp:'none',uniform:true},
+ {n:'Cylinder 1 niżej, zero cęgów i opóźnienie toru',pr:'Benzyna 1,6 l, cylinder 1 niżej; zero cęgów +1,5 A, opóźnienie toru znacznika 1,2 ms (wprowadzone w kalibracji).',N:4,type:'BENZYNA',kat:380,leak:{1:.08},i0:190,rpm:250,exp:[1],zero:1.5,delay:1.2}
+];
+let sc=SC[0],W=null,play=0,running=false,res=null,done=false,tab='prz';
+/* ---------- model rozruchu ---------- */
+function simulate(s){
+ const r=LAB.rng(100+SC.indexOf(s)),N=s.N,ord=ORD[N],n=DUR*FS,sp=720/N,I=new Float32Array(n),th=new Float32Array(n),rp=new Float32Array(n),ub=new Float32Array(n);let a=0;
+ for(let i=0;i<n;i++){const t=i/FS,rr=s.rpm*(1-Math.exp(-t/.25))*(s.weakBat?(1-.18*t/DUR):1);rp[i]=rr;a+=rr*6/FS;th[i]=a}
+ const cyc=Math.ceil(a/720)+2,events=[];
+ for(let c=0;c<cyc;c++)for(let p=0;p<N;p++){const cyl=ord[p];events.push({c,p,cyl,th:c*720+30+p*sp,amp:1+LAB.gauss(r)*.02})}
+ const w=sp*.2,kA=.28*s.i0;
+ for(let i=0;i<n;i++){const t=i/FS;let v=s.i0*(1+.8*Math.exp(-t/.18))-(s.weakBat?20*t/DUR:0);
+  for(const e of events){const d=th[i]-e.th;if(Math.abs(d)<4*w)v+=kA*(1-2.6*(s.leak[e.cyl]||0))*e.amp*Math.exp(-d*d/(2*w*w))*Math.min(1,t/.5+.2)}
+  v+=LAB.gauss(r)*.25;if(s.zero)v+=s.zero;if(s.rev)v=-v;I[i]=v;ub[i]=s.weakBat?11.4-.25*t/DUR*2:12.5-.45*Math.exp(-t/.4)}
+ // znacznik cylindra 1: krawędź tuż przed TDC cyl.1 (ok. 20° wcześniej)
+ const marks=[];
+ if(!s.nomark){let idx=0;for(const e of events.filter(e=>e.p===0)){const target=e.th-22;while(idx<n-1&&th[idx]<target)idx++;if(idx>=n-1)break;marks.push(idx/FS+(s.delay||0)/1000);if(s.twice){const tg2=target+360;let j=idx;while(j<n-1&&th[j]<tg2)j++;if(j<n-1)marks.push(j/FS+(s.delay||0)/1000)}}}
+ else{let t=.3;while(t<DUR){marks.push(t);t+=.05+r()*.35}}
+ return {I,th,rp,ub,n,marks,events,sp,N,ord,s};
+}
+/* ---------- analiza z przebiegu ---------- */
+function analyse(upto){
+ const s=sc,Wv=W,N=s.N,fs=FS;
+ const inv=Wv.I[Math.min(upto,Wv.n-1)]<0||s.rev;
+ const sig=i=>(s.rev?-Wv.I[i]:Wv.I[i])-(s.zero||0);
+ const tNow=upto/fs;
+ // okresy cyklu z odstępów znacznika
+ let mk=Wv.marks.filter(t=>t<=tNow);
+ if(s.twice){mk=mk.filter((t,i)=>i%2===0)} // numer wymaga potwierdzenia: bierzemy co drugi
+ const mr=mk.filter(t=>t>=1.0);const regular=mr.length>=3&&(()=>{const d=[];for(let i=1;i<mr.length;i++)d.push(mr[i]-mr[i-1]);const m=d.reduce((a,b)=>a+b)/d.length;return d.every(x=>Math.abs(x-m)<.25*m)})();
+ const out={cyl:Array.from({length:N},(_,i)=>({q:i+1,amps:[],dev:null,rep:0})),cycles:0,marker:!s.nomark&&regular,mk,rpm:Wv.rp[Math.min(upto,Wv.n-1)],mean:0,ripple:0};
+ // statystyki prądu
+ let sum=0,cn=0,mx=-1e9,mn=1e9;for(let i=Math.floor(1*fs);i<=upto&&i<Wv.n;i++){const v=sig(i);sum+=v;cn++;mx=Math.max(mx,v);mn=Math.min(mn,v)}out.mean=cn?sum/cn:0;out.ripple=cn?(mx-mn)/out.mean*100:0;
+ if(!out.marker)return out;
+ const ord=Wv.ord;
+ for(let m=0;m+1<mk.length;m++){
+  const t0=mk[m],t1=mk[m+1];if(t0<1.0)continue; // pomijamy rozruch (udar prądu)
+  const i0=Math.round(t0*fs),i1=Math.round(t1*fs);if(i1>upto)break;
+  // N najwyższych maksimów lokalnych rozdzielonych o ≥ 0,6 okresu na cylinder
+  const per=(i1-i0)/N,ps=[];
+  for(let i=i0+2;i<i1-2;i++){const v=sig(i);if(v>=sig(i-1)&&v>sig(i+1)&&v>=sig(i-2)&&v>sig(i+2)){const lo=Math.min(...Array.from({length:Math.round(per)},(_,k)=>sig(Math.max(0,Math.min(Wv.n-1,i-Math.round(per/2)+k)))));ps.push({i,a:v-lo})}}
+  ps.sort((a,b)=>b.a-a.a);const sel=[];for(const p of ps){if(sel.every(q=>Math.abs(q.i-p.i)>.6*per))sel.push(p);if(sel.length===N)break}
+  if(sel.length<N)continue;sel.sort((a,b)=>a.i-b.i);
+  sel.forEach((p,k)=>out.cyl[ord[k]-1].amps.push(p.a));out.cycles++;
+ }
+ const vs=out.cyl.filter(c=>c.amps.length);if(!vs.length)return out;
+ vs.forEach(c=>c.mean=c.amps.reduce((a,b)=>a+b)/c.amps.length);
+ const srt=[...vs].sort((a,b)=>b.mean-a.mean),half=srt.slice(0,Math.max(1,Math.floor(srt.length/2)));
+ const ref=[...half].sort((a,b)=>a.mean-b.mean)[Math.floor((half.length-1)/2)].mean;out.ref=ref;
+ const cls=d=>d<=TH_L?2:d<=TH_W?1:0;
+ vs.forEach(c=>{c.dev=(c.mean/ref-1)*100;const tg=cls(c.dev);c.rep=c.amps.filter(a=>cls((a/ref-1)*100)===tg).length/c.amps.length*100});
+ return out;
+}
+function verdict(o){
+ const s=sc;if(!W)return null;
+ const rangeBad=false;
+ if(!o.marker&&running===false&&done)return{l:'warn',t:'BRAK WNIOSKU',sub:'brak znacznika cylindra 1',p:'—',st:'BRAK WNIOSKU',stl:'warn',w:'Nie wykryto regularnych impulsów znacznika cylindra 1, więc szczytów prądu nie da się przypisać do cylindrów. Nie podaję cylindra.',n:'Sprawdź przewód znacznika i podłączenie (przy odciętym wtrysku wiele sterowników nie nadaje impulsów). Powtórz rozruch.'};
+ if(!o.marker)return{l:'',t:'ZBIERAM DANE',sub:'szukam znacznika cylindra 1…',p:'',st:'POMIAR TRWA',stl:'',w:'Pomiar trwa.',n:'Poczekaj na koniec rozruchu.'};
+ const vs=o.cyl.filter(c=>c.dev!==null);
+ if(!vs.length||o.cycles<1)return{l:'',t:'ZBIERAM DANE',sub:'pełne cykle: '+o.cycles,p:'',st:'POMIAR TRWA',stl:'',w:'Zebrano '+o.cycles+' pełnych cykli.',n:'Potrzebne co najmniej 3.'};
+ const low=vs.filter(c=>c.dev<=TH_L),warn=vs.filter(c=>c.dev<=TH_W&&c.dev>TH_L);
+ const confirmed=o.cycles>=3&&vs.every(c=>c.rep>=80);
+ const worst=vs.reduce((m,c)=>c.dev<m.dev?c:m);
+ const stTxt=confirmed?'potwierdzone pomiarowo (powtarzalny wzorzec)':'wstępnie (za mało cykli lub słaba powtarzalność)';
+ if(low.length){
+  const adj=low.length===2&&Math.abs(low[0].q-low[1].q)===1;
+  const t=low.length===1?'CYLINDER '+low[0].q+' — KOMPRESJA NISKA':'CYLINDRY '+low.map(c=>c.q).join(' i ')+' — KOMPRESJA NISKA';
+  const st=s.twice?'POZYCJA WIARYGODNA, NUMER WYMAGA POTWIERDZENIA':(confirmed?'ODCHYŁKA POTWIERDZONA (SYMULACJA)':'ODCHYŁKA WSTĘPNA');
+  return{l:'fail',t,sub:'najniżej '+Math.round(worst.dev)+' % względem wzorca • '+stTxt,p:Math.round(worst.dev)+'%',st,stl:'fail',w:'Cylinder '+low.map(c=>c.q+' ('+Math.round(c.dev)+' %)').join(', ')+' poniżej wzorca o ponad 15 %.'+(adj?' Dwa sąsiednie cylindry: możliwa nieszczelność między nimi (uszczelka głowicy).':'')+(s.type==='DIESEL'?' W dieslu rozważ też nieszczelny zawór.':''),n:'Potwierdź manometrem lub testem szczelności cylindrów. Przy diesla sprawdź luzy zaworowe i wtryskiwacz.',confirmed};}
+ if(warn.length)return{l:'warn',t:'UWAGA: CYLINDER '+warn.map(c=>c.q).join(', '),sub:Math.round(worst.dev)+' % • '+stTxt,p:Math.round(worst.dev)+'%',st:'ODCHYŁKA LEKKA',stl:'warn',w:'Cylinder '+warn.map(c=>c.q+' ('+Math.round(c.dev)+' %)').join(', ')+' między −10 % a −15 % od wzorca.',n:'Powtórz rozruch i porównaj powtarzalność; w razie potrzeby test szczelności.',confirmed};
+ return{l:'ok',t:'CYLINDRY WYRÓWNANE',sub:'wszystkie w granicach 10 % od wzorca • '+stTxt,p:'OK',st:s.uniform?'BRAK RÓŻNIC (metoda względna)':'BRAK RÓŻNIC',stl:'ok',w:s.uniform?'Nie widać różnic między cylindrami. Metoda względna nie wykryje równomiernie obniżonej kompresji (zużyty silnik).':'Wszystkie cylindry w granicach 10 % od wzorca ('+o.cycles+' pełnych cykli).',n:s.uniform?'Jeśli silnik ma objawy (dymienie, słaba moc, wysokie zużycie oleju), wykonaj pomiar manometrem lub test szczelności.':'Test nie wykrywa wszystkich usterek (np. nieszczelnego zaworu o równych szczytach).',confirmed};
+}
+/* ---------- rysowanie ---------- */
+const cR=LAB.canvas(document.getElementById('cRadar'),1),cS=LAB.canvas(document.getElementById('cWaveS'),.28),cB=LAB.canvas(document.getElementById('cWaveB'),w=>w>700?.42:.7);
+function colFor(d){return d===null?'#a3b0c2':d<=TH_L?'#ef5350':d<=TH_W?'#ffca28':'#66bb6a'}
+function drawRadar(o){
+ const c=cR.ctx,d=cR.dpr,Wd=cR.W,H=cR.H,cx=Wd/2,cy=H/2+10*d,R=Math.min(Wd,H)*.34;c.fillStyle='#03080e';c.fillRect(0,0,Wd,H);
+ const N=sc.N,rad=p=>R*Math.max(.2,Math.min(1.15,(p-40)/60));// 100 % = R
+ const mapR=p=>R*(.35+(Math.max(40,Math.min(110,p))-40)/60*.65);
+ // pola
+ c.fillStyle='rgba(60,110,60,.20)';c.beginPath();c.arc(cx,cy,mapR(110),0,7);c.fill();c.fillStyle='rgba(150,60,40,.25)';c.beginPath();c.arc(cx,cy,mapR(85),0,7);c.fill();
+ c.strokeStyle='rgba(255,255,255,.08)';c.lineWidth=d;[60,80].forEach(p=>{c.beginPath();c.arc(cx,cy,mapR(p),0,7);c.stroke()});
+ c.setLineDash([10*d,7*d]);c.strokeStyle='#d6a852';c.lineWidth=3*d;c.beginPath();c.arc(cx,cy,mapR(100),0,7);c.stroke();c.setLineDash([]);
+ c.fillStyle='#ff8a65';c.font=(12*d)+'px Roboto,sans-serif';c.fillText('85%',cx+mapR(85)*.7,cy+mapR(85)*.7);
+ const ang=i=>-Math.PI/2+i/N*2*Math.PI;
+ c.strokeStyle='rgba(255,255,255,.12)';for(let i=0;i<N;i++){c.beginPath();c.moveTo(cx,cy);c.lineTo(cx+Math.cos(ang(i))*mapR(110),cy+Math.sin(ang(i))*mapR(110));c.stroke()}
+ const pts=[];const labs=[];
+ for(let i=0;i<N;i++){const cy_=o&&o.cyl[i]&&o.cyl[i].dev!==null?o.cyl[i]:null,p=cy_?100+cy_.dev:100;pts.push([cx+Math.cos(ang(i))*mapR(p),cy+Math.sin(ang(i))*mapR(p),cy_?cy_.dev:null]);labs.push(cy_?Math.round(p):null)}
+ if(o&&o.marker){c.strokeStyle='#f4d89a';c.lineWidth=4*d;c.beginPath();pts.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.closePath();c.stroke()}
+ pts.forEach((p,i)=>{c.fillStyle=colFor(p[2]);c.strokeStyle='#000';c.lineWidth=2*d;c.beginPath();c.arc(p[0],p[1],11*d,0,7);c.fill();c.stroke();
+  c.font='bold '+(17*d)+'px Roboto,sans-serif';c.fillStyle=colFor(p[2]);const lx=cx+Math.cos(ang(i))*(R*1.32),ly=cy+Math.sin(ang(i))*(R*1.32);c.textAlign='center';c.fillText('C'+(i+1)+(labs[i]!==null?' '+labs[i]+'%':' —'),lx,ly+6*d);c.textAlign='left'});
+ // środek
+ if(o&&o.marker){const vs=o.cyl.filter(c=>c.dev!==null);if(vs.length){const w=vs.reduce((m,c)=>c.dev<m.dev?c:m);c.textAlign='center';c.fillStyle='#a3b0c2';c.font=(13*d)+'px Roboto,sans-serif';c.fillText('NAJNIŻSZY C'+w.q,cx,cy-18*d);c.fillStyle=colFor(w.dev);c.font='900 '+(40*d)+'px Roboto,sans-serif';c.fillText((w.dev>=0?'+':'')+Math.round(w.dev)+'%',cx,cy+22*d);c.textAlign='left'}}
+ c.fillStyle='#f4d89a';c.font=(13*d)+'px Roboto,sans-serif';c.fillText('- - - ZADANA 100%',Wd-170*d,H-12*d);
+}
+function drawWave(cv,o,big){
+ const c=cv.ctx,d=cv.dpr,Wd=cv.W,H=cv.H,L=(big?58:50)*d,R=8*d,T=18*d,B=(big?32:24)*d,pw=Wd-L-R,ph=H-T-B;c.fillStyle='#03080e';c.fillRect(0,0,Wd,H);
+ if(!W)return;const upto=Math.min(W.n-1,Math.floor(play*FS)),n=W.n;
+ const sg=i=>(sc.rev?-W.I[i]:W.I[i])-(sc.zero||0);let ymin=1e9,ymax=-1e9;for(let i=0;i<n;i+=4){const v=sg(i);ymin=Math.min(ymin,v);ymax=Math.max(ymax,v)}ymin=Math.floor((ymin-10)/20)*20;ymax=Math.ceil((ymax+5)/20)*20;
+ const X=i=>L+i/n*pw,Y=v=>T+ph-(v-ymin)/(ymax-ymin)*ph;
+ c.font=(13*d)+'px Roboto,sans-serif';c.fillStyle='#a3b0c2';c.strokeStyle='rgba(255,255,255,.08)';c.lineWidth=d;
+ for(let v=ymin;v<=ymax;v+=40){c.beginPath();c.moveTo(L,Y(v));c.lineTo(Wd-R,Y(v));c.stroke();c.fillText(v+' A',4*d,Y(v)+4*d)}
+ for(let t=0;t<=DUR;t++){c.fillText(t+' s',L+t/DUR*pw-8*d,H-8*d)}
+ // pasy cylindrów (zielone/czerwone wg oceny)
+ if(o&&o.marker)for(const e of W.events){const i=W.th.findIndex(x=>x>=e.th);if(i<0||i>upto)continue;const half=W.sp/2,i0=Math.max(0,W.th.findIndex(x=>x>=e.th-half)),i1=Math.min(n-1,W.th.findIndex(x=>x>=e.th+half)<0?n-1:W.th.findIndex(x=>x>=e.th+half));const cy=o.cyl[e.cyl-1];const dv=cy&&cy.dev!==null?cy.dev:null;if(i1>upto)continue;c.fillStyle=dv===null?'rgba(255,255,255,.03)':dv<=TH_L?'rgba(239,83,80,.18)':dv<=TH_W?'rgba(255,202,40,.14)':'rgba(102,187,106,.10)';c.fillRect(X(i0),T,X(i1)-X(i0),ph);if(big||W.N<=6){c.fillStyle=colFor(dv);c.font='bold '+((big?16:13)*d)+'px Roboto,sans-serif';c.fillText('C'+e.cyl,X(i)-8*d,H-(big?10:6)*d-(big?14*d:0))}}
+ c.strokeStyle='#f0b858';c.lineWidth=2.2*d;c.beginPath();for(let i=0;i<=upto;i+=1){const x=X(i),y=Y(sg(i));i?c.lineTo(x,y):c.moveTo(x,y)}c.stroke();
+ // znacznik M
+ for(const t of W.marks){const i=Math.round(t*FS);if(i>upto)continue;c.strokeStyle='#5adce8';c.setLineDash([4*d,4*d]);c.lineWidth=2*d;c.beginPath();c.moveTo(X(i),T);c.lineTo(X(i),T+ph);c.stroke();c.setLineDash([]);c.fillStyle='#5adce8';c.font='bold '+(15*d)+'px Roboto,sans-serif';c.fillText(sc.nomark?'?':'M',X(i)+3*d,T+14*d)}
+ c.fillStyle='#a3b0c2';c.font=(12*d)+'px Roboto,sans-serif';c.fillText('PRĄD ROZRUSZNIKA · SYMULACJA',Wd-R-230*d,T+12*d);
+}
+function bars(o){
+ const rows=[];for(let i=0;i<sc.N;i++){const c=o&&o.cyl[i]&&o.cyl[i].dev!==null?o.cyl[i]:null,p=c?100+c.dev:null,cl=c?(c.dev<=TH_L?'fail':c.dev<=TH_W?'warn':''):'';
+  rows.push('<div class="crow '+cl+'"><div class="n">C'+(i+1)+'</div><div class="bar"><div class="zone" style="left:0;width:'+(85-40)/70*100+'%"></div><div class="zw" style="left:'+(85-40)/70*100+'%;width:'+5/70*100+'%"></div><div class="fill" style="width:'+(p===null?0:Math.max(0,Math.min(100,(p-40)/70*100)))+'%"></div><div class="mk" style="left:'+(100-40)/70*100+'%"></div></div><div class="pc" style="color:'+colFor(c?c.dev:null)+'">'+(p===null?'—':Math.round(p)+'%')+'</div><div class="dv">'+(c?Math.round(c.dev)+'%':'')+'</div></div>')}
+ LAB.html('bars',rows.join(''));
+}
+function tilesAndOthers(o,v){
+ LAB.html('tiles',[['obr/min',o?Math.round(o.rpm):0],['prąd A',o&&o.mean?Math.round(o.mean):0],['falow. %',o&&o.ripple?Math.round(o.ripple):0],['cykle',o?o.cycles:0]].map(x=>'<div class="tile" style="text-align:center"><div class="v">'+x[1]+'</div><div class="lbl">'+x[0]+'</div></div>').join(''));
+ LAB.html('ctiles',Array.from({length:sc.N},(_,i)=>{const c=o&&o.cyl[i]&&o.cyl[i].dev!==null?o.cyl[i]:null,cl=c?(c.dev<=TH_L?'fail':c.dev<=TH_W?'warn':''):'',p=c?Math.max(40,Math.min(110,100+c.dev)):0;return '<div class="ctile '+cl+'"><div class="h">C'+(i+1)+'</div><div class="bw"><div class="bf" style="height:'+((p-40)/70*100)+'%"></div><div class="ln" style="bottom:'+(60/70*100)+'%"></div></div><div class="pv" style="color:'+colFor(c?c.dev:null)+'">'+(c?Math.round(100+c.dev)+'%':'—')+'</div><div class="dm" style="font-size:.85rem">'+(c?Math.round(c.dev)+'%':'')+'</div></div>'}).join(''));
+ const vs=o?o.cyl.filter(c=>c.dev!==null):[];if(vs.length&&o.marker){const w=vs.reduce((m,c)=>c.dev<m.dev?c:m);document.getElementById('devKn').style.left=Math.max(2,Math.min(98,92+w.dev*(90/30)*.5))+'%';LAB.set('devT','C'+w.q+' '+(w.dev>=0?'+':'')+Math.round(w.dev)+'%')}else{document.getElementById('devKn').style.left='92%';LAB.set('devT','—')}
+}
+function kontrole(o,v){
+ const s=sc,items=[];
+ items.push([s.nomark?'fail':(o&&o.marker?'ok':'warn'),'Znacznik cylindra 1',s.nomark?'Tylko zakłócenia na wejściu znacznika; brak regularnych impulsów.':(o&&o.marker?'Impulsy regularne, '+(o.mk?o.mk.length:0)+' znaczników'+(s.twice?' (co 360°: numer cylindra wymaga potwierdzenia)':'')+(s.type==='DIESEL'?' · aktywny '+(s.rev?'niski (od strony masy)':'wysoki'):'')+'.':'Szukam znacznika…')]);
+ items.push([s.rev?'warn':'ok','Polaryzacja cęgów',s.rev?'Prąd ujemny: cęgi założone odwrotnie. Tester automatycznie odwrócił znak (zalecane poprawne założenie).':'Prąd dodatni, kierunek cęgów prawidłowy.']);
+ items.push([s.zero?'warn':'ok','Zero cęgów i zakres',s.zero?'Zero +1,5 A wprowadzone w kalibracji i odjęte. Zakres ok. 1 mV/A, bez przesterowania.':'Zero ≈ 0 A, zakres ok. 1 mV/A, bez przesterowania.']);
+ items.push([s.delay?'warn':'ok','Opóźnienie toru znacznika',s.delay?'1,2 ms wprowadzone w kalibracji i skompensowane.':'0 ms (brak opóźnienia).']);
+ items.push([s.weakBat?'warn':'ok','Akumulator i obroty rozruchu',s.weakBat?'Akumulator 11,4 V i spadające obroty: słaby akumulator nie daje fałszywej usterki cylindra (porównanie względne).':'Obroty rozruchu stabilne, ok. '+s.rpm+' obr/min.']);
+ items.push([o&&o.cycles>=3?'ok':'warn','Liczba pełnych cykli','Zebrano '+(o?o.cycles:0)+' pełnych cykli (wymagane ≥ 3).']);
+ const vs=o?o.cyl.filter(c=>c.dev!==null):[];const rep=vs.length?Math.min(...vs.map(c=>c.rep)):0;
+ items.push([vs.length&&rep>=80?'ok':'warn','Powtarzalność',vs.length?'Najsłabsza powtarzalność cylindra: '+Math.round(rep)+' % (wymagane ≥ 80 %).':'Brak danych.']);
+ LAB.html('kontr',items.map(i=>'<div class="chk '+(i[0]==='ok'?'':i[0])+'"><div class="ic '+(i[0]==='ok'?'ok':i[0]==='warn'?'warn':'fail')+'">'+(i[0]==='ok'?'✓':i[0]==='warn'?'!':'✕')+'</div><div><b>'+i[1]+'</b><div class="dm">'+i[2]+'</div></div></div>').join(''));
+}
+function ui(){
+ const upto=Math.min(W.n-1,Math.floor(play*FS));res=play>0?analyse(upto):null;const v=res?verdict(res):null;
+ const bg=document.getElementById('bigV');bg.className='big '+(v&&v.l?v.l:'none');
+ LAB.set('bgT',v?v.t:'GOTOWY');LAB.set('bgS',v?v.sub:'Wybierz scenariusz i naciśnij START ROZRUCHU.');LAB.set('bgP',v?v.p:'');
+ LAB.set('tbSt',play>0?('SYMULACJA • '+(v&&v.confirmed?'potwierdzone pomiarowo (powtarzalny wzorzec)':running?'pomiar trwa…':'wynik')):'SYMULACJA • gotowy');document.getElementById('tbSt').className=v&&v.l==='fail'?'fail':v&&v.l==='warn'?'warn':'ok';
+ bars(res);tilesAndOthers(res,v);kontrole(res,v);
+ if(v){LAB.set('oW',v.w);LAB.set('oD',res&&res.cyl.some(c=>c.dev!==null)?'Odchyłki: '+res.cyl.map(c=>'C'+c.q+' '+(c.dev===null?'—':(c.dev>=0?'+':'')+Math.round(c.dev)+'%')).join(' · ')+'. Wzorzec = mediana lepszej połowy cylindrów; progi −10 % / −15 % [robocze]. Cykle: '+res.cycles+'. [SYMULACJA – nie jest dowodem sprzętowym]':'Brak danych liczbowych. [SYMULACJA]');LAB.set('oSt',v.st+' (SYMULACJA)');document.getElementById('oStC').className='card4 st '+(v.stl||'');LAB.set('oN',v.n)}
+}
+function draw(){const upto=Math.min(W.n-1,Math.floor(play*FS)),o=res;if(tab==='radar'){drawRadar(o);drawWave(cS,o,false)}if(tab==='wyk')drawWave(cB,o,true)}
+function report(){
+ const o=res,v=o?verdict(o):null;return 'RAPORT – TESTER KOMPRESJI WZGLĘDNEJ (SYMULACJA)\nScenariusz: '+sc.n+'\n'+sc.pr+'\n\nWniosek: '+(v?v.t+' – '+v.sub:'—')+'\n'+(v?v.w:'')+'\nOdchyłki: '+(o?o.cyl.map(c=>'C'+c.q+' '+(c.dev===null?'—':Math.round(c.dev)+'%')).join(', '):'—')+'\nPełne cykle: '+(o?o.cycles:0)+'\nNastępny krok: '+(v?v.n:'—')+'\n\nUwaga: wynik z SYMULACJI nie jest dowodem sprzętowym. Sprzęt i pojazd niesprawdzone.';
+}
+function setSc(i){sc=SC[i];W=simulate(sc);play=0;running=false;done=false;res=null;document.querySelectorAll('#scBtns .btn').forEach((b,k)=>b.classList.toggle('sel',k===i));
+ LAB.set('scD',sc.pr);LAB.html('scU','<div class="tile"><span class="lbl">Cylindry</span><div class="v">'+sc.N+'</div></div><div class="tile"><span class="lbl">Silnik</span><div class="v">'+sc.type+'</div></div><div class="tile"><span class="lbl">Kąt znacznika (preset)</span><div class="v">'+sc.kat+'°</div></div><div class="tile"><span class="lbl">Rozruch</span><div class="v">~'+sc.rpm+' obr/min</div></div><div class="tile"><span class="lbl">Prąd</span><div class="v">~'+sc.i0+' A</div></div>');ui();LAB.set('rep','Raport pojawi się po rozruchu.')}
+document.getElementById('scBtns').innerHTML=SC.map((s,i)=>'<button class="btn" data-i="'+i+'">'+(i+1)+'  '+s.n+'</button>').join('');
+document.getElementById('scBtns').addEventListener('click',e=>{const b=e.target.closest('[data-i]');if(b)setSc(+b.dataset.i)});
+function showTab(t){tab=t;document.querySelectorAll('#tabs .btn').forEach(b=>b.classList.toggle('on',b.dataset.t===t));document.querySelectorAll('[data-p]').forEach(p=>p.classList.toggle('hidden',p.dataset.p!==t));[cR,cS,cB].forEach(o=>o.fit());ui();draw()}
+document.getElementById('tabs').addEventListener('click',e=>{const b=e.target.closest('[data-t]');if(b)showTab(b.dataset.t)});
+function start(){setSc(SC.indexOf(sc));running=true;play=.001;showTab('radar')}
+document.getElementById('bStart').onclick=start;document.getElementById('bAgain').onclick=start;
+document.getElementById('bRep').onclick=()=>{LAB.set('rep',report());document.getElementById('repBox').scrollIntoView({behavior:'smooth'})};
+window.addEventListener('resize',()=>{[cR,cS,cB].forEach(o=>o.fit());draw()});
+LAB.loop(dt=>{if(running){play+=dt;if(play>=DUR){play=DUR;running=false;done=true;LAB.set('rep',report())}}if(play>0){ui()}draw()});
+window.__sim={SC,setSc,finish(){play=DUR;running=false;done=true;ui();LAB.set('rep',report());return {res,v:verdict(res)}},showTab,get res(){return res},verdict:()=>verdict(res)};
+setSc(0);
+})();
+</script></body></html>

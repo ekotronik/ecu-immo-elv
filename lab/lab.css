@@ -1,0 +1,69 @@
+/* EKOTRONIK AI – styl panelu aplikacji (motyw czarno-złoty, wartości z Theme.kt) */
+:root{--gold:#d6a852;--gold-l:#f4d89a;--gold-d:#8e6b2c;--bg:#07111c;--bg-deep:#040a11;--top:#0b1a2a;--panel:#0b1827;--raised:#0f2135;--border:#6b5a33;--text:#eceff3;--muted:#a3b0c2;--ok:#66bb6a;--fail:#ef5350;--warn:#ffca28;--demo:#e65100;--cyan:#5adce8;--hdr:#050608;--wave:#07090c;--canh:#4de3f5;--canl:#6be36b}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;background:#040a11}
+body{margin:0;min-height:100vh;background:linear-gradient(180deg,var(--top),var(--bg) 40%,var(--bg-deep));background-attachment:fixed;color:var(--text);font-family:Roboto,"Segoe UI",system-ui,-apple-system,Arial,sans-serif;font-size:17px;line-height:1.45}
+a{color:inherit}
+.wrap{max-width:1360px;margin:0 auto;padding:12px 12px 40px}
+/* nagłówek jak w aplikacji */
+.hdr{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--hdr);border:1px solid var(--border);border-radius:16px;padding:8px 12px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;min-width:0}
+.brand img{height:72px;width:auto;flex:none;border-radius:16px}
+.brand .w1{font-size:2.05rem;font-weight:900;letter-spacing:.04em;line-height:1;background:linear-gradient(180deg,#f4d89a,#d6a852 55%,#8e6b2c);-webkit-background-clip:text;background-clip:text;color:transparent;white-space:nowrap}
+.brand .w2{font-size:.95rem;font-weight:800;letter-spacing:.5em;color:var(--gold);margin-top:6px;text-indent:.2em}
+.symbox{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:12px;padding:6px 12px;background:var(--wave);margin-left:auto}
+.symbox svg{width:54px;height:44px;flex:none}
+.symbox .st{font-size:.82rem;color:var(--gold);font-weight:800;letter-spacing:.04em;line-height:1.2}
+.symbox .sd{font-size:.8rem;color:var(--muted)}
+.pill{border:1px solid var(--demo);border-radius:12px;padding:6px 12px;font-size:.85rem;line-height:1.3}
+.pill b{color:var(--demo);font-weight:800}
+.pill span{color:var(--muted)}
+.crumb{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:10px 0}
+.crumb .path{color:var(--text);font-size:1.15rem}.crumb .path b{color:var(--gold);font-weight:700}
+/* przyciski */
+.btn{min-height:52px;padding:0 20px;border-radius:14px;border:2px solid var(--gold);background:var(--raised);color:var(--text);font:inherit;font-weight:700;letter-spacing:.02em;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;text-align:center;text-decoration:none}
+.btn:hover{border-color:var(--gold-l)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.back{border-color:#9fb1c8}
+.btn.gold,.btn.sel{background:linear-gradient(180deg,#f0d28f,#c9a04d 55%,#9a7634);color:#0e0c08;border-color:var(--gold-l)}
+.btn.red{border-color:var(--fail)}.btn.cyan{border-color:var(--cyan)}.btn.demo{border-color:var(--demo)}
+.btn:focus-visible,select:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:10px}.row>.btn{flex:1 1 150px}
+.tabs{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0}.tabs .btn{flex:1 1 130px}
+.tabs .btn.on{background:#d6a852;color:#0e0c08;border-color:var(--gold-l)}
+.tabs.small .btn{min-height:46px;font-size:.95rem}
+.grp{display:flex;gap:10px;margin:10px 0}.grp .tabs{flex:1;margin:0}
+/* panele */
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:14px 16px}
+.pt{font-size:1.3rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase}.pt i{font-style:normal;color:var(--gold);margin-right:8px}
+.psub{color:var(--muted);font-size:.95rem;margin:2px 0 10px}
+.lbl{color:var(--muted);font-size:.8rem;letter-spacing:.06em;text-transform:uppercase}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:8px 0}
+.kpi{min-width:0}.kpi .v{font-size:1.9rem;font-weight:800;line-height:1.15;font-variant-numeric:tabular-nums}
+.tile{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:8px 12px}
+.tile .lbl{display:block}.tile .v{font-size:1.5rem;font-weight:800;font-variant-numeric:tabular-nums}.tile .s{font-size:.8rem;color:var(--muted)}
+.ok{color:var(--ok)}.fail{color:var(--fail)}.warn{color:var(--warn)}.cy{color:var(--cyan)}.gd{color:var(--gold)}.dm{color:var(--muted)}
+.box{border:2px solid var(--border);border-radius:14px;padding:10px 14px;background:var(--panel)}
+.box.ok{border-color:var(--ok)}.box.fail{border-color:var(--fail)}.box.warn{border-color:var(--warn)}
+.box.ok,.box.fail,.box.warn{color:var(--text)}
+.box .bt{font-weight:800;font-size:1.25rem}
+.box.ok .bt{color:var(--ok)}.box.fail .bt{color:var(--fail)}.box.warn .bt{color:var(--warn)}
+.two{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:12px}
+@media(max-width:960px){.two{grid-template-columns:1fr}}
+.three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media(max-width:760px){.three{grid-template-columns:1fr}}
+canvas{display:block;width:100%;background:#03080e;border-radius:10px}
+.cwrap{background:#03080e;border:1px solid #1d2c3c;border-radius:12px;padding:6px}
+.ev{list-style:none;margin:0;padding:0;font-size:.98rem}
+.ev li{display:flex;gap:12px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.ev time{color:var(--muted);font-weight:700;min-width:54px;font-variant-numeric:tabular-nums}
+table{width:100%;border-collapse:collapse;font-size:.98rem}th,td{padding:7px 8px;text-align:left;border-bottom:1px solid rgba(255,255,255,.08);font-variant-numeric:tabular-nums}th{color:var(--muted);font-weight:600;font-size:.85rem}
+.scn{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;margin:8px 0}
+.scn .btn{justify-content:flex-start;text-align:left;min-height:56px;font-size:.98rem;padding:6px 14px}
+.hidden{display:none!important}
+.about{margin-top:26px;display:grid;gap:12px}
+.about h2{margin:0 0 6px;font-size:1.2rem;color:var(--gold)}
+.about p,.about li{color:#d6dbe8;margin:6px 0}
+.about ul{padding-left:22px;margin:4px 0}
+.note{font-size:.92rem;color:var(--muted);border-left:3px solid var(--demo);padding-left:12px}
+select.sel{min-height:52px;border-radius:14px;border:2px solid var(--gold);background:var(--raised);color:var(--text);font:inherit;font-weight:700;padding:0 14px}
