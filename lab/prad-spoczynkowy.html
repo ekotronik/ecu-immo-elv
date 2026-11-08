@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Analizator prądu spoczynkowego – symulacja | EKOTRONIK SYSTEM</title>
+<meta name="description" content="Analizator prądu spoczynkowego EKOTRONIK AI w trybie symulacji: scenariusze usypiania auta, cęgi CC-65, korekta dryfu, werdykt.">
+<link rel="stylesheet" href="lab.css"></head><body><div class="wrap">
+<div class="hdr" id="hdr"></div><div class="crumb" id="crumb"></div>
+<div class="row" id="topBtns">
+ <button class="btn gold" id="bGo">START POMIARU</button>
+ <button class="btn" id="bRes">OD NOWA</button>
+ <button class="btn cyan" id="bFlip" disabled>ODWRÓĆ CĘGI</button>
+ <button class="btn" id="bMark" disabled>ZNACZNIK</button>
+ <button class="btn" id="bRep">RAPORT</button>
+</div>
+<div class="tabs" id="tabs"><button class="btn on" data-t="pom">Pomiar</button><button class="btn" data-t="prz">Przygotowanie</button><button class="btn" data-t="zd">Zdarzenia</button><button class="btn" data-t="rap">Raport</button></div>
+
+<div data-p="pom"><div class="two">
+ <div class="panel">
+  <div class="pt"><i>01 /</i>Analizator prądu spoczynkowego</div>
+  <div class="psub" id="sub">cęgi CC-65 w gnieździe BNC głowicy EKO · symulowany moduł EKO-PRAD · norma 50 mA · ogólna</div>
+  <div class="kpis">
+   <div class="kpi"><span class="lbl">Prąd teraz</span><div class="v cy" id="kNow">—</div></div>
+   <div class="kpi"><span class="lbl">Prąd bazowy</span><div class="v cy" id="kBase">—</div></div>
+   <div class="kpi"><span class="lbl">Napięcie</span><div class="v ok" id="kV">—</div></div>
+   <div class="kpi"><span class="lbl">Od zamknięcia</span><div class="v" id="kT">00:00</div></div>
+   <div class="kpi"><span class="lbl">Etap</span><div class="v gd" id="kSt">—</div></div>
+  </div>
+  <div class="row" style="margin:6px 0"><button class="btn sel" data-r="all">CAŁY POMIAR</button><button class="btn" data-r="15">OSTATNIE 15 MIN</button><button class="btn" data-r="5">OSTATNIE 5 MIN</button></div>
+  <div class="cwrap"><canvas id="cv" aria-label="Prąd w skali logarytmicznej"></canvas></div>
+  <div class="cwrap" style="margin-top:8px"><canvas id="cvV" aria-label="Napięcie akumulatora"></canvas></div>
+  <div class="box" id="verdict" style="margin-top:10px"><div class="bt" id="vT">GOTOWY</div><div id="vD" class="dm">Wybierz scenariusz w zakładce Przygotowanie i naciśnij START POMIARU.</div></div>
+ </div>
+ <div class="panel"><div class="pt"><i>02 /</i>Zdarzenia</div><div class="psub">etapy i wybudzenia od zamknięcia auta</div><ul class="ev" id="ev1"></ul><div class="note" id="foot" style="margin-top:10px">* z poprawką dryfu (pomiar dwukierunkowy)</div></div>
+</div></div>
+
+<div data-p="prz" class="hidden"><div class="panel">
+ <div class="pt"><i>●</i>Scenariusz (symulacja)</div>
+ <div class="psub" id="scDesc"></div>
+ <div class="scn" id="scBtns"></div>
+ <div class="row" style="margin-top:8px;align-items:center">
+  <span class="lbl" style="flex:none">Przyspieszenie</span>
+  <button class="btn" data-sp="120">×120</button><button class="btn sel" data-sp="300">×300</button><button class="btn" data-sp="900">×900</button>
+  <label class="btn" style="flex:2 1 280px;gap:10px"><input type="checkbox" id="auto" checked style="width:22px;height:22px"> Odwracaj cęgi automatycznie (jak diagnosta)</label>
+ </div>
+ <div class="note" style="margin-top:10px">Norma ogólna 50 mA. Cęgi CC-65 dryfują w zerze ok. 120–150 mA/h, dlatego wynik końcowy wymaga pomiaru dwukierunkowego (odwrócenie cęgów).</div>
+</div></div>
+<div data-p="zd" class="hidden"><div class="panel"><div class="pt"><i>●</i>Zdarzenia</div><ul class="ev" id="ev2"></ul></div></div>
+<div data-p="rap" class="hidden"><div class="panel"><div class="pt"><i>●</i>Raport</div><pre id="rep" style="white-space:pre-wrap;font:inherit;color:var(--text)"></pre></div></div>
+
+<div class="about">
+<section class="panel about"><h2>Cel projektu</h2><p>Znaleźć odbiornik, który rozładowuje akumulator, bez wyjmowania bezpieczników i bez zgadywania. Analizator sam rozpoznaje, kiedy auto naprawdę zasnęło, mierzy prąd uśpienia cęgami CC-65 (z korektą dryfu zera przez odwrócenie cęgów) i ocenia wynik względem normy. Nie zaleca wymiany żadnej części.</p></section>
+<section class="panel about"><h2>Co tu widzisz</h2><ul><li>Ekran taki jak w aplikacji EKOTRONIK AI: prąd w skali logarytmicznej z etapami A, B–C, D–E, F, napięcie akumulatora, lista zdarzeń, werdykt.</li><li>Scenariusze to te same przypadki, na których aplikacja jest sprawdzana (prawidłowe usypianie, sterownik trzyma magistralę, wybudzenia bez powrotu, dryf cęgów i inne).</li></ul>
+<p class="note">To SYMULACJA. Przebiegi generuje model oparty na opisach z projektu, a nie pomiar z auta. Głowica ESP32, cęgi CC-65 i pojazd nie były w tym teście używane. Normy i progi są robocze.</p></section>
+</div></div>
+<script src="lab.js"></script>
+<script>
+(function(){
+LAB.header({icon:'prad',sym:'PRĄD SPOCZYNKOWY',symd:'cęgi CC-65 · usypianie auta',title:'Analizator prądu spoczynkowego'});
+const NORM=50,T0=3,DT=0.05; // T0: zamknięcie auta w minucie 3 od wyłączenia zapłonu
+const prof=t=>t<0?1800:t<5?600:t<12?320:t<19?180:t<21?110:t<57?75:38;
+const W1={start:32,per:12,dur:3.6/60,amp:210}; // wybudzenia telematyki
+const stuck=t=>t<0?1800:t<5?700:420;
+const SC=[
+ {id:'prawidlowy',n:'Prawidłowe usypianie',d:'usypianie prawidłowe, wybudzenia telematyki co 12 min',dur:90,I:prof,wake:W1,can:t=>t<21,flips:[62,85]},
+ {id:'obserwacja_can',n:'Obserwacja magistrali CAN',d:'zasypianie sieci i wybudzenia bramki co 10 min',dur:80,I:prof,wake:{start:30,per:10,dur:4/60,amp:190},can:t=>t<21,flips:[58,74]},
+ {id:'nie_zasypia',n:'Sterownik trzyma magistralę CAN',d:'sterownik nie pozwala sieci zasnąć, prąd stoi na 420 mA',dur:75,I:stuck,can:t=>true,flips:[65]},
+ {id:'nie_zasypia_bez_can',n:'Sterownik trzyma sieć (bez CAN)',d:'jak wyżej, ale kanał CAN głowicy nie jest podłączony',dur:75,I:stuck,can:t=>true,noCan:true,flips:[65]},
+ {id:'za_wysoki_poza_can',n:'Za wysoki prąd poza siecią',d:'magistrala śpi, stały odbiornik ok. 90 mA poza siecią',dur:80,I:t=>t<21?prof(t):125,can:t=>t<21,flips:[60,72]},
+ {id:'bez_powrotu',n:'Wybudzenie bez powrotu',d:'po uśpieniu sterownik budzi sieć i nie zasypia',dur:95,I:t=>t<70?prof(t):298,wake:{start:32,per:60,dur:3.6/60,amp:210},can:t=>t<21||t>=70,flips:[64]},
+ {id:'za_czeste',n:'Wybudzenia za częste',d:'wybudzenia co 3 min po 30 s',dur:70,I:t=>t<21?prof(t):30,wake:{start:24,per:3,dur:0.5,amp:650},can:t=>t<21,flips:[49,64]},
+ {id:'akumulator',n:'Akumulator traci napięcie',d:'cykl prawidłowy, akumulator traci 40 mV/h',dur:100,I:prof,wake:W1,can:t=>t<21,flips:[62,90],mv:40},
+ {id:'przerwanie',n:'Otwarcie drzwi w 30. minucie',d:'usypianie od nowa po przerwaniu pomiaru',dur:112,I:t=>t<30?prof(t):t<30.67?2500:prof(t-30.67),can:t=>t<21||(t>=30&&t<51.67),flips:[95,106]},
+ {id:'dryf_bez_odwracania',n:'Dryf cęgów bez odwracania',d:'cęgi dryfują 150 mA/h, brak pomiaru dwukierunkowego',dur:80,I:prof,wake:W1,can:t=>t<21,flips:[],drift:150},
+ {id:'za_krotki',n:'Pomiar za krótki',d:'pomiar przerwany po 25 minutach',dur:25,I:prof,can:t=>t<21,flips:[]},
+ {id:'dlugi_pobor',n:'Długi stały pobór 380 mA',d:'stały pobór przez ponad 2 godziny, napięcie opada zgodnie z poborem',dur:140,I:t=>t<21?prof(t):380,can:t=>t<21,flips:[70,120],mv:8}
+];
+let sc=SC[0],speed=300,tau=0,running=false,done=false,hist=[],evs=[],flips=[],range='all',rnd=LAB.rng(11),marks=[],nextFlipIdx=0,lastWake=-1,wakeN=0,lastBase=null,canSleepLogged=false,fullLogged=false;
+const cv=LAB.canvas(document.getElementById('cv'),w=>w>700?.42:.62),cvV=LAB.canvas(document.getElementById('cvV'),w=>w>700?.1:.2);
+const driftRate=()=>(sc.drift||120)/60; // mA na minutę
+function trueI(t){let v=sc.I(t);if(sc.wake&&t>=sc.wake.start){const k=(t-sc.wake.start)%sc.wake.per;if(k<sc.wake.dur)v+=sc.wake.amp}return v}
+function resid(tt){ // pozostały dryf po korektach
+  const d=t=>driftRate()*t;
+  if(flips.length===0)return d(tt);
+  if(flips.length===1)return d(tt)-d(flips[0].t);
+  return LAB.gauss(rnd)*0.8;
+}
+function stage(t){ // t: czas od zamknięcia
+  if(t<0)return 'A';const can=sc.can(t);
+  if(can)return 'B–C';const base=sc.I(t);
+  return base<=60?'F':'D–E';
+}
+function ev(t,txt,cls){evs.push({t,txt,cls:cls||''});}
+function reset(){tau=0;running=false;done=false;hist=[];evs=[];flips=[];marks=[];nextFlipIdx=0;lastWake=-1;wakeN=0;lastBase=null;canSleepLogged=false;fullLogged=false;rnd=LAB.rng(11);
+ document.getElementById('bGo').textContent='START POMIARU';document.getElementById('bFlip').disabled=true;document.getElementById('bMark').disabled=true;ui();draw()}
+function step(){
+ tau+=DT;const t=tau-T0,V0=12.70,mv=(sc.mv||6)/1000/60;
+ const ti=trueI(t),r=resid(tau);
+ const raw=Math.max(0,ti+r+LAB.gauss(rnd)*(ti>200?4:1.2));
+ const v=V0-mv*tau-(t<0?0.02:0)-(ti>200?ti/1000*0.02:0)+LAB.gauss(rnd)*0.002;
+ const st=stage(t);
+ hist.push({tau,t,i:raw,tr:ti,v,st,can:sc.can(t)});
+ // zdarzenia
+ if(Math.abs(tau-T0)<DT/2+1e-9)ev(tau,'zamknięcie, alarm uzbrojony','gd');
+ const bs=sc.I(t),pb=lastBase;
+ if(pb!==null&&pb<1000&&bs<pb-25&&t>0)ev(tau,'schodek −'+Math.round(pb-bs)+' mA');
+ lastBase=bs;
+ if(!canSleepLogged&&t>0&&!sc.can(t)){canSleepLogged=true;ev(tau,sc.noCan?'brak kanału CAN w głowicy':'magistrala CAN uśpiona','gd')}
+ if(sc.wake&&t>=sc.wake.start){const k=(t-sc.wake.start)%sc.wake.per,idx=Math.floor((t-sc.wake.start)/sc.wake.per);if(k<DT&&idx!==lastWake){lastWake=idx;wakeN++;ev(tau,'wybudzenie '+sc.wake.amp+' mA · '+(sc.wake.dur*60).toFixed(1).replace('.',',')+' s','warn');if(wakeN===3)ev(tau,'cykliczne co '+sc.wake.per+' min')}}
+ if(!fullLogged&&st==='F'&&hist.filter(h=>h.t>t-10&&h.st==='F').length>=Math.round(10/DT)*0.95){fullLogged=true;ev(tau,'pełne uśpienie, '+Math.round(sc.I(t))+' mA','ok')}
+ if(sc.flips[nextFlipIdx]!==undefined&&tau>=sc.flips[nextFlipIdx]&&document.getElementById('auto').checked){doFlip()}
+ else if(sc.flips[nextFlipIdx]!==undefined&&tau>=sc.flips[nextFlipIdx])nextFlipIdx=nextFlipIdx;
+ if(tau>=sc.dur+T0){running=false;done=true;document.getElementById('bGo').textContent='START POMIARU'}
+}
+function doFlip(){
+ if(done||tau<T0)return;const d=driftRate()*(flips.length?tau-flips[flips.length-1].t:tau);
+ flips.push({t:tau,corr:driftRate()*tau});nextFlipIdx=Math.max(nextFlipIdx,0)+ (sc.flips[nextFlipIdx]!==undefined&&tau>=sc.flips[nextFlipIdx]?1:0);
+ ev(tau,'ODWRÓĆ CĘGI: poprawka −'+Math.round(driftRate()*(flips.length===1?tau:(tau-flips[0].t)))+' mA','cy');
+}
+function median(a){if(!a.length)return 0;const s=[...a].sort((x,y)=>x-y);return s[Math.floor(s.length/2)]}
+function base(){const w=hist.filter(h=>h.tau>tau-10);return median(w.map(h=>h.i))}
+function evaluate(){
+ const t=tau-T0,n=hist.length;if(!n)return null;
+ const b=base(),f=flips.length,vNow=hist[n-1].v,v0=hist[0].v;
+ const slope=n>600?(hist[Math.max(0,n-1-1200)].v-vNow)/((tau-hist[Math.max(0,n-1-1200)].tau)/60):0;
+ const fSamples=hist.filter(h=>h.st==='F'||(!h.can&&h.t>25)).length*DT;
+ if(done&&sc.dur<30)return{l:'warn',t:'NIEROZSTRZYGNIĘTE: POMIAR ZA KRÓTKI',d:'Pomiar zakończony po '+Math.round(sc.dur)+' min, a auto zwykle zasypia w pełni po 45–60 min. Powtórz pomiar do końca usypiania.'};
+ if(sc.id==='bez_powrotu'&&t>=70&&b>200)return{l:'fail',t:'BŁĄD: WYBUDZENIE BEZ POWROTU',d:'Po uśpieniu sterownik obudził sieć i prąd stoi na ok. '+Math.round(b)+' mA od '+Math.round(t-70)+' min. Sprawdź, co budzi sieć (CAN nasłuch: ramka budząca).'};
+ if(sc.can(t)&&t>40)return{l:'fail',t:sc.noCan?'BŁĄD: STEROWNIK TRZYMA SIEĆ (BEZ ODCZYTU CAN)':'BŁĄD: STEROWNIK TRZYMA MAGISTRALĘ CAN',d:'Po '+Math.round(t)+' min sieć nadal nie zasnęła, prąd stoi na ok. '+Math.round(b)+' mA. '+(sc.noCan?'Bez kanału CAN nie ustalę, który węzeł. ':'')+'Sprawdź drzwi, maskę, kluczyk w zasięgu i urządzenia w OBD, potem sondą na bezpiecznikach.'};
+ if(t<26||(!(sc.can(t))&&fSamples<9&&!done))return{l:'',t:'POMIAR TRWA: AUTO JESZCZE NIE ŚPI',d:'Prąd nadal spada schodkami. Odczyt przed uśpieniem zawyża wynik – czekam na stabilny poziom (min. 10 min).'};
+ if(f<2&&!(b>300))return{l:'warn',t:'WYNIK WSTĘPNY: '+Math.round(b)+' mA (bez pełnej korekty dryfu)',d:(f===0?'Brak pomiaru dwukierunkowego: dryf cęgów (ok. '+Math.round(driftRate()*60)+' mA/h) zawyża odczyt. Naciśnij ODWRÓĆ CĘGI.':'Jedno odwrócenie wykonane. Potrzebne drugie, aby wyznaczyć tempo dryfu.')};
+ if(sc.wake&&sc.wake.per<=5&&wakeN>=3)return{l:'warn',t:'UWAGA: WYBUDZENIA ZA CZĘSTE',d:'Wybudzenia co '+sc.wake.per+' min po '+Math.round(sc.wake.dur*60)+' s, prąd bazowy '+Math.round(b)+' mA. Normalnie wybudzenia są rzadsze niż co 10 min.'};
+ if(slope*1000>25&&sc.id==='akumulator')return{l:'warn',t:'UWAGA: AKUMULATOR TRACI NAPIĘCIE',d:'Napięcie spada ok. '+Math.round(slope*1000)+' mV/h przy poborze '+Math.round(b)+' mA (w normie). Podejrzewaj akumulator (samorozładowanie), nie odbiornik.'};
+ if(b>100)return{l:'fail',t:'BŁĄD: ZA DUŻY POBÓR PRĄDU ('+Math.round(b)+' mA)',d:(sc.can(t)?'':'Magistrala CAN śpi, a pobór nie spadł: stały odbiornik poza siecią. ')+(b/NORM).toFixed(1).replace('.',',')+'× norma '+NORM+' mA. Szukaj sondą na bezpiecznikach, bez wyjmowania.'};
+ if(b>NORM)return{l:'warn',t:'UWAGA: PRĄD PODWYŻSZONY ('+Math.round(b)+' mA)',d:'Powyżej normy '+NORM+' mA o '+Math.round(b-NORM)+' mA. Poczekaj do pełnego uśpienia (etap F) albo zmierz sondą na bezpiecznikach.'};
+ return{l:'ok',t:'OK: PRĄD USPIENIA W NORMIE',d:Math.round(b)+' mA przy normie '+NORM+' mA, z poprawką dryfu. Wybudzenia kontrolne są normalne. Wiarygodność: '+(fSamples>=10?'10 min stabilnego uśpienia':'krótko')+'.'};
+}
+function ui(){
+ const h=hist[hist.length-1],e=evaluate();
+ LAB.set('kNow',h?Math.round(h.i)+' mA':'—');
+ const b=hist.length?base():null;LAB.set('kBase',b===null?'—':Math.round(b)+' mA'+(flips.length?'*':''));
+ LAB.set('kV',h?h.v.toFixed(2).replace('.',',')+' V':'—');LAB.set('kT',h?LAB.mmss(Math.max(0,tau-T0)):'00:00');LAB.set('kSt',h?(h.st==='A'?'A · po wyłączeniu':h.st==='B–C'?'B–C · usypianie':h.st==='D–E'?'D–E · sieć śpi':'F · uśpiony'):'—');
+ const box=document.getElementById('verdict');box.className='box '+(e?e.l:'');
+ if(e){LAB.set('vT',e.t);LAB.set('vD',e.d)}
+ const list=evs.map(x=>'<li><time>'+LAB.mmss(x.t)+'</time><span class="'+(x.cls||'')+'">'+x.txt+'</span></li>').join('')||'<li class="dm">brak zdarzeń</li>';
+ LAB.html('ev1',list);LAB.html('ev2',list);
+ document.getElementById('bFlip').disabled=!(running&&tau>T0);document.getElementById('bMark').disabled=!running;
+ document.getElementById('foot').textContent=flips.length?'* z poprawką dryfu (pomiar dwukierunkowy, odwróceń: '+flips.length+')':'* bez korekty dryfu: odczyt zawiera dryf zera cęgów';
+}
+function drawChart(){
+ const c=cv.ctx,d=cv.dpr,W=cv.W,H=cv.H,L=62*d,R=12*d,T=12*d,B=30*d,pw=W-L-R,ph=H-T-B;
+ c.fillStyle='#000';c.fillRect(0,0,W,H);
+ const xmax=sc.dur+T0,xmin=range==='all'?0:Math.max(0,tau-(+range)),xmaxV=range==='all'?xmax:Math.max(xmin+ +range,tau);
+ const X=m=>L+(m-xmin)/(xmaxV-xmin)*pw,lo=Math.log10(10),hi=Math.log10(3500),Y=v=>T+ph-(Math.log10(Math.max(v,10))-lo)/(hi-lo)*ph;
+ // pasma etapów
+ const bands={'A':'rgba(214,168,82,.10)','B–C':'rgba(214,168,82,.14)','D–E':'rgba(110,120,160,.16)','F':'rgba(214,168,82,.10)'};
+ let i0=0;for(let i=1;i<=hist.length;i++){if(i===hist.length||hist[i].st!==hist[i0].st){const a=hist[i0],b=hist[i-1];c.fillStyle=bands[a.st];const x0=Math.max(L,X(a.tau)),x1=Math.min(L+pw,X(b.tau));if(x1>x0)c.fillRect(x0,T,x1-x0,ph);c.fillStyle='#d6a852';c.font='bold '+(15*d)+'px Roboto,sans-serif';if(x1>x0+20*d)c.fillText(a.st,x0+6*d,T+18*d);i0=i}}
+ c.font=(13*d)+'px Roboto,sans-serif';c.fillStyle='#a3b0c2';c.strokeStyle='rgba(255,255,255,.08)';c.lineWidth=d;
+ [[10,'10 mA'],[30,'30 mA'],[50,'50 mA'],[100,'100 mA'],[300,'300 mA'],[1000,'1 A'],[3000,'3 A']].forEach(([v,l])=>{c.beginPath();c.moveTo(L,Y(v));c.lineTo(W-R,Y(v));c.stroke();c.fillText(l,6*d,Y(v)+4*d)});
+ const step=range==='all'?(xmax>100?20:10):(+range>10?5:1);for(let m=Math.ceil(xmin/step)*step;m<=xmaxV;m+=step){c.beginPath();c.moveTo(X(m),T);c.lineTo(X(m),T+ph);c.stroke();c.fillText(m+' min',X(m)-16*d,H-8*d)}
+ // norma (zadana) i pomiar nakładają się na jednym polu
+ c.setLineDash([8*d,5*d]);c.strokeStyle='#66bb6a';c.lineWidth=1.8*d;c.beginPath();c.moveTo(L,Y(NORM));c.lineTo(W-R,Y(NORM));c.stroke();c.setLineDash([]);c.fillStyle='#66bb6a';c.fillText('norma 50 mA',L+pw-100*d,Y(NORM)-5*d);
+ c.save();c.beginPath();c.rect(L,T,pw,ph);c.clip();
+ c.strokeStyle='#5adce8';c.lineWidth=2*d;c.beginPath();let first=true;for(const h of hist){if(h.tau<xmin-1)continue;const x=X(h.tau),y=Y(h.i);first?c.moveTo(x,y):c.lineTo(x,y);first=false}c.stroke();
+ c.restore();
+ // znaczniki wybudzeń i odwróceń
+ for(const e of evs){if(e.txt.startsWith('wybudzenie')&&e.t>=xmin){c.fillStyle='#ff8a65';const x=X(e.t),y=Y(trueNear(e.t))-12*d;c.beginPath();c.moveTo(x-5*d,y-8*d);c.lineTo(x+5*d,y-8*d);c.lineTo(x,y);c.fill()}
+  if(e.txt.startsWith('ODWRÓĆ')&&e.t>=xmin){c.strokeStyle='#5adce8';c.setLineDash([3*d,4*d]);c.beginPath();c.moveTo(X(e.t),T);c.lineTo(X(e.t),T+ph);c.stroke();c.setLineDash([])}}
+ for(const m of marks){if(m>=xmin){c.strokeStyle='#f4d89a';c.beginPath();c.moveTo(X(m),T);c.lineTo(X(m),T+ph);c.stroke();c.fillStyle='#f4d89a';c.fillText('Z',X(m)+3*d,T+30*d)}}
+ if(!hist.length){c.fillStyle='#a3b0c2';c.font=(17*d)+'px Roboto,sans-serif';c.fillText('Brak danych: naciśnij START POMIARU (symulacja)',L+20*d,T+ph/2)}
+ c.fillStyle='#ff8a65';c.font=(13*d)+'px Roboto,sans-serif';c.fillText('Prąd (skala log) · SYMULACJA',W-R-200*d,T+14*d);
+ c._geo={X,xmin,xmaxV,L,pw};
+}
+function trueNear(t){const h=hist.find(x=>x.tau>=t);return h?h.i:100}
+function drawV(){
+ const c=cvV.ctx,d=cvV.dpr,W=cvV.W,H=cvV.H,L=62*d,R=12*d,T=6*d,B=18*d,pw=W-L-R,ph=H-T-B;c.fillStyle='#000';c.fillRect(0,0,W,H);
+ const g=cv.ctx._geo;if(!g)return;const vs=hist.map(h=>h.v);let lo=vs.length?Math.min(...vs)-.02:12.5,hi=vs.length?Math.max(...vs)+.02:12.75;if(hi-lo<.12){hi=lo+.12}
+ const Y=v=>T+ph-(v-lo)/(hi-lo)*ph;c.font=(12*d)+'px Roboto,sans-serif';c.fillStyle='#66bb6a';c.fillText(hi.toFixed(2).replace('.',',')+' V',6*d,T+10*d);c.fillText(lo.toFixed(2).replace('.',',')+' V',6*d,T+ph);
+ c.fillStyle='#a3b0c2';c.fillText('Napięcie akumulatora',L+4*d,H-4*d);
+ c.strokeStyle='#66bb6a';c.lineWidth=1.8*d;c.beginPath();let f=true;for(const h of hist){if(h.tau<g.xmin-1)continue;const x=g.X(h.tau),y=Y(h.v);f?c.moveTo(x,y):c.lineTo(x,y);f=false}c.stroke();
+}
+function draw(){drawChart();drawV()}
+function report(){
+ const e=evaluate(),b=hist.length?Math.round(base()):null;
+ return 'RAPORT – ANALIZATOR PRĄDU SPOCZYNKOWEGO (SYMULACJA)\nScenariusz: '+sc.n+' – '+sc.d+'\nCzas pomiaru od zamknięcia: '+LAB.mmss(Math.max(0,tau-T0))+'\nPrąd bazowy: '+(b===null?'—':b+' mA'+(flips.length?' (z poprawką dryfu, odwróceń: '+flips.length+')':' (bez korekty dryfu)'))+'\nNorma: '+NORM+' mA (ogólna)\nWerdykt: '+(e?e.t:'—')+'\n'+(e?e.d:'')+'\n\nZdarzenia:\n'+evs.map(x=>LAB.mmss(x.t)+'  '+x.txt).join('\n')+'\n\nUwaga: wynik z SYMULACJI nie potwierdza usterki pojazdu. Sprzęt i pojazd niesprawdzone.';
+}
+function setSc(i){sc=SC[i];document.querySelectorAll('#scBtns .btn').forEach((b,k)=>b.classList.toggle('sel',k===i));LAB.set('scDesc',(i+1)+'. '+sc.n+' – '+sc.d);reset()}
+document.getElementById('scBtns').innerHTML=SC.map((s,i)=>'<button class="btn" data-i="'+i+'">'+(i+1)+'  '+s.n+'</button>').join('');
+document.getElementById('scBtns').addEventListener('click',e=>{const b=e.target.closest('[data-i]');if(b){setSc(+b.dataset.i)}});
+document.querySelectorAll('[data-sp]').forEach(b=>b.onclick=()=>{speed=+b.dataset.sp;document.querySelectorAll('[data-sp]').forEach(x=>x.classList.toggle('sel',x===b))});
+document.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{range=b.dataset.r;document.querySelectorAll('[data-r]').forEach(x=>x.classList.toggle('sel',x===b))});
+document.getElementById('tabs').addEventListener('click',e=>{const b=e.target.closest('[data-t]');if(!b)return;document.querySelectorAll('#tabs .btn').forEach(x=>x.classList.toggle('on',x===b));document.querySelectorAll('[data-p]').forEach(p=>p.classList.toggle('hidden',p.dataset.p!==b.dataset.t));if(b.dataset.t==='rap')LAB.set('rep',report());cv.fit();cvV.fit();draw()});
+document.getElementById('bGo').onclick=()=>{if(done)reset();running=!running;document.getElementById('bGo').textContent=running?'PAUZA':'WZNÓW'};
+document.getElementById('bRes').onclick=reset;
+document.getElementById('bFlip').onclick=()=>{doFlip();ui()};
+document.getElementById('bMark').onclick=()=>{marks.push(tau);ev(tau,'znacznik diagnosty','gd');ui()};
+document.getElementById('bRep').onclick=()=>{document.querySelector('[data-t=rap]').click()};
+window.addEventListener('resize',()=>{cv.fit();cvV.fit();draw()});
+let acc=0;LAB.loop(dt=>{if(running){acc+=dt*speed/60;let n=Math.floor(acc/DT);acc-=n*DT;while(n-->0&&running)step();ui()}draw()});
+window.__sim={setSc,reset,get tau(){return tau},get hist(){return hist},eval:evaluate,get flips(){return flips},run(min){running=true;while(tau<min&&!done){step()}running=false;ui();draw();return evaluate()},flip(){doFlip()},auto:v=>document.getElementById('auto').checked=v,SC};
+setSc(0);
+})();
+</script></body></html>
