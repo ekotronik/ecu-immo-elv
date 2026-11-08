@@ -1,188 +1,443 @@
 <!doctype html>
 <html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Analizator rozrządu – symulacja | EKOTRONIK SYSTEM</title>
-<meta name="description" content="Kontrola rozrządu EKOTRONIK w trybie symulacji: CKP 60-2 i CMP, offset względem wzorca, odchyłka, dryft w stanach pracy silnika, 6 scenariuszy.">
+<meta name="description" content="Analizator rozrządu EKOTRONIK w trybie symulacji: realistyczne przebiegi CKP 60-2 i CMP, pomiar kąta CMP względem luki, wskaźnik odchyłki, werdykt i test przydatności koncepcji pomiaru.">
 <link rel="canonical" href="https://ekotronik.github.io/ecu-immo-elv/lab/kontrola-rozrzadu.html">
 <meta name="robots" content="index,follow">
 <link rel="icon" type="image/png" sizes="64x64" href="../assets_v8/favicon.png">
 <link rel="apple-touch-icon" href="../assets_v8/apple-touch-icon.png">
 <meta property="og:type" content="website"><meta property="og:locale" content="pl_PL"><meta property="og:site_name" content="EKOTRONIK SYSTEM">
-<meta property="og:url" content="https://ekotronik.github.io/ecu-immo-elv/lab/kontrola-rozrzadu.html"><meta property="og:title" content="Analizator rozrządu – symulacja | EKOTRONIK SYSTEM"><meta property="og:description" content="Kontrola rozrządu EKOTRONIK w trybie symulacji: CKP 60-2 i CMP, offset względem wzorca, odchyłka, dryft w stanach pracy silnika, 6 scenariuszy.">
+<meta property="og:url" content="https://ekotronik.github.io/ecu-immo-elv/lab/kontrola-rozrzadu.html"><meta property="og:title" content="Analizator rozrządu – symulacja | EKOTRONIK SYSTEM"><meta property="og:description" content="Analizator rozrządu EKOTRONIK w trybie symulacji: realistyczne przebiegi CKP 60-2 i CMP, pomiar kąta CMP względem luki, wskaźnik odchyłki, werdykt i test przydatności koncepcji pomiaru.">
 <meta property="og:image" content="https://ekotronik.github.io/ecu-immo-elv/assets_v8/og_ekotronik_system.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Logo EKOTRONIK SYSTEM">
-<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Analizator rozrządu – symulacja | EKOTRONIK SYSTEM"><meta name="twitter:description" content="Kontrola rozrządu EKOTRONIK w trybie symulacji: CKP 60-2 i CMP, offset względem wzorca, odchyłka, dryft w stanach pracy silnika, 6 scenariuszy."><meta name="twitter:image" content="https://ekotronik.github.io/ecu-immo-elv/assets_v8/og_ekotronik_system.png">
-<link rel="stylesheet" href="lab.css">
-<style>
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Analizator rozrządu – symulacja | EKOTRONIK SYSTEM"><meta name="twitter:description" content="Analizator rozrządu EKOTRONIK w trybie symulacji: realistyczne przebiegi CKP 60-2 i CMP, pomiar kąta CMP względem luki, wskaźnik odchyłki, werdykt i test przydatności koncepcji pomiaru."><meta name="twitter:image" content="https://ekotronik.github.io/ecu-immo-elv/assets_v8/og_ekotronik_system.png">
+<link rel="stylesheet" href="lab.css"><style>
 .titlebar{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:baseline;border:1px solid var(--border);border-radius:14px;padding:10px 16px;background:var(--panel);margin:8px 0}
-.titlebar b{color:var(--gold);font-size:1.2rem;letter-spacing:.03em}
-.prof{border:1px solid var(--border);border-radius:14px;padding:10px 14px;background:var(--panel);margin:8px 0}
-.prof .k,.card4 .k{color:var(--gold);font-weight:800;font-size:.82rem;letter-spacing:.08em}
 .card4{border:1px solid var(--border);border-radius:14px;padding:10px 14px;background:var(--panel);margin-bottom:10px}
+.card4 .k{color:var(--gold);font-weight:800;font-size:.82rem;letter-spacing:.08em}
 .card4.st{border-width:2px}.card4.fail{border-color:var(--fail)}.card4.ok{border-color:var(--ok)}.card4.warn{border-color:var(--warn)}
-.tile.ok{border-color:var(--ok)}.tile.warn{border-color:var(--warn)}.tile.fail{border-color:var(--fail)}
-.tile.ok .v{color:var(--ok)}.tile.warn .v{color:var(--warn)}.tile.fail .v{color:var(--fail)}
-.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.88rem;color:var(--muted);margin:6px 2px}
-.legend i{display:inline-block;width:22px;height:4px;border-radius:2px;margin-right:6px;vertical-align:middle}
 table.st{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
 table.st th{color:var(--gold);text-align:left;font-size:.82rem;letter-spacing:.06em;padding:6px 8px;border-bottom:1px solid var(--border)}
-table.st td{padding:8px;border-bottom:1px solid rgba(107,90,51,.35);font-size:1.02rem}
+table.st td{padding:8px;border-bottom:1px solid rgba(107,90,51,.35);font-size:1rem}
 .z-ok{color:var(--ok);font-weight:800}.z-warn{color:var(--warn);font-weight:800}.z-fail{color:var(--fail);font-weight:800}
+.scroll{overflow-x:auto}
 </style></head><body><div class="wrap">
 <div class="hdr" id="hdr"></div><div class="crumb" id="crumb"></div>
-<div class="titlebar"><b>KONTROLA ROZRZĄDU</b><span id="tbSt">SYMULACJA • gotowy</span></div>
-<div class="tabs" id="tabs"><button class="btn on" data-t="prz">PRZYGOTOWANIE</button><button class="btn" data-t="pom">POMIAR</button><button class="btn" data-t="wyn">WYNIK</button></div>
+<div class="row" id="topBtns">
+ <button class="btn gold" id="bGo">START POMIARU</button>
+ <button class="btn" id="bRes">OD NOWA</button>
+ <button class="btn cyan" id="bProof">TEST PRZYDATNOŚCI</button>
+ <button class="btn" id="bRep">RAPORT</button>
+</div>
+<div class="tabs" id="tabs"><button class="btn on" data-t="pom">Pomiar</button><button class="btn" data-t="prz">Przygotowanie</button><button class="btn" data-t="wyn">Wynik</button><button class="btn" data-t="prd">Przydatność</button><button class="btn" data-t="rap">Raport</button></div>
 
-<div data-p="prz"><div class="panel"><div class="pt"><i>●</i>Profil silnika i czujniki</div>
- <div class="prof"><div class="k">PROFIL</div><div style="font-size:1.1rem;font-weight:700">4 cyl., jeden wałek • CKP 60-2 • CMP 1 impuls/720°</div><div class="psub">Wzorzec offsetu CMP względem luki CKP: <b>100,0°</b> OWK • progi T1 = 2° (dobrze), T2 = 6° (ostrzeżenie)</div></div>
+<div data-p="pom"><div class="two">
+ <div class="panel">
+  <div class="pt"><i>01 /</i>Analizator rozrządu</div>
+  <div class="psub" id="sub">ekran pomiaru z oscylogramem CKP/CMP otwiera się na pełny ekran po START POMIARU · czujniki CKP 60-2 i CMP na wejściach głowicy EKO · wzorzec offsetu 100,0° OWK · T1 = 2°, T2 = 6°</div>
+  <div class="kpis">
+   <div class="kpi"><span class="lbl">Kąt CMP od luki</span><div class="v cy" id="kAng">—</div></div>
+   <div class="kpi"><span class="lbl">Odchyłka od wzorca</span><div class="v" id="kDev">—</div></div>
+   <div class="kpi"><span class="lbl">Obroty</span><div class="v gd" id="kRpm">—</div></div>
+   <div class="kpi"><span class="lbl">Stan silnika</span><div class="v" id="kSt">—</div></div>
+   <div class="kpi"><span class="lbl">Zdarzeń CMP</span><div class="v" id="kN">0</div></div>
+   <div class="kpi"><span class="lbl">Czas</span><div class="v" id="kT">00:00</div></div>
+  </div>
+  <div class="row" style="margin:6px 0"><button class="btn gold" id="bMz">OTWÓRZ EKRAN POMIARU (jak w aplikacji)</button></div>
+  <div class="box" id="verdict" style="margin-top:10px"><div class="bt" id="vT">GOTOWY</div><div id="vD" class="dm">Wybierz scenariusz w zakładce Przygotowanie i naciśnij START POMIARU.</div></div>
+ </div>
+ <div class="panel"><div class="pt"><i>02 /</i>Zdarzenia</div><div class="psub">od startu pomiaru</div><ul class="ev" id="ev1"></ul></div>
+</div></div>
+
+<div data-p="prz" class="hidden"><div class="panel">
+ <div class="pt"><i>●</i>Profil silnika i czujniki</div>
+ <div class="card4" style="margin-top:8px"><div class="k">PROFIL</div><div style="font-size:1.1rem;font-weight:700">4 cyl., jeden wałek rozrządu · CKP 60-2 (58 zębów + luka) · CMP 1 impuls na 720°</div><div class="psub">Wzorzec offsetu CMP względem luki CKP: <b>100,0°</b> OWK · progi T1 = 2° (dobrze), T2 = 6° (ostrzeżenie) · jeden ząb koła wałka 42-zębowego ≈ 17,1° OWK</div></div>
  <div class="pt" style="margin-top:12px"><i>●</i>Typ czujników</div><div class="scn" id="snBtns"></div>
- <div class="pt" style="margin-top:12px"><i>●</i>Scenariusz (symulacja)</div><div class="scn" id="scBtns"></div>
- <div class="card4" style="margin-top:10px"><div class="k">OPIS PRZYPADKU</div><div id="scD"></div></div>
- <button class="btn gold" id="bStart" style="width:100%;min-height:64px;font-size:1.2rem">START POMIARU (12 s)</button></div></div>
-
-<div data-p="pom" class="hidden">
- <div class="cwrap"><canvas id="cSig" aria-label="Sygnały CKP i CMP w oknie 720 stopni"></canvas></div>
- <div class="legend"><span><i style="background:#4de3f5"></i>CKP 60-2 (luka = 0° / 360° / 720°)</span><span><i style="background:#f4d89a"></i>CMP</span><span><i style="background:#66bb6a"></i>pole wzorca CMP (±T1)</span></div>
- <div class="kpis" id="tiles"></div>
- <div class="pt" style="margin-top:8px"><i>●</i>Odchyłka w czasie (pasma ±T1 / ±T2 dla każdego stanu silnika)</div>
- <div class="cwrap"><canvas id="cDev" aria-label="Odchyłka w czasie"></canvas></div>
- <div class="row" style="margin-top:10px"><button class="btn red" id="bStop">STOP</button><button class="btn" id="bPause">PAUZA</button><button class="btn" id="bDig">CYFRY</button><button class="btn back" id="bBack">POWRÓT</button></div></div>
+ <div class="pt" style="margin-top:12px"><i>●</i>Scenariusz (symulacja)</div><div class="psub" id="scDesc"></div><div class="scn" id="scBtns"></div>
+ <div class="row" style="margin-top:8px;align-items:center">
+  <span class="lbl" style="flex:none">Przyspieszenie</span>
+  <button class="btn sel" data-sp="1">×1</button><button class="btn" data-sp="3">×3</button><button class="btn" data-sp="10">×10</button>
+ </div>
+ <div class="note" style="margin-top:10px">Pomiar trwa 14 s symulowanego czasu: rozruch (ok. 250 obr/min), bieg jałowy (ok. 843 obr/min), obroty podwyższone (ok. 1974 obr/min). Analizator widzi wyłącznie zdarzenia z czujników (czas zboczy CKP i CMP), tak jak głowica EKO. Zadanego przesunięcia nie zna.</div>
+</div></div>
 
 <div data-p="wyn" class="hidden">
  <div class="card4"><div class="k">WNIOSEK</div><div id="wW" style="font-size:1.2rem;font-weight:800">—</div></div>
  <div class="card4"><div class="k">DOWÓD</div><div id="wD">—</div></div>
  <div class="card4 st" id="wStC"><div class="k">STATUS</div><div id="wSt" style="font-size:1.3rem;font-weight:900">—</div></div>
  <div class="card4"><div class="k">NASTĘPNY KROK</div><div id="wN">—</div></div>
- <div class="panel"><div class="pt"><i>●</i>Stany silnika</div><table class="st"><thead><tr><th>STAN</th><th>OBR/MIN</th><th>OFFSET</th><th>ODCHYŁKA</th><th>σ</th><th>STREFA</th></tr></thead><tbody id="tb"></tbody></table></div>
- <div class="row" style="margin-top:12px"><button class="btn" id="bDet">SZCZEGÓŁY</button><button class="btn" id="bRep">RAPORT</button><button class="btn gold" id="bAgain">POWTÓRZ</button><a class="btn" href="../index.html#galeria">← POWRÓT DO LAB</a></div>
- <div class="panel" id="repBox" style="margin-top:10px"><div class="pt"><i>●</i>Raport</div><pre id="rep" style="white-space:pre-wrap;font:inherit;margin:6px 0 0">Raport pojawi się po pomiarze.</pre></div></div>
+ <div class="panel"><div class="pt"><i>●</i>Stany silnika</div><div class="scroll"><table class="st"><thead><tr><th>STAN</th><th>OBR/MIN</th><th>KĄT CMP</th><th>ODCHYŁKA</th><th>σ</th><th>ZDARZEŃ</th><th>STREFA</th></tr></thead><tbody id="tb"></tbody></table></div></div>
+ <div class="row" style="margin-top:12px"><button class="btn gold" id="bAgain">POWTÓRZ</button><button class="btn" id="bMz2">EKRAN POMIARU</button><a class="btn" href="../index.html#galeria">← POWRÓT DO LAB</a></div>
+</div>
 
-<div class="about"><section class="panel about"><h2>Cel projektu</h2><p>Sprawdzić fazę rozrządu bez rozbierania silnika: analizator mierzy położenie impulsu CMP względem luki koła CKP 60-2 i porównuje je ze wzorcem. Jeden ząb koła wałka rozrządu 42-zębowego to ok. 17,1° obrotu wału korbowego, więc przeskok łańcucha lub paska widać od razu, a rozciąganie łańcucha jako dryft zależny od obrotów.</p></section>
-<section class="panel about"><h2>Co tu widzisz</h2><ul><li>Trzy ekrany jak w aplikacji: PRZYGOTOWANIE (profil, typ czujników, scenariusz), POMIAR (CKP z oznaczoną luką, CMP z polem wzorca, kafelki, wykres odchyłki w stanach rozruch / bieg jałowy / obroty) i WYNIK (wniosek, dowód, status, następny krok).</li><li>Sześć scenariuszy: ustawienie prawidłowe, przesunięcie o 1 ząb, o kilka zębów, dryft łańcucha, zły sygnał, pomiar bez wzorca.</li></ul>
-<p class="note">To SYMULACJA. Przebiegi generuje model, nie silnik z auta. Czujniki, głowica ESP32 i pojazd nie były w tym teście używane.</p></section></div>
+<div data-p="prd" class="hidden"><div class="panel proof">
+ <div class="pt"><i>●</i>Test przydatności i wiarygodności koncepcji pomiaru (symulacja)</div>
+ <div class="psub">Ten sam analizator, który pracuje na ekranie pomiaru, sprawdza wszystkie scenariusze wielokrotnie, z różnymi ziarnami szumu i trzema typami czujników. Porównujemy to, co zmierzył, z tym, co model zadał (prawdą znaną tylko symulacji).</div>
+ <div class="row"><button class="btn gold" id="bProof2">URUCHOM TEST (ok. 3 s)</button><span class="dm" id="prSt" style="align-self:center">Test jeszcze nie uruchomiony.</span></div>
+ <div class="kp" id="prK"></div>
+ <div class="scroll"><table class="st" id="prT"></table></div>
+ <div><div class="lbl">Liniowość: kąt zmierzony a kąt zadany (przesunięcie CMP od −20° do +60° OWK, trzy stany pracy silnika)</div><div class="cwrap"><canvas id="cLin" style="aspect-ratio:2.1/1"></canvas></div><div class="hint" id="prLinT"></div></div>
+ <div class="note">Co to potwierdza: że sam sposób pomiaru (zliczanie zębów CKP od luki i interpolacja zbocza CMP w obrębie zęba) daje kąt z błędem rzędu dziesiątych części stopnia nawet przy rozruchu z silnie falującymi obrotami i szumie czasu zboczy, oraz że werdykt zgadza się z założeniami scenariusza. Czego NIE potwierdza: zachowania prawdziwych czujników i okablowania, głowicy ESP32 ani konkretnego auta. To nadal symulacja.</div>
+</div></div>
+
+<div data-p="rap" class="hidden"><div class="panel"><div class="pt"><i>●</i>Raport</div><pre id="rep" style="white-space:pre-wrap;font:inherit;color:var(--text)">Raport pojawi się po pomiarze.</pre></div></div>
+
+<div class="about"><section class="panel about"><h2>Cel projektu</h2><p>Sprawdzić fazę rozrządu bez rozbierania silnika: analizator mierzy położenie impulsu CMP względem luki koła CKP 60-2 i porównuje je ze wzorcem. Jeden ząb koła wałka rozrządu 42-zębowego to ok. 17,1° obrotu wału korbowego, więc przeskok łańcucha lub paska widać od razu, a rozciąganie łańcucha jako odchyłkę rosnącą z obrotami.</p></section>
+<section class="panel about"><h2>Co tu widzisz</h2><ul><li>Ten sam ekran pomiaru co w aplikacji EKOTRONIK: oscylogram CKP (zielony, z luką odniesienia) i CMP (niebieski), znacznik R0, pole wzorca, nałożony na nie pomiar B ze wskaźnikiem odchyłki, pasek historii odchyłek, przyciski jak w aplikacji.</li><li>Siedem scenariuszy: ustawienie prawidłowe, przeskok o 1 ząb w obie strony, przeskok o 3 zęby, dryft łańcucha, zły sygnał, pomiar bez wzorca.</li><li>Zakładka Przydatność: automatyczny test całej koncepcji pomiaru na wszystkich scenariuszach.</li></ul>
+<p class="note">To SYMULACJA. Przebiegi generuje model, nie silnik z auta. Czujniki, głowica ESP32 i pojazd nie były w tym teście używane. Progi T1 i T2 oraz wzorzec są robocze.</p></section></div>
+</div>
+
+<div class="mz hidden" id="mz">
+ <div class="mz-bar"><b>ANALIZATOR ROZRZĄDU</b><span class="st" id="mzSt">Gotowy do pomiaru · SYMULACJA</span><span class="mz-chip" id="chSc">SYMULACJA · scen. 1</span><span class="mz-chip live" id="chMode">● LIVE</span><button class="mzb" id="mzFull">Pełny ekran</button></div>
+ <div class="mz-ban none" id="mzBan"><div><div class="bt" id="mzBt">GOTOWY</div><div class="bd" id="mzBd"></div></div><span class="mz-chip ok" id="chQ">DETEKCJA OK (bramka jakości)</span></div>
+ <div class="mz-main">
+  <div class="mz-col">
+   <div class="mz-kpis" id="mzK"></div>
+   <div class="mz-chart" id="mzC"><canvas id="cvM" aria-label="Przebiegi CKP i CMP"></canvas><div class="mz-hint" id="mzHint"></div></div>
+   <div class="mz-strip"><canvas id="cvS" aria-label="Historia odchyłki CMP"></canvas></div>
+   <div class="mz-tool" id="mzTool"><button data-a="axis">OŚ: kąt ° OWK</button><button data-a="all">CAŁOŚĆ</button><button data-a="r0">→ R0</button><button data-a="cmp">→ CMP</button><button data-a="bprev">◄ B</button><button data-a="bnext">B ►</button><button data-a="ckp">CKP: napięcie</button></div>
+  </div>
+  <div class="mz-side" id="mzSide"></div>
+ </div>
+ <div class="mz-q" id="mzQ"><span id="mzQt"></span><button id="mzQb" class="hidden"></button></div>
+ <div class="mz-btns" id="mzBtns"></div>
+ <div class="mz-pop hidden" id="mzPop"><button class="x" id="mzPopX">ZAMKNIJ</button><div id="mzPopB"></div></div>
 </div>
 <script src="lab.js"></script>
 <script>
 (function(){
-LAB.header({icon:'roz',sym:'KONTROLA ROZRZĄDU',symd:'CKP 60-2 · CMP · offset i dryft',title:'Analizator rozrządu'});
-const REF=100,T1=2,T2=6,TOOTH=360/42*2,DUR=12;
-const ST=[{k:'ROZRUCH',rpm:248,a:0,b:3},{k:'BIEG JAŁOWY',rpm:843,a:3,b:8},{k:'OBROTY',rpm:1974,a:8,b:12}];
+LAB.header({icon:'roz',sym:'ANALIZATOR ROZRZĄDU',symd:'CKP 60-2 · CMP · offset i dryft',title:'Analizator rozrządu'});
+const REF=100,T1=2,T2=6,TOOTH=360/42*2,DUR=14,PITCH=6,CMPW=190,DT=0.0001;
+const f1=LAB.f1,sg=LAB.sg;
+const STN=['ROZRUCH','BIEG JAŁOWY','OBROTY'];
+const PROF=[[0,250],[3.6,250],[4.1,843],[8.6,843],[9.1,1974],[14,1974]];
+const SNS=['CKP ind. + CMP Hall','CKP Hall + CMP Hall','CKP ind. + CMP ind.'];
 const SN=['CKP indukcyjny + CMP Hall','CKP Hall + CMP Hall','CKP indukcyjny + CMP indukcyjny'];
+const DRIFT_PTS=[[250,0.7],[843,2.9],[1974,7.5]];
 const SC=[
- {n:'Ustawienie prawidłowe',pr:'Rozrząd w normie: offset CMP ok. 100° w całym zakresie obrotów.',off:[100.2,100.0,99.9],sg:[.35,.25,.2]},
- {n:'Przesunięcie o 1 ząb',pr:'Koło wałka przeskoczyło o 1 ząb: offset większy o ok. 17,1° OWK na każdym stanie.',off:[117.3,117.1,117.2],sg:[.4,.3,.3]},
- {n:'Przesunięcie o kilka zębów',pr:'Przeskok o 3 zęby (ok. 51°): silnik może nie dać się uruchomić normalnie.',off:[151.4,151.3,151.5],sg:[.5,.4,.4]},
- {n:'Dryft łańcucha',pr:'Rozciągnięty łańcuch: odchyłka rośnie z obrotami. 0,7° / 2,9° / 7,5° w trzech stanach.',off:[100.7,102.9,107.5],sg:[.4,.7,1.3]},
- {n:'Sygnał zły',pr:'Zakłócony lub nieszczelny sygnał CMP: pomiar niewiarygodny, analizator nie wydaje wniosku.',off:[100,100,100],sg:[5,6,7],bad:true},
- {n:'Pomiar bez wzorca',pr:'Brak zapisanego wzorca: analizator pokazuje tylko zmierzony offset i prosi o zapis wzorca na sprawnym silniku.',off:[103.1,103.3,103.0],sg:[.3,.3,.3],noref:true}
+ {k:'ok',n:'Ustawienie prawidłowe',pr:'Rozrząd w normie: offset CMP ok. 100° w całym zakresie obrotów.',off:REF,sg:[.35,.25,.2]},
+ {k:'shift',n:'Przeskok o 1 ząb (+)',pr:'Koło wałka przeskoczyło o 1 ząb: offset większy o ok. 17,1° OWK na każdym stanie.',off:REF+TOOTH,sg:[.4,.3,.3]},
+ {k:'shift',n:'Przeskok o 1 ząb (−)',pr:'Przeskok w drugą stronę: offset mniejszy o ok. 17,1° OWK na każdym stanie.',off:REF-TOOTH,sg:[.4,.3,.3]},
+ {k:'shift',n:'Przeskok o 3 zęby',pr:'Przeskok o 3 zęby (ok. 51°): silnik może nie dać się uruchomić normalnie.',off:REF+3*TOOTH,sg:[.5,.4,.4]},
+ {k:'drift',n:'Dryft łańcucha',pr:'Rozciągnięty łańcuch: odchyłka rośnie z obrotami, ok. 0,7° / 2,9° / 7,5° w trzech stanach.',drift:true,sg:[.4,.7,1.3]},
+ {k:'bad',n:'Sygnał zły',pr:'Zakłócony CMP (zły przewód, luźna masa): rozrzut kąta i dodatkowe zbocza. Analizator nie wydaje wniosku.',off:REF,sg:[4.5,5.5,6.5],bad:true},
+ {k:'noref',n:'Pomiar bez wzorca',pr:'Brak zapisanego wzorca: analizator pokazuje tylko zmierzony offset i prosi o zapis wzorca na sprawnym silniku.',off:103.1,sg:[.3,.3,.3],noref:true}
 ];
-let sc=SC[0],sn=0,t=0,running=false,done=false,tab='prz',digits=false,paused=false,rng=LAB.rng(7),hist=[];
-const cS=LAB.canvas(document.getElementById('cSig'),()=>innerWidth<700?0.62:0.3),cD=LAB.canvas(document.getElementById('cDev'),()=>innerWidth<700?0.7:0.32);
+const trueOff=(s,rpm)=>{if(!s.drift)return s.off;const p=DRIFT_PTS,l=Math.log(rpm);if(rpm<=p[0][0])return REF+p[0][1];if(rpm>=p[2][0])return REF+p[2][1];const i=rpm<p[1][0]?0:1,a=Math.log(p[i][0]),b=Math.log(p[i+1][0]);return REF+p[i][1]+(p[i+1][1]-p[i][1])*(l-a)/(b-a)};
+const stIdx=r=>r<500?0:r<1300?1:2;
+function rpmAt(t){const p=PROF;if(t<=p[0][0])return p[0][1];for(let i=1;i<p.length;i++)if(t<=p[i][0]){const u=(t-p[i-1][0])/(p[i][0]-p[i-1][0]),s=u*u*(3-2*u);return p[i-1][1]+(p[i][1]-p[i-1][1])*s}return p[p.length-1][1]}
+const rip=r=>.35*Math.exp(-r/250)+.003;
+/* ================= model silnika i głowicy: tor zdarzeń CKP/CMP ================= */
+function newSim(sc,sn,seed){return{sc,sn,rnd:LAB.rng(seed),t:0,th:0,cyc:0,cmpHigh:false,cmpNext:null,noiseNext:null,A:newA()}}
+function planRise(S,c,rpm){const s=S.sc;return c*720+trueOff(s,rpm)+LAB.gauss(S.rnd)*s.sg[stIdx(rpm)]}
+function stepSim(S,dt){
+ const rnd=S.rnd,t1=S.t+dt,rpm=rpmAt(t1);
+ if(S.cmpNext===null){S.cmpNext=planRise(S,0,rpm);S.noiseNext=S.sc.bad?.05:1e9}
+ const w=rpm*6*(1+rip(rpm)*Math.sin(S.th*Math.PI/90)+.004*Math.sin(t1*7.3));
+ const th1=S.th+w*dt,jt=(S.sn===1?2e-6:3e-6);
+ const m0=Math.floor(S.th/PITCH),m1=Math.floor(th1/PITCH);
+ for(let m=m0+1;m<=m1;m++){const k=((m%60)+60)%60;if(k>=58)continue;const te=S.t+(m*PITCH-S.th)/(th1-S.th)*dt+LAB.gauss(rnd)*jt;aCkp(S.A,te)}
+ while(S.cmpNext<=th1){const te=S.t+(S.cmpNext-S.th)/(th1-S.th)*dt;
+  if(!S.cmpHigh){S.A.pend.push(te);S.cmpHigh=true;S.cmpNext+=CMPW}
+  else{S.cmpHigh=false;S.cyc=Math.floor(S.cmpNext/720)+1;S.cmpNext=planRise(S,S.cyc,rpm)}}
+ if(S.sc.bad&&t1>=S.noiseNext){S.A.pend.push(t1);S.noiseNext=t1+.03+rnd()*.15}
+ S.A.pend.sort((a,b)=>a-b);
+ S.th=th1;S.t=t1;
+}
+/* ================= analizator: widzi tylko czasy zboczy ================= */
+function newA(){return{teeth:[],j:-1,synced:false,r0:null,revs:[],pend:[],ev:[],toothOk:0,toothBad:0,lastCnt:0,cmpBad:0,lastRise:null,lastTc:0,evLog:[]}}
+function aCkp(A,t){
+ const L=A.teeth.length,p=L?A.teeth[L-1]:null,p2=L>1?A.teeth[L-2]:null;let j=A.j+1,isR0=false;
+ if(p&&p2&&(t-p.t)>2.0*(p.t-p2.t)){isR0=true;j=0;if(A.synced){A.lastCnt=p.j+1;if(p.j+1===58)A.toothOk++;else A.toothBad++}
+  if(A.r0!==null)A.revs.push({t,T:t-A.r0});A.r0=t;A.synced=true}
+ if(!A.synced)j=-1;
+ A.j=j;A.teeth.push({t,j,r0:isR0});if(A.teeth.length>300)A.teeth.shift();
+ while(A.pend.length&&A.pend[0]<t){aMeasure(A,A.pend.shift())}
+}
+function aMeasure(A,tc){
+ const T=A.teeth;let i=T.length-2;while(i>=0&&T[i].t>tc)i--;
+ if(i<0||T[i].j<0||!(T[i+1].t>tc))return;
+ const a=T[i],b=T[i+1],span=b.r0?3:1,ang=PITCH*(a.j+(tc-a.t)/(b.t-a.t)*span);
+ const rv=A.revs;if(rv.length<2)return;
+ const Tr=rv[rv.length-1].T,rpm=60/Tr;let valid=true,why='';
+ if(Math.abs(rv[rv.length-1].T/rv[rv.length-2].T-1)>.06){valid=false;why='przejście obrotów'}
+ let extra=false;if(A.lastRise!==null&&tc-A.lastRise<1.4*Tr){extra=true;A.cmpBad++;valid=false;why='dodatkowe zbocze CMP'}
+ A.lastRise=tc;
+ A.ev.push({n:A.ev.length+1,t:tc,ang,rpm,st:stIdx(rpm),valid,why,extra});
+}
+function stats(A){const out=STN.map((k,i)=>({i,k,v:[],r:[]}));A.ev.forEach(e=>{if(e.valid){out[e.st].v.push(e.ang);out[e.st].r.push(e.rpm)}});
+ return out.map(o=>{const n=o.v.length;if(!n)return{...o,n:0};const m=o.v.reduce((a,b)=>a+b)/n,sd=Math.sqrt(o.v.reduce((a,b)=>a+(b-m)**2,0)/n);return{...o,n,m,sd,d:m-REF,rpm:o.r.reduce((a,b)=>a+b)/n}})}
 const zone=d=>Math.abs(d)<=T1?'ok':Math.abs(d)<=T2?'warn':'fail';
 const zl={ok:'DOBRZE',warn:'UWAGA',fail:'BŁĄD'};
-function stateAt(tt){return ST.findIndex(s=>tt>=s.a&&tt<s.b)<0?2:ST.findIndex(s=>tt>=s.a&&tt<s.b)}
-function cur(){const i=stateAt(t),s=ST[i];const g=sc.bad?LAB.gauss(rng)*sc.sg[i]:LAB.gauss(rng)*sc.sg[i]*.5;const rp=s.rpm*(1+.01*LAB.gauss(rng));return{i,rp,off:sc.off[i]+g}}
-function stats(){const out=ST.map(s=>({s,v:[]}));hist.forEach(h=>out[h.i].v.push(h.off));return out.map(o=>{const n=o.v.length;if(!n)return{...o,n:0};const m=o.v.reduce((a,b)=>a+b)/n;const sd=Math.sqrt(o.v.reduce((a,b)=>a+(b-m)**2,0)/n);return{...o,n,m,sd,d:m-REF}})}
-function verdict(){
- const S=stats().filter(x=>x.n>5);if(!S.length)return null;
- if(sc.bad)return{k:'fail',w:'BRAK WNIOSKU – sygnał CMP niewiarygodny',d:'Rozrzut offsetu σ = '+S.map(x=>x.sd.toFixed(1)).join(' / ')+'° wielokrotnie powyżej progu T2. Pomiar nie jest powtarzalny.',st:'SYGNAŁ ZŁY',n:'Sprawdź czujnik CMP, przewód, masę i szczelinę. Powtórz pomiar. Nie oceniam fazy rozrządu z zakłóconego sygnału.',rows:S};
- if(sc.noref)return{k:'warn',w:'BRAK WZORCA – zmierzony offset '+S[0].m.toFixed(1)+'°',d:'Nie ma wzorca do porównania. Offset stały w trzech stanach (σ ≤ '+Math.max(...S.map(x=>x.sd)).toFixed(1)+'°).',st:'POMIAR BEZ WZORCA',n:'Zapisz wzorzec na silniku o pewnie prawidłowym rozrządzie albo porównaj z danymi producenta.',rows:S,noref:true};
- const worst=S.reduce((a,b)=>Math.abs(b.d)>Math.abs(a.d)?b:a),z=zone(worst.d);
- const spread=Math.max(...S.map(x=>x.d))-Math.min(...S.map(x=>x.d));
- const teeth=Math.abs(worst.d)/17.1;
- if(z==='ok')return{k:'ok',w:'ROZRZĄD W NORMIE',d:'Największa odchyłka '+worst.d.toFixed(1)+'° (T1 = '+T1+'°). Offset zgodny ze wzorcem we wszystkich stanach.',st:'USTAWIENIE PRAWIDŁOWE (SYMULACJA)',n:'Brak działań. Dla pewności powtórz pomiar po rozgrzaniu silnika.',rows:S};
- if(spread>3)return{k:z,w:'DRYFT ROZRZĄDU – odchyłka rośnie z obrotami',d:'Odchyłka '+S.map(x=>x.s.k.toLowerCase()+' '+x.d.toFixed(1)+'°').join(', ')+'. Rozrzut między stanami '+spread.toFixed(1)+'°.',st:z==='fail'?'PODEJRZENIE ROZCIĄGNIĘTEGO ŁAŃCUCHA':'DRYFT W OBSERWACJI',n:'Sprawdź luz i napinacz łańcucha, wykonaj pomiar przy obciążeniu. Wynik z symulacji nie jest dowodem usterki w aucie.',rows:S};
- return{k:z,w:'PRZESUNIĘCIE ROZRZĄDU o ok. '+worst.d.toFixed(1).replace('.',',')+'° OWK (ok. '+teeth.toFixed(1).replace('.',',')+' zęba)',d:'Offset stały w stanach, odchyłka '+worst.d.toFixed(1)+'° (wzorzec '+REF+'°, T2 = '+T2+'°). Jeden ząb koła wałka ≈ 17,1° OWK.',st:'PRZESUNIĘCIE POTWIERDZONE (SYMULACJA)',n:'Sprawdź znaki rozrządu, napinacz i prowadnice. Nie uruchamiaj silnika z błędnym rozrządem.',rows:S};
+function verdict(A,sc,fin){
+ const R=stats(A),S=R.filter(x=>x.n>=4);if(!S.length)return null;
+ const full=S.length===3,lim=(!full&&!fin)?'LIVE: ':'';
+ const part=!full?' (ocena ograniczona: zebrano stany '+S.map(x=>x.k.toLowerCase()).join(', ')+')':'';
+ const nBadFrac=A.cmpBad/Math.max(1,A.ev.length);
+ if(nBadFrac>.25||S.some(x=>x.sd>T2))return{kind:'bad',k:'fail',t:lim+'BRAK WNIOSKU: SYGNAŁ CMP NIEWIARYGODNY',w:'BRAK WNIOSKU: sygnał CMP niewiarygodny',d:'Rozrzut kąta σ = '+S.map(x=>f1(x.sd)).join(' / ')+'° przy progu T2 = '+T2+'°, dodatkowych zboczy CMP: '+A.cmpBad+' z '+A.ev.length+'. Pomiar nie jest powtarzalny.',st:'SYGNAŁ ZŁY',n:'Sprawdź czujnik CMP, przewód, masę i szczelinę. Powtórz pomiar. Nie oceniam fazy rozrządu z zakłóconego sygnału.',rows:R,S};
+ if(sc.noref)return{kind:'noref',k:'warn',t:lim+'BRAK WZORCA: ZMIERZONY KĄT '+f1(S[0].m)+'°',w:'BRAK WZORCA – zmierzony offset '+f1(S[0].m)+'°',d:'Nie ma wzorca do porównania. Offset stały w stanach (σ ≤ '+f1(Math.max(...S.map(x=>x.sd)))+'°).',st:'POMIAR BEZ WZORCA',n:'Zapisz wzorzec na silniku o pewnie prawidłowym rozrządzie albo porównaj z danymi producenta.',rows:R,S,noref:true};
+ const worst=S.reduce((a,b)=>Math.abs(b.d)>Math.abs(a.d)?b:a),z=zone(worst.d),spread=Math.max(...S.map(x=>x.d))-Math.min(...S.map(x=>x.d)),teeth=Math.abs(worst.d)/TOOTH;
+ if(z==='ok'&&spread<=3)return{kind:'ok',k:'ok',t:lim+(full?'ROZRZĄD W NORMIE':'ODCHYŁKA W NORMIE')+(full?'':' (stan: '+S.map(x=>x.k.toLowerCase()).join(', ')+')'),w:'ROZRZĄD W NORMIE',d:'Największa odchyłka '+sg(worst.d)+'° (T1 = '+T1+'°). Kąt zgodny ze wzorcem '+(full?'we wszystkich stanach.':'w zmierzonych stanach.'),st:'USTAWIENIE PRAWIDŁOWE (SYMULACJA)',n:'Brak działań. Dla pewności powtórz pomiar po rozgrzaniu silnika.'+part,rows:R,S};
+ if(spread>3&&S.length>1)return{kind:'drift',k:z==='ok'?'warn':z,t:lim+'DRYFT ROZRZĄDU: ODCHYŁKA ROŚNIE Z OBROTAMI',w:'DRYFT ROZRZĄDU – odchyłka rośnie z obrotami',d:'Odchyłka '+S.map(x=>x.k.toLowerCase()+' '+sg(x.d)+'°').join(', ')+'. Rozrzut między stanami '+f1(spread)+'°.',st:z==='fail'?'PODEJRZENIE ROZCIĄGNIĘTEGO ŁAŃCUCHA':'DRYFT W OBSERWACJI',n:'Sprawdź luz i napinacz łańcucha, wykonaj pomiar przy obciążeniu. Wynik z symulacji nie jest dowodem usterki w aucie.',rows:R,S};
+ return{kind:'shift',k:z,t:lim+(z==='ok'?'ODCHYŁKA W NORMIE':'PRZESUNIĘCIE ROZRZĄDU '+sg(worst.d)+'° OWK'),w:'PRZESUNIĘCIE ROZRZĄDU o ok. '+sg(worst.d)+'° OWK (ok. '+f1(teeth)+' zęba)',d:'Offset stały w stanach, odchyłka '+sg(worst.d)+'° (wzorzec '+REF+'°, T2 = '+T2+'°). Jeden ząb koła wałka ≈ 17,1° OWK.',st:'PRZESUNIĘCIE POTWIERDZONE (SYMULACJA)',n:'Sprawdź znaki rozrządu, napinacz i prowadnice. Nie uruchamiaj silnika z błędnym rozrządem.'+part,rows:R,S};
 }
-function drawSig(){
- const {ctx,W,H}=cS;ctx.clearRect(0,0,W,H);ctx.fillStyle='#07111c';ctx.fillRect(0,0,W,H);
- const L=44,R=W-12,T=14,B=H-26,w=R-L,x=a=>L+a/720*w;
- ctx.font='13px sans-serif';ctx.textBaseline='middle';
- const c=cur(),off=running||hist.length?(hist.length?hist[hist.length-1].off:c.off):sc.off[0];
- const ind=sn!==1&&sn!==2||sn===0; // CKP indukcyjny
- const yC=[T+8,T+(B-T)*.46],hC=(B-T)*.4;
- // pole wzorca
- ctx.fillStyle='rgba(102,187,106,.22)';ctx.fillRect(x(REF-T1),yC[1]-6,x(REF+T1)-x(REF-T1)+0,hC+14);
- ctx.strokeStyle='rgba(244,216,154,.6)';ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(x(REF),T);ctx.lineTo(x(REF),B);ctx.stroke();ctx.setLineDash([]);
+function runHeadless(sc,sn,seed,dur){const S=newSim(sc,sn,seed);dur=dur||DUR;while(S.t<dur)stepSim(S,DT);return S}
+/* ================= stan interfejsu ================= */
+let sc=SC[0],sn=0,speed=1,S=null,running=false,done=false,mzOn=false,pelny=false,frozen=false,rec=false,recS=0,axisMs=false,ckpEv=false,zoom=null,browse=null,cur={A:null,B:null},view=null,viewT=0,evs=[],lastSt=-1,loggedV='',loggedGap=false;
+const cvM=LAB.fillCanvas(document.getElementById('cvM')),cvS=LAB.fillCanvas(document.getElementById('cvS')),cLin=LAB.canvas(document.getElementById('cLin'),.48);
+const $=id=>document.getElementById(id);
+function ev(t,txt,cls){evs.push({t,txt,cls:cls||''})}
+function reset(){running=false;done=false;S=null;frozen=false;browse=null;cur={A:null,B:null};view=null;viewT=0;evs=[];lastSt=-1;loggedV='';loggedGap=false;rec=false;recS=0;zoom=null;$('bGo').textContent='START POMIARU';ui();draw()}
+function startMeasure(){if(done||!S){S=newSim(sc,sn,11+SC.indexOf(sc)*7+sn);evs=[];lastSt=-1;loggedV='';loggedGap=false;done=false;view=null;browse=null;frozen=false;cur={A:null,B:null}}running=true;ev(S.t,'start pomiaru, scenariusz: '+sc.n,'gd');$('bGo').textContent='PAUZA';openMz()}
+function finish(){running=false;done=true;const v=verdict(S.A,sc,true);ev(S.t,'koniec pomiaru: '+(v?v.w:'brak wniosku'),v?(v.k==='ok'?'ok':v.k==='fail'?'fail':'warn'):'');$('bGo').textContent='START POMIARU';ui();draw()}
+function latest(){if(!S)return null;const e=S.A.ev;return e.length?e[e.length-1]:null}
+function nowV(){return S?verdict(S.A,sc,done):null}
+function runInfo(A,e){ // seria kolejnych pomiarów o utrzymującej się odchyłce
+ const valid=A.ev.filter(x=>x.valid);let i=valid.length-1;if(i<0||sc.noref)return null;const z=zone(valid[i].ang-REF),sgn=Math.sign(valid[i].ang-REF);if(z==='ok')return null;
+ const run=[];while(i>=0&&zone(valid[i].ang-REF)!=='ok'&&Math.sign(valid[i].ang-REF)===sgn&&Math.abs(valid[i].ang-valid[valid.length-1].ang)<4){run.push(valid[i]);i--}
+ if(run.length>=3&&Math.max(...run.map(x=>x.ang))-Math.min(...run.map(x=>x.ang))>3)return null;
+ return run.length>=3?{n:run.length,min:Math.min(...run.map(x=>x.ang-REF)),max:Math.max(...run.map(x=>x.ang-REF)),t0:run[run.length-1].t,t1:run[0].t}:null}
+/* ================= ekran pomiaru: wyświetlanie ================= */
+const GRN='#7CFF6B',CYA='#5adfff',AMB='#ffca28';
+const zcol=z=>z==='ok'?'#66bb6a':z==='warn'?'#ffca28':'#ef5350';
+function takeView(){ // odświeżanie obrazu: najwyżej 4 razy na sekundę (jak w aplikacji)
+ if(!S)return;const e=latest();if(!e)return;const now=performance.now();if(view&&view.n===e.n)return;if(frozen||browse!==null)return;if(view&&now-viewT<250)return;
+ view={n:e.n,ang:e.ang,rpm:e.rpm,st:e.st,t:e.t,valid:e.valid};viewT=now}
+function curView(){if(browse!==null){const e=S.A.ev[browse];return e?{n:e.n,ang:e.ang,rpm:e.rpm,st:e.st,t:e.t,valid:e.valid}:null}return view}
+function ckpV(a,ind,amp,hash){ // napięcie CKP w funkcji kąta (okno wałka)
+ if(ind){let v=0;const m0=Math.floor(a/PITCH)-2;for(let m=m0;m<=m0+5;m++){const k=((m%60)+60)%60;if(k>=58)continue;const u=a-m*PITCH,s=2.0;v+=(k===0?1.4:k===57?.8:1)*(-u/s)*Math.exp(-u*u/(2*s*s))/.607}return v*amp}
+ let h=0;const m=Math.floor(a/PITCH),k=((m%60)+60)%60;if(k<58&&a-m*PITCH<3)h=1;return h}
+function drawMain(){
+ if(!cvM.fit())return;const c=cvM.ctx,d=cvM.dpr,W=cvM.W,H=cvM.H;c.fillStyle='#050c14';c.fillRect(0,0,W,H);
+ const V=curView(),narrow=W/d<640,sensCkpInd=sn!==1,sensCmpInd=sn===2;
+ let x0=narrow?-20:-24,x1=narrow?400:744;if(zoom){x0=zoom[0];x1=zoom[1]}
+ const L=(narrow?46:68)*d,R=12*d,top=30*d,axH=(axisMs?34:42)*d,avail=H-top-axH,pw=W-L-R;
+ const X=a=>L+(a-x0)/(x1-x0)*pw;
+ const yC0=top+16*d,hC=avail*.30,yM0=top+avail*.47,hM=avail*.47;
+ const rpm=V?V.rpm:843,msA=a=>a/(6*rpm)*1000;
+ c.textBaseline='alphabetic';
+ // tytuł i legenda
+ c.fillStyle='#fff';c.font='bold '+(15*d)+'px Roboto,sans-serif';c.textAlign='left';c.fillText(narrow?'CKP / CMP · SYMULACJA':'Przebiegi CKP / CMP · dwa obroty wału · SYMULACJA',L,20*d);
+ if(!narrow){c.font=(13*d)+'px Roboto,sans-serif';const lx=W-R-250*d;c.strokeStyle=GRN;c.lineWidth=2.5*d;c.beginPath();c.moveTo(lx,16*d);c.lineTo(lx+22*d,16*d);c.stroke();c.fillStyle='#d6dbe8';c.fillText('CKP',lx+28*d,20*d);c.strokeStyle=CYA;c.beginPath();c.moveTo(lx+70*d,16*d);c.lineTo(lx+92*d,16*d);c.stroke();c.fillText('CMP',lx+98*d,20*d);c.setLineDash([5*d,4*d]);c.strokeStyle='#fff';c.lineWidth=1.8*d;c.beginPath();c.moveTo(lx+140*d,16*d);c.lineTo(lx+162*d,16*d);c.stroke();c.setLineDash([]);c.fillText('Wzorzec',lx+168*d,20*d)}
+ // siatka pionowa i oś
+ c.font=(13*d)+'px Roboto,sans-serif';c.textAlign='center';
+ const st=(x1-x0)>500||narrow?90:(x1-x0)>200?45:15;
+ for(let a=Math.ceil(x0/st)*st;a<=x1;a+=st){c.strokeStyle='rgba(255,255,255,.07)';c.lineWidth=d;c.beginPath();c.moveTo(X(a),top);c.lineTo(X(a),H-axH);c.stroke();c.fillStyle='#e8c87a';c.fillText(axisMs?f1(msA(a),a===0?0:(rpm>1200?1:0))+' ms':a+'°',X(a),H-axH+16*d);if(!axisMs){c.fillStyle='#7f8da1';c.font=(12*d)+'px Roboto,sans-serif';c.fillText(f1(msA(a),rpm>1200?1:0)+' ms',X(a),H-axH+32*d);c.font=(13*d)+'px Roboto,sans-serif'}}
+ // luki CKP (brązowe pola)
+ const gaps=[];for(let r=-1;r<=2;r++)gaps.push(r*360-12);
+ gaps.forEach(g=>{if(g+12<x0||g>x1)return;c.fillStyle='rgba(176,98,40,.40)';c.fillRect(X(g),yC0-4*d,X(g+12)-X(g),hC+8*d)});
+ c.fillStyle='#d9a56a';c.font=(12*d)+'px Roboto,sans-serif';c.textAlign='left';if(X(-12)>L+10*d)c.fillText(narrow?'luka CKP':'ZNACZNIK CKP — luka odniesienia',Math.max(L+6*d,X(-12)-6*d),yC0-8*d);else c.fillText('ZNACZNIK CKP — luka odniesienia',L+4*d,yC0-8*d);
  // CKP
- ctx.strokeStyle='#4de3f5';ctx.lineWidth=1.6;ctx.beginPath();
- const inductive=sn===0||sn===2;
- for(let k=0;k<120;k++){const a0=(k%60)*6+Math.floor(k/60)*360-0; const ang=k*6; const gap=(k%60)>=58;
-  const x0=x(ang),x1=x(ang+3),x2=x(ang+6);
-  if(inductive){ if(gap){continue} ctx.moveTo(x0,yC[0]+hC/2);ctx.quadraticCurveTo((x0+x1)/2,yC[0]-2,x1,yC[0]+hC/2);ctx.quadraticCurveTo((x1+x2)/2,yC[0]+hC+2,x2,yC[0]+hC/2)}
-  else{ if(gap)continue;ctx.moveTo(x0,yC[0]+hC);ctx.lineTo(x0,yC[0]);ctx.lineTo(x1,yC[0]);ctx.lineTo(x1,yC[0]+hC)}
- }
- ctx.stroke();
- // luki
- ctx.fillStyle='rgba(239,83,80,.9)';ctx.strokeStyle='rgba(239,83,80,.9)';ctx.lineWidth=2;
- [0,360,720].forEach(a=>{ctx.beginPath();ctx.moveTo(x(a),T);ctx.lineTo(x(a),B);ctx.stroke();ctx.textAlign=a===720?'right':a===0?'left':'center';ctx.fillText('LUKA '+a+'°',x(a)+(a===0?4:a===720?-4:0),T+4)});
+ c.strokeStyle=GRN;c.lineWidth=1.6*d;c.beginPath();const stp=Math.max(.4,(x1-x0)/(pw/d*1.6));
+ const amp=.46,mid=yC0+hC/2;
+ if(ckpEv){ // zdarzenia: wykryte zbocza jako prostokąt
+  for(let a=Math.floor(x0/PITCH)*PITCH;a<=x1;a+=PITCH){const k=(((a/PITCH)%60)+60)%60;if(k>=58)continue;const xa=X(a),xb=X(a+3);c.moveTo(xa,yC0+hC);c.lineTo(xa,yC0+4*d);c.lineTo(xb,yC0+4*d);c.lineTo(xb,yC0+hC)}}
+ else if(sensCkpInd){let first=true;const rr=LAB.rng(V?V.n:3);for(let a=x0;a<=x1;a+=stp){const v=ckpV(a,true,1)*(1+0*rr())+ (rr()-.5)*.03,y=mid-v*amp*hC;first?c.moveTo(X(a),y):c.lineTo(X(a),y);first=false}}
+ else{let first=true;const rr=LAB.rng(V?V.n:3);for(let a=x0;a<=x1;a+=PITCH/12){const v=ckpV(a,false)+0,y=yC0+hC-(v*.92+0.02)*hC;first?c.moveTo(X(a),y):c.lineTo(X(a),y);first=false}}
+ c.stroke();
+ // opisy kanałów
+ c.textAlign='left';c.fillStyle=GRN;c.font='bold '+(16*d)+'px Roboto,sans-serif';c.fillText('CKP',6*d,mid+4*d);c.font=(12*d)+'px Roboto,sans-serif';c.fillStyle='#a3b0c2';c.fillText(ckpEv?'[zdarz.]':'[V]',6*d,mid+20*d);
+ c.fillStyle=CYA;c.font='bold '+(16*d)+'px Roboto,sans-serif';c.fillText('CMP',6*d,yM0+hM*.5+4*d);c.font=(12*d)+'px Roboto,sans-serif';c.fillStyle='#a3b0c2';c.fillText(sensCmpInd?'[V]':'[V]',6*d,yM0+hM*.5+20*d);
+ // kolejny obrót
+ if(x1>360&&x0<360){c.setLineDash([6*d,5*d]);c.strokeStyle='rgba(255,255,255,.35)';c.lineWidth=1.4*d;c.beginPath();c.moveTo(X(360),yC0);c.lineTo(X(360),yM0+hM);c.stroke();c.setLineDash([]);c.fillStyle='#b4bfd0';c.font=(12*d)+'px Roboto,sans-serif';c.textAlign='left';c.fillText('kolejny obrót',X(360)+4*d,yC0+hC+16*d)}
+ // pole wzorca w pasie CMP
+ const refKnown=!sc.noref;
+ if(refKnown){c.fillStyle='rgba(102,187,106,.22)';c.fillRect(X(REF-T1),yM0-4*d,X(REF+T1)-X(REF-T1),hM+8*d);c.setLineDash([5*d,4*d]);c.strokeStyle='#fff';c.lineWidth=1.8*d;c.beginPath();c.moveTo(X(REF),yC0+hC+2*d);c.lineTo(X(REF),yM0+hM+4*d);c.stroke();c.setLineDash([]);
+  if(!narrow){c.fillStyle='#b4bfd0';c.font=(12*d)+'px Roboto,sans-serif';c.textAlign='right';c.fillText('oczekiwany '+f1(REF)+'° ± '+f1(T1)+'° OWK',W-R-4*d,yM0+hM+14*d)}}
  // CMP
- const cmpA=sc.bad?off+LAB.gauss(rng)*3:off;
- ctx.strokeStyle='#f4d89a';ctx.lineWidth=2;ctx.beginPath();
- const wd=inductive&&sn===2?24:46;
- if(sn===2){ctx.moveTo(x(cmpA-20),yC[1]+hC/2);ctx.quadraticCurveTo(x(cmpA-8),yC[1]-4,x(cmpA),yC[1]+hC/2);ctx.quadraticCurveTo(x(cmpA+8),yC[1]+hC+4,x(cmpA+20),yC[1]+hC/2)}
- else{ctx.moveTo(x(0),yC[1]+hC);ctx.lineTo(x(cmpA),yC[1]+hC);ctx.lineTo(x(cmpA),yC[1]);ctx.lineTo(x(cmpA+wd+30),yC[1]);ctx.lineTo(x(cmpA+wd+30),yC[1]+hC);ctx.lineTo(x(720),yC[1]+hC)}
- ctx.stroke();
- // noise for bad
- if(sc.bad&&(running||hist.length)){ctx.strokeStyle='rgba(244,216,154,.5)';ctx.lineWidth=1;ctx.beginPath();for(let i=0;i<40;i++){const a=rng()*720;ctx.moveTo(x(a),yC[1]+hC);ctx.lineTo(x(a),yC[1]+rng()*hC)}ctx.stroke()}
- // opisy
- ctx.fillStyle='#9fb1c8';ctx.textAlign='left';ctx.fillText('CKP',4,yC[0]+hC/2);ctx.fillText('CMP',4,yC[1]+hC/2);
- ctx.textAlign='center';[0,180,360,540,720].forEach(a=>ctx.fillText(a+'°',x(a),H-10));
- if(!running&&!hist.length){ctx.fillStyle='#d6a852';ctx.textAlign='center';ctx.font='bold 15px sans-serif';ctx.fillText('Naciśnij START POMIARU (podgląd wzorcowy)',W/2,H-10)}
+ const cmpHi=yM0+hM*.14,cmpLo=yM0+hM*.86;
+ let ang=V?V.ang:null;
+ const rr2=LAB.rng(V?V.n*7+1:5);
+ c.strokeStyle=CYA;c.lineWidth=2.2*d;c.beginPath();
+ if(ang===null)ang=REF;
+ const drawn=V!==null;
+ if(sensCmpInd){let first=true;for(let a=x0;a<=x1;a+=stp){const u=a-ang,uf=a-(ang+CMPW);let v=drawn?(-u/6*Math.exp(-u*u/72)+uf/6*Math.exp(-uf*uf/72))/.607:0;if(drawn&&sc.bad)v+=(rr2()-.5)*.5;const y=(yM0+hM/2)-v*hM*.40;first?c.moveTo(X(a),y):c.lineTo(X(a),y);first=false}}
+ else{ // Hall: poziom wysoki od krawędzi narastającej
+  c.moveTo(X(x0),cmpLo);
+  if(drawn){const g=sc.bad?[...Array(6)].map(()=>({a:x0+rr2()*(x1-x0),w:2+rr2()*8})):[];
+   const pts=[[ang,1],[ang+CMPW,0]];pts.forEach(([a,hi],i)=>{});
+   const edges=[{a:ang,up:true},{a:ang+CMPW,up:false}];g.forEach(q=>{edges.push({a:q.a,up:true},{a:q.a+q.w,up:false})});edges.sort((p,q)=>p.a-q.a);
+   let lvl=0;for(const e of edges){if(e.a<x0||e.a>x1)continue;const xx=X(e.a);c.lineTo(xx,lvl?cmpHi:cmpLo);lvl=e.up?1:0;c.lineTo(xx,lvl?cmpHi:cmpLo)}c.lineTo(X(x1),lvl?cmpHi:cmpLo)}
+  else c.lineTo(X(x1),cmpLo)}
+ c.stroke();
+ // R0
+ if(x0<=0&&x1>=0){c.strokeStyle='#fff';c.lineWidth=2.4*d;c.beginPath();c.moveTo(X(0),yC0-4*d);c.lineTo(X(0),yM0+hM);c.stroke();
+  const bx=X(0)+6*d,by=yM0+hM*.40+(narrow?hM*.2:0);c.fillStyle='#050c14';c.strokeStyle='#fff';c.lineWidth=1.6*d;rr(c,bx,by-11*d,66*d,24*d,8*d);c.fill();c.stroke();c.fillStyle='#fff';c.font='bold '+(13*d)+'px Roboto,sans-serif';c.textAlign='left';c.fillText('A · R0',bx+8*d,by+6*d)}
+ // pomiar B i wskaźnik odchyłki
+ if(V&&drawn){const dev=ang-REF,z=refKnown?zone(dev):'ok',col=refKnown?zcol(z):CYA,badNow=!!(S&&verdictKind()==='bad');
+  if(refKnown&&z!=='ok'&&ang>=x0-200&&ang<=x1){const xa=X(Math.min(REF,ang)),xb=X(Math.max(REF,ang));c.fillStyle=z==='fail'?'rgba(239,83,80,.34)':'rgba(255,202,40,.28)';c.fillRect(xa,yM0-4*d,xb-xa,hM+8*d);c.strokeStyle=col;c.lineWidth=1.6*d;c.strokeRect(xa,yM0-4*d,xb-xa,hM+8*d)}
+  if(ang>=x0&&ang<=x1){c.strokeStyle=CYA;c.lineWidth=2.2*d;c.beginPath();c.moveTo(X(ang),yC0+hC+2*d);c.lineTo(X(ang),yM0+hM);c.stroke();c.beginPath();c.arc(X(ang),cmpLo-(cmpLo-cmpHi)*(sensCmpInd?.5:0),7*d,0,7);c.strokeStyle=CYA;c.stroke();
+   const lx=Math.min(X(ang)+8*d,W-R-(narrow?150:230)*d);c.fillStyle='#050c14';c.strokeStyle=CYA;c.lineWidth=1.6*d;rr(c,lx,yM0+2*d,78*d,24*d,8*d);c.fill();c.stroke();c.fillStyle='#fff';c.font='bold '+(13*d)+'px Roboto,sans-serif';c.textAlign='left';c.fillText('B · CMP',lx+8*d,yM0+19*d);
+   c.fillStyle=badNow?'#9aa7ba':col;c.font='bold '+(17*d)+'px "Roboto Mono",monospace';c.fillText(refKnown?sg(dev,2)+'° OWK':f1(ang,2)+'° OWK',lx+86*d,yM0+20*d);
+   if(refKnown&&z!=='ok'&&!narrow){const lab='Odchyłka '+sg(dev)+'° OWK';c.font=(12*d)+'px Roboto,sans-serif';const w2=c.measureText(lab).width+18*d,xm=X(Math.min(REF,ang))+(Math.abs(X(ang)-X(REF))-w2)/2;const lx2=Math.max(L+4*d,Math.min(xm,W-R-w2-4*d));c.fillStyle='rgba(5,12,20,.92)';c.strokeStyle=col;c.lineWidth=1.4*d;rr(c,lx2,yM0+hM*.56,w2,22*d,8*d);c.fill();c.stroke();c.fillStyle='#fff';c.fillText(lab,lx2+9*d,yM0+hM*.56+16*d)}
+   const ri=!frozen&&browse===null&&!narrow?runInfo(S.A):null;if(ri){const lab='utrzymuje się: '+ri.n+' kolejnych pomiarów ('+sg(ri.min)+'…'+sg(ri.max)+'°)';c.font=(12*d)+'px Roboto,sans-serif';const w3=c.measureText(lab).width+18*d,lx3=Math.max(L+4*d,Math.min(lx,W-R-w3-4*d));c.fillStyle='rgba(5,12,20,.92)';c.strokeStyle=col;c.lineWidth=1.4*d;rr(c,lx3,yM0+32*d,w3,22*d,8*d);c.fill();c.stroke();c.fillStyle='#fff';c.fillText(lab,lx3+9*d,yM0+48*d)}}}
+ // kursory A–B
+ ['A','B'].forEach(n=>{const a=cur[n];if(a===null||a<x0||a>x1)return;c.strokeStyle=n==='A'?'#fff':'#ffd54f';c.lineWidth=1.6*d;c.setLineDash([4*d,3*d]);c.beginPath();c.moveTo(X(a),top);c.lineTo(X(a),H-axH);c.stroke();c.setLineDash([]);c.fillStyle=n==='A'?'#fff':'#ffd54f';c.font='bold '+(14*d)+'px Roboto,sans-serif';c.textAlign='left';c.fillText('K'+n+' '+Math.round(a)+'°',X(a)+4*d,top+12*d)});
+ if(!V){c.fillStyle='#d6a852';c.font='bold '+(16*d)+'px Roboto,sans-serif';c.textAlign='center';c.fillText('Czekam na pierwsze zdarzenie CMP · podgląd wzorcowy · SYMULACJA',L+pw/2,yM0+hM*.5)}
+ cvM.geo={X,x0,x1,L,pw,top,H,axH}
 }
-function drawDev(){
- const {ctx,W,H}=cD;ctx.clearRect(0,0,W,H);ctx.fillStyle='#07111c';ctx.fillRect(0,0,W,H);
- const L=54,R=W-10,T=12,B=H-26,w=R-L,h=B-T,lim=Math.max(10,...hist.map(p=>Math.abs(p.off-REF)+2));
- const X=tt=>L+tt/DUR*w,Y=d=>T+h/2-d/lim*h/2;
- ctx.font='13px sans-serif';
- ST.forEach(s=>{ctx.fillStyle='rgba(180,140,30,.12)';ctx.fillRect(X(s.a),Y(T2),X(s.b)-X(s.a),Y(-T2)-Y(T2));ctx.fillStyle='rgba(102,187,106,.20)';ctx.fillRect(X(s.a),Y(T1),X(s.b)-X(s.a),Y(-T1)-Y(T1));ctx.fillStyle='#9fb1c8';ctx.textAlign='left';ctx.fillText(s.k,X(s.a)+6,T+12);ctx.strokeStyle='rgba(107,90,51,.6)';ctx.beginPath();ctx.moveTo(X(s.a),T);ctx.lineTo(X(s.a),B);ctx.stroke()});
- ctx.strokeStyle='#d6a852';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(L,Y(0));ctx.lineTo(R,Y(0));ctx.stroke();
- ctx.fillStyle='#9fb1c8';ctx.textAlign='right';[-lim,-T2,0,T2,lim].forEach(d=>ctx.fillText(d.toFixed(0)+'°',L-6,Y(d)));
- ctx.strokeStyle='#f4d89a';ctx.lineWidth=2;ctx.beginPath();hist.forEach((p,i)=>{const xx=X(p.t),yy=Math.max(T,Math.min(B,Y(p.off-REF)));i?ctx.lineTo(xx,yy):ctx.moveTo(xx,yy)});ctx.stroke();
- ctx.fillStyle='#9fb1c8';ctx.textAlign='center';[0,3,8,12].forEach(s=>ctx.fillText(s+' s',X(s),H-8));
+function verdictKind(){const v=nowV();return v?v.kind:''}
+function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
+function drawStrip(){
+ if(!cvS.fit())return;const c=cvS.ctx,d=cvS.dpr,W=cvS.W,H=cvS.H;c.fillStyle='#050c14';c.fillRect(0,0,W,H);
+ const L=(W/d<640?44:68)*d,R=12*d,T=14*d,B=16*d,pw=W-L-R,ph=H-T-B;
+ const A=S?S.A:null,evl=A?A.ev:[];const dv=evl.map(e=>sc.noref?e.ang-103:e.ang-REF);let lim=8;dv.forEach(x=>{if(Math.abs(x)+2>lim)lim=Math.min(60,Math.ceil((Math.abs(x)+2)/4)*4)});
+ const X=t=>L+t/DUR*pw,Y=v=>T+ph/2-v/lim*ph/2;
+ c.fillStyle='rgba(102,187,106,.20)';c.fillRect(L,Y(T1),pw,Y(-T1)-Y(T1));c.setLineDash([5*d,4*d]);c.strokeStyle='rgba(255,202,40,.55)';c.lineWidth=d;[T2,-T2].forEach(v=>{c.beginPath();c.moveTo(L,Y(v));c.lineTo(L+pw,Y(v));c.stroke()});c.setLineDash([]);
+ c.strokeStyle='#d6a852';c.lineWidth=1.3*d;c.beginPath();c.moveTo(L,Y(0));c.lineTo(L+pw,Y(0));c.stroke();
+ c.font=(11*d)+'px Roboto,sans-serif';c.textAlign='left';c.fillStyle='#a3b0c2';if(W/d>640){c.fillText('Odch. CMP',3*d,T+10*d);c.fillText('[° OWK]',3*d,T+22*d);c.fillStyle='#66bb6a';c.fillText('pasmo ±'+T1+'°',3*d,T+34*d)}else c.fillText('odch. CMP [°]',3*d,T-2*d);
+ c.fillStyle='#7f8da1';c.textAlign='left';c.fillText('+'+lim+'°',L+3*d,T+22*d);c.fillText('−'+lim+'°',L+3*d,T+ph-3*d);
+ // stany
+ const bounds=[[0,'ROZRUCH'],[4.1,'BIEG JAŁOWY'],[9.1,'OBROTY']];bounds.forEach(([t,l])=>{c.strokeStyle='rgba(255,255,255,.14)';c.lineWidth=d;c.beginPath();c.moveTo(X(t),T);c.lineTo(X(t),T+ph);c.stroke()});
+ const ri=S&&!sc.noref?runInfo(A):null;
+ if(ri&&!sc.noref){const z=zone((ri.min+ri.max)/2),col=zcol(z);c.fillStyle=z==='fail'?'rgba(239,83,80,.30)':'rgba(255,202,40,.26)';const xa=X(ri.t0)-6*d,xb=X(ri.t1)+6*d;c.fillRect(xa,T,xb-xa,ph);c.strokeStyle=col;c.lineWidth=1.4*d;c.strokeRect(xa,T,xb-xa,ph);c.fillStyle='#fff';c.font=(11*d)+'px Roboto,sans-serif';c.textAlign='left';c.fillText('Odchyłka '+sg((ri.min+ri.max)/2)+'° OWK · '+ri.n+' pomiarów',Math.max(L+4*d,xa+4*d),T+ph-4*d)}
+ c.textAlign='left';c.fillStyle='#c4cfdf';c.font='bold '+(11*d)+'px Roboto,sans-serif';if(W/d>640)bounds.forEach(([t,l])=>c.fillText(l,X(t)+(t?6:L/d-60+34-34+6)*d,T-3*d));
+ evl.forEach((e,i)=>{const x=X(e.t),y=Math.max(T+3*d,Math.min(T+ph-3*d,Y(dv[i])));c.beginPath();c.arc(x,y,3.6*d,0,7);if(e.valid){c.fillStyle=sc.noref?CYA:zcol(zone(dv[i]));c.fill()}else{c.strokeStyle='#8f9db0';c.lineWidth=1.2*d;c.stroke()}});
+ if(browse!==null&&evl[browse]){const e=evl[browse];c.strokeStyle='#fff';c.lineWidth=2*d;c.strokeRect(X(e.t)-8*d,T,16*d,ph)}
+ c.fillStyle='#7f8da1';c.textAlign='left';c.font=(11*d)+'px Roboto,sans-serif';c.fillText('0 s',L,H-3*d);c.textAlign='right';c.fillText(DUR+' s',L+pw,H-3*d);c.textAlign='center';if(W/d>640)c.fillText(sc.noref?'zmierzony kąt względem 103° (brak wzorca)':'oś czasu pomiaru · ○ pomiar wyłączony z oceny',L+pw/2,H-3*d)
 }
-function tiles(){
- const c=hist.length?hist[hist.length-1]:null;const d=c?c.off-REF:null;const S=stats().filter(x=>x.n>5);
- const sd=c&&S.length?S[S.length-1].sd:null;const drift=S.length>1?Math.max(...S.map(x=>x.d))-Math.min(...S.map(x=>x.d)):null;
- const q=sc.bad?'ZŁY':'DOBRY';
- const T=(l,v,s,k)=>'<div class="tile '+(k||'')+'"><span class="lbl">'+l+'</span><div class="v">'+v+'</div><div class="s">'+s+'</div></div>';
- LAB.html('tiles',
-  T('OFFSET CMP',c?c.off.toFixed(1)+'°':'—','wzorzec '+REF+',0°')+
-  T('ODCHYŁKA',d===null?'—':(d>=0?'+':'')+d.toFixed(1)+'°',sc.noref?'brak wzorca':'T1 '+T1+'° · T2 '+T2+'°',d===null||sc.noref?'':zone(d))+
-  T('DRYFT',drift===null?'—':drift.toFixed(1)+'°','między stanami',drift===null?'':drift>6?'fail':drift>2?'warn':'ok')+
-  T('ROZRZUT σ',sd===null?'—':sd.toFixed(2)+'°','okno 8 cykli',sd===null?'':sd>2?'fail':sd>1?'warn':'ok')+
-  T('SYGNAŁ',q,sc.bad?'zakłócenia CMP':'amplituda, kształt OK',sc.bad?'fail':'ok')+
-  T('OBROTY',c?Math.round(c.rp)+'':'—','obr/min')+
-  T('ZĘBY / OBRÓT','60','(58+2)'));
+/* ================= ekran pomiaru: panele i przyciski ================= */
+function kpiHtml(V,e){
+ const dev=V?V.ang-REF:null,z=V&&!sc.noref?zone(dev):'';
+ const pod=V?Math.floor(V.ang/PITCH)+' + '+f1((V.ang/PITCH)%1,3):'—';
+ return '<div><span class="l">Kąt</span><span class="v">'+(V?f1(V.ang,2):'—')+'</span><span class="u">° OWK</span></div><div><span class="l">Odchyłka</span><span class="v" style="color:'+(z?zcol(z):'#fff')+'">'+(V?(sc.noref?'brak wzorca':sg(dev,2)):'—')+'</span><span class="u">'+(V&&!sc.noref?'° OWK':'')+'</span></div><div><span class="l">Podziałki</span><span class="v">'+pod+'</span></div><div><span class="l">Obroty</span><span class="v">'+(V?Math.round(V.rpm):'—')+'</span><span class="u">obr/min</span></div>'}
+function indHtml(dev){const pos=Math.max(4,Math.min(96,50+dev/(T2*1.6)*50));const z=zone(dev);return '<div class="mz-ind"><div class="tag">WSKAŹNIK<br>ODCHYŁKI</div><div class="tr"><div class="rf"></div><div class="kn" style="left:'+pos+'%;background:'+zcol(z)+'"></div></div></div>'}
+function sideHtml(V){
+ const A=S?S.A:null,R=A?stats(A):[],S2=R.filter(x=>x.n>=3);const dev=V?V.ang-REF:null;
+ const dr=S2.length>1?S2[S2.length-1].d-S2[0].d:null;
+ const kq=A?(A.toothBad===0&&A.toothOk>0):false,cq=A?(A.cmpBad/Math.max(1,A.ev.length)<.25&&!R.some(x=>x.n>3&&x.sd>T2)):false;
+ return '<div class="mz-t"><div class="l">Kąt R0 → CMP</div><div class="v">'+(V?f1(V.ang,2):'—')+' <small>° OWK</small></div><div class="s">'+(V?(browse!==null?'Zdarzenie CMP #'+V.n+' (przeglądanie)':'Ostatnie przyjęte zdarzenie CMP #'+V.n):'brak zdarzeń')+'</div></div>'+
+ '<div class="mz-t"><div class="l">Odchyłka od odniesienia</div><div class="v" style="color:'+(V&&!sc.noref?zcol(zone(dev)):'#fff')+'">'+(V?(sc.noref?'—':sg(dev,2)):'—')+' <small>'+(V&&!sc.noref?'° OWK':'')+'</small></div>'+(V&&!sc.noref?indHtml(dev):'')+'<div class="s">'+(sc.noref?'brak zapisanego wzorca':'wzorzec '+f1(REF,1)+'° · T1 '+T1+'° · T2 '+T2+'°')+'</div></div>'+
+ '<div class="mz-t"><div class="l">Obroty wału</div><div class="v">'+(V?Math.round(V.rpm):'—')+' <small>obr/min</small></div><div class="s">'+(V?STN[V.st].charAt(0)+STN[V.st].slice(1).toLowerCase()+' · z tego samego pomiaru':'')+'</div></div>'+
+ '<div class="mz-t"><div class="l">Zmiana odchyłki między stanami</div><div class="v">'+(dr===null?'—':sg(dr,2))+' <small>° OWK</small></div><div class="s">'+(dr===null?'potrzebne co najmniej 2 stany obrotów':'pierwszy stan → ostatni stan, rozrzut stanów '+f1(Math.max(...S2.map(x=>x.d))-Math.min(...S2.map(x=>x.d)))+'°')+'</div></div>'+
+ '<div class="mz-t"><div class="l">Kontrola danych (bieżąca)</div><div class="v" style="font-size:19px"><span style="color:'+(kq?'#7ff0c0':'#ff9a98')+'">CKP '+(kq?'OK':'—')+'</span> &nbsp; <span style="color:'+(cq?'#7ff0c0':'#ff9a98')+'">CMP '+(cq?'OK':'BŁĄD')+'</span></div><div class="s">Koło 60−2: '+(A&&A.lastCnt?'wykryto '+A.lastCnt+' zęby, luka 2 pozycji — '+(A.lastCnt===58?'zgodne':'niezgodne'):'oczekiwanie na pierwszą lukę')+'</div></div>'}
+function mzUi(){
+ const V=S?curView():null,v=nowV(),A=S?S.A:null;
+ const mode=browse!==null?'PRZEGLĄDANIE':frozen?'PAUZA A–B':(running?'LIVE':done?'ZAKOŃCZONO':'GOTOWY');
+ const ch=$('chMode');ch.textContent=(mode==='LIVE'?'● ':'')+mode;ch.className='mz-chip '+(mode==='LIVE'?'live':mode==='ZAKOŃCZONO'?'':'warn');
+ $('chSc').textContent='SYMULACJA · scen. '+(SC.indexOf(sc)+1);
+ $('mzSt').textContent=(running?'Pomiar trwa':done?'Pomiar zakończony':S?'Pomiar wstrzymany':'Gotowy do pomiaru')+(S?' · '+(S.t.toFixed(1).replace('.',','))+' s · '+(V?STN[V.st]+' · '+Math.round(V.rpm)+' obr/min':'czekam na obroty'):'')+(rec?' · ● REC '+recS.toFixed(1).replace('.',',')+' s':'')+' · '+SNS[sn];
+ const bn=$('mzBan');
+ if(v){bn.className='mz-ban '+v.k;$('mzBt').textContent=(v.kind==='noref'||v.kind==='bad'?'':'')+v.t;
+  const base=sc.noref?'Odniesienie: brak zapisanego wzorca':'Odniesienie: wzorzec demonstracyjny (SYMULACJA) '+f1(REF,2)+'° OWK · zakres roboczy '+(REF-T1)+'–'+(REF+T1)+'° OWK';
+  $('mzBd').textContent=(browse!==null&&V?'Dotyczy zdarzenia B #'+V.n+' (t = '+Math.round(V.t*1000)+' ms): odchyłka '+(sc.noref?'—':sg(V.ang-REF))+'° OWK. ':'')+(cur.A!==null&&cur.B!==null?'KA–KB: Δ '+f1(Math.abs(cur.B-cur.A))+'° OWK = '+f1(Math.abs(cur.B-cur.A)/(6*(V?V.rpm:843))*1000)+' ms. ':'')+base+(v.kind==='ok'||v.kind==='shift'||v.kind==='drift'?'':'');
+  const good=!(v.kind==='bad');$('chQ').textContent=good?'DETEKCJA OK (bramka jakości)':'SYGNAŁ NIEWIARYGODNY';$('chQ').className='mz-chip '+(good?'ok':'bad')}
+ else{bn.className='mz-ban none';$('mzBt').textContent=S?(A&&A.ev.length?'LIVE: OCENA OGRANICZONA':'LIVE: SZUKAM LUKI CKP I ZBOCZA CMP'):'GOTOWY';$('mzBd').textContent=S?'Zebrano '+(A?A.ev.filter(x=>x.valid).length:0)+' poprawnych zdarzeń CMP; ocena stanu wymaga co najmniej 4. '+(sc.noref?'Odniesienie: brak zapisanego wzorca.':'Odniesienie: wzorzec demonstracyjny (SYMULACJA) '+f1(REF,2)+'° OWK'):'Naciśnij START POMIARU. Symulacja generuje zdarzenia CKP/CMP, analizator widzi tylko ich czasy.';$('chQ').textContent=S&&A&&A.toothOk>0?'DETEKCJA OK (bramka jakości)':'CZEKAM NA LUKĘ CKP';$('chQ').className='mz-chip '+(S&&A&&A.toothOk>0?'ok':'warn')}
+ $('mzK').innerHTML=kpiHtml(V);
+ if(!$('mz').classList.contains('norm')===false||true){$('mzSide').innerHTML=sideHtml(V)}
+ // wiersz
+ let q=null;if(browse!==null||frozen)q=[(browse!==null?'Przeglądanie — pomiar trwa. Widok historyczny: wartości dotyczą wybranego zdarzenia B, nie bieżących obrotów.':'Obraz zatrzymany. Dotknij wykresu, aby ustawić kursor KA, potem KB (pomiar kąta i czasu A–B).'),['Do LIVE','live']];else if(done)q=['Pomiar zakończony: wynik jest gotowy.',['WYNIK','wyn']];
+ $('mzQ').classList.toggle('on',!!q);if(q){LAB.set('mzQt',q[0]);const bt=$('mzQb');bt.classList.toggle('hidden',!q[1]);if(q[1]){bt.textContent=q[1][0];bt.dataset.a=q[1][1]}}
+ const key=[running,frozen,rec,done].join();const bx=$('mzBtns');
+ if(bx.dataset.k!==key){bx.dataset.k=key;bx.innerHTML=(running||frozen||S&&!done?'<button class="r" data-a="stop">■ STOP</button>':'<button class="f" data-a="start">▶ START POMIARU</button>')+'<button data-a="pause" class="'+(frozen?'on':'')+'">'+(frozen?'WZNÓW A–B':'PAUZA A–B')+'</button><button data-a="rec" class="'+(rec?'on':'')+'">● '+(rec?'NAGRYWA':'NAGRYWAJ')+'</button><button class="f" data-a="auto">ANALIZA AUTO</button><button data-a="data">DANE</button><button class="b" data-a="back">← POWRÓT</button>'}
+ $('mzTool').querySelector('[data-a=axis]').textContent=axisMs?'OŚ: czas ms':'OŚ: kąt ° OWK';$('mzTool').querySelector('[data-a=ckp]').textContent=ckpEv?'CKP: zdarzenia':'CKP: napięcie';
+ $('mzHint').textContent='';
 }
-function results(){
- const v=verdict();if(!v)return;
- LAB.set('wW',v.w);LAB.set('wD',v.d);LAB.set('wSt',v.st);LAB.set('wN',v.n);
- document.getElementById('wStC').className='card4 st '+v.k;
- document.getElementById('tb').innerHTML=v.rows.map(r=>{const z=sc.bad?'fail':sc.noref?'warn':zone(r.d);return '<tr><td>'+r.s.k+'</td><td>'+r.s.rpm+'</td><td>'+r.m.toFixed(1)+'°</td><td>'+(sc.noref?'—':(r.d>=0?'+':'')+r.d.toFixed(1)+'°')+'</td><td>'+r.sd.toFixed(2)+'°</td><td class="z-'+z+'">'+(sc.noref?'BRAK WZORCA':zl[z])+'</td></tr>'}).join('');
- return v;
+function openMz(){mzOn=true;$('mz').classList.remove('hidden');document.body.style.overflow='hidden';$('mz').classList.toggle('norm',!pelny&&innerWidth>760);$('mzFull').textContent=pelny?'Zwykły widok':'Pełny ekran';mzUi();draw()}
+function closeMz(){mzOn=false;$('mz').classList.add('hidden');document.body.style.overflow='';$('mzPop').classList.add('hidden')}
+function pop(h){$('mzPopB').innerHTML=h;$('mzPop').classList.remove('hidden')}
+function autoHtml(){const v=verdict(S.A,sc,true)||verdict(S.A,sc,false);if(!v)return '<h3>ANALIZA AUTO</h3><p>Brak danych: poczekaj na kilka zdarzeń CMP w każdym stanie obrotów.</p>';return '<h3>ANALIZA AUTO · '+(done?'pomiar zakończony':'wynik wstępny')+'</h3><div class="card4"><div class="k">WNIOSEK</div><div style="font-size:1.1rem;font-weight:800">'+v.w+'</div></div><div class="card4"><div class="k">DOWÓD</div>'+v.d+'</div><div class="card4 st '+v.k+'"><div class="k">STATUS</div><b>'+v.st+'</b></div><div class="card4"><div class="k">NASTĘPNY KROK</div>'+v.n+'</div>'+tableHtml(v)}
+function tableHtml(v){return '<table class="st"><thead><tr><th>STAN</th><th>OBR/MIN</th><th>KĄT</th><th>ODCHYŁKA</th><th>σ</th><th>N</th><th>STREFA</th></tr></thead><tbody>'+v.rows.map(r=>{if(!r.n)return '<tr><td>'+r.k+'</td><td colspan="6" class="dm">brak danych</td></tr>';const z=v.kind==='bad'?'fail':v.kind==='noref'?'warn':zone(r.d);return '<tr><td>'+r.k+'</td><td>'+Math.round(r.rpm)+'</td><td>'+f1(r.m)+'°</td><td>'+(sc.noref?'—':sg(r.d)+'°')+'</td><td>'+f1(r.sd,2)+'°</td><td>'+r.n+'</td><td class="z-'+z+'">'+(v.kind==='noref'?'BRAK WZORCA':zl[z])+'</td></tr>'}).join('')+'</tbody></table>'}
+function dataHtml(){const l=S?S.A.ev.slice(-40).reverse():[];return '<h3>DANE · zdarzenia CMP (ostatnie '+l.length+')</h3><table class="st"><thead><tr><th>#</th><th>t [ms]</th><th>KĄT [° OWK]</th><th>ODCH.</th><th>OBR/MIN</th><th>STAN</th><th>UWAGA</th></tr></thead><tbody>'+l.map(e=>'<tr><td>'+e.n+'</td><td>'+Math.round(e.t*1000)+'</td><td>'+f1(e.ang,2)+'</td><td>'+(sc.noref?'—':sg(e.ang-REF,2))+'</td><td>'+Math.round(e.rpm)+'</td><td>'+STN[e.st]+'</td><td class="'+(e.valid?'dm':'warn')+'">'+(e.valid?'':e.why)+'</td></tr>').join('')+'</tbody></table>'}
+function mzAction(a){
+ if(a==='start')startMeasure();
+ else if(a==='back')closeMz();
+ else if(a==='stop'){if(S&&S.A.ev.length>4){finish()}else{running=false}closeMz();showTab('wyn')}
+ else if(a==='pause'){frozen=!frozen;if(frozen){cur={A:null,B:null}}else{view=null}}
+ else if(a==='rec'){rec=!rec;if(rec)recS=0}
+ else if(a==='auto'){if(S)pop(autoHtml());else pop('<h3>ANALIZA AUTO</h3><p>Najpierw uruchom pomiar.</p>')}
+ else if(a==='data'){pop(dataHtml())}
+ else if(a==='live'){browse=null;frozen=false;view=null;cur={A:null,B:null}}
+ else if(a==='wyn'){closeMz();showTab('wyn')}
+ else if(a==='axis'){axisMs=!axisMs}
+ else if(a==='ckp'){ckpEv=!ckpEv}
+ else if(a==='all'){zoom=null}
+ else if(a==='r0'){zoom=[-24,336]}
+ else if(a==='cmp'){const V=curView();const c0=V?V.ang:REF;zoom=[c0-90,c0+110]}
+ else if(a==='bprev'||a==='bnext'){if(!S||!S.A.ev.length)return;const n=S.A.ev.length;let i=browse===null?n-1:browse;i=a==='bprev'?Math.max(0,i-1):Math.min(n-1,i+1);browse=i;frozen=false}
+ mzUi();draw()}
+function draw(){if(!mzOn)return;drawMain();drawStrip()}
+/* ================= strona: zakładki, wynik, raport ================= */
+function ui(){
+ const e=latest(),v=nowV();
+ LAB.set('kAng',e?f1(e.ang,2)+'°':'—');const dv=$('kDev');dv.textContent=e?(sc.noref?'brak wzorca':sg(e.ang-REF,2)+'°'):'—';dv.className='v '+(e&&!sc.noref?zone(e.ang-REF):'');
+ LAB.set('kRpm',e?Math.round(e.rpm)+'':'—');LAB.set('kSt',e?STN[e.st]:'—');LAB.set('kN',String(S?S.A.ev.length:0));LAB.set('kT',S?LAB.mmss(S.t/60):'00:00');
+ const box=$('verdict');box.className='box '+(v?(v.k):'');
+ if(v){LAB.set('vT',v.t);LAB.set('vD',v.d)}else{LAB.set('vT','GOTOWY');LAB.set('vD','Wybierz scenariusz w zakładce Przygotowanie i naciśnij START POMIARU.')}
+ LAB.html('ev1',evs.map(x=>'<li><time>'+LAB.mmss(x.t/60)+'</time><span class="'+(x.cls||'')+'">'+x.txt+'</span></li>').join('')||'<li class="dm">brak zdarzeń</li>');
+ if(v&&done)results(v);
 }
-function report(){const v=verdict();return 'RAPORT – KONTROLA ROZRZĄDU (SYMULACJA)\nScenariusz: '+sc.n+'\nCzujniki: '+SN[sn]+'\nWzorzec: '+REF+'°, T1 '+T1+'°, T2 '+T2+'°\n\n'+(v?'Wniosek: '+v.w+'\nDowód: '+v.d+'\nStatus: '+v.st+'\nNastępny krok: '+v.n:'Brak danych.')+'\n\nPrzebiegi pochodzą z modelu symulacji. Czujniki i pojazd nie były użyte.'}
-function showTab(x){tab=x;document.querySelectorAll('#tabs .btn').forEach(b=>b.classList.toggle('on',b.dataset.t===x));document.querySelectorAll('[data-p]').forEach(p=>p.classList.toggle('hidden',p.dataset.p!==x));cS.fit();cD.fit();draw()}
-function draw(){if(tab==='pom'){drawSig();drawDev()}}
-function setSc(i){sc=SC[i];running=false;done=false;t=0;hist=[];rng=LAB.rng(7+i);document.querySelectorAll('#scBtns .btn').forEach((b,k)=>b.classList.toggle('sel',k===i));LAB.set('scD',sc.pr);LAB.set('tbSt','SYMULACJA • gotowy');tiles();LAB.set('rep','Raport pojawi się po pomiarze.')}
-function setSn(i){sn=i;document.querySelectorAll('#snBtns .btn').forEach((b,k)=>b.classList.toggle('sel',k===i))}
-document.getElementById('scBtns').innerHTML=SC.map((s,i)=>'<button class="btn" data-i="'+i+'">'+(i+1)+'  '+s.n+'</button>').join('');
-document.getElementById('snBtns').innerHTML=SN.map((s,i)=>'<button class="btn" data-i="'+i+'">'+s+'</button>').join('');
-document.getElementById('scBtns').addEventListener('click',e=>{const b=e.target.closest('[data-i]');if(b)setSc(+b.dataset.i)});
-document.getElementById('snBtns').addEventListener('click',e=>{const b=e.target.closest('[data-i]');if(b)setSn(+b.dataset.i)});
-document.getElementById('tabs').addEventListener('click',e=>{const b=e.target.closest('[data-t]');if(b)showTab(b.dataset.t)});
-function start(){setSc(SC.indexOf(sc));running=true;paused=false;LAB.set('tbSt','SYMULACJA • pomiar trwa');showTab('pom')}
-function finish(){running=false;done=true;LAB.set('tbSt','SYMULACJA • zakończono');results();LAB.set('rep',report())}
-document.getElementById('bStart').onclick=start;document.getElementById('bAgain').onclick=start;
-document.getElementById('bStop').onclick=()=>{if(hist.length>5){finish();showTab('wyn')}else{running=false}};
-document.getElementById('bPause').onclick=function(){paused=!paused;this.textContent=paused?'WZNÓW':'PAUZA'};
-document.getElementById('bDig').onclick=()=>{digits=!digits;document.getElementById('tiles').style.fontSize=digits?'1.15em':''};
-document.getElementById('bBack').onclick=()=>showTab('prz');
-document.getElementById('bDet').onclick=()=>{results();showTab('wyn')};
-document.getElementById('bRep').onclick=()=>{LAB.set('rep',report());document.getElementById('repBox').scrollIntoView({behavior:'smooth'})};
-window.addEventListener('resize',()=>{cS.fit();cD.fit();draw()});
-let acc=0;
-LAB.loop(dt=>{if(running&&!paused){t+=dt*1.0*(window.__fast||1);acc+=dt*(window.__fast||1);while(acc>=.1){acc-=.1;const c=cur();hist.push({t,off:c.off,i:c.i,rp:c.rp})}if(t>=DUR){t=DUR;finish();showTab('wyn')}tiles()}draw()});
-window.__sim={SC,setSc,setSn,start,showTab,finish(){while(t<DUR){t+=.1;const c=cur();hist.push({t,off:c.off,i:c.i,rp:c.rp})}finish();return verdict()},verdict};
+function results(v){LAB.set('wW',v.w);LAB.set('wD',v.d);LAB.set('wSt',v.st);LAB.set('wN',v.n);$('wStC').className='card4 st '+v.k;$('tb').innerHTML=v.rows.map(r=>{if(!r.n)return '<tr><td>'+r.k+'</td><td colspan="6" class="dm">brak danych</td></tr>';const z=v.kind==='bad'?'fail':v.kind==='noref'?'warn':zone(r.d);return '<tr><td>'+r.k+'</td><td>'+Math.round(r.rpm)+'</td><td>'+f1(r.m)+'°</td><td>'+(sc.noref?'—':sg(r.d)+'°')+'</td><td>'+f1(r.sd,2)+'°</td><td>'+r.n+'</td><td class="z-'+z+'">'+(v.kind==='noref'?'BRAK WZORCA':zl[z])+'</td></tr>'}).join('')}
+function report(){const v=nowV();return 'RAPORT – ANALIZATOR ROZRZĄDU (SYMULACJA)\nScenariusz: '+sc.n+'\nCzujniki: '+SN[sn]+'\nWzorzec: '+(sc.noref?'brak':REF+'°')+', T1 '+T1+'°, T2 '+T2+'°\nZdarzeń CMP: '+(S?S.A.ev.length:0)+'\n\n'+(v?'Wniosek: '+v.w+'\nDowód: '+v.d+'\nStatus: '+v.st+'\nNastępny krok: '+v.n:'Brak danych.')+'\n\nZdarzenia:\n'+evs.map(x=>LAB.mmss(x.t/60)+'  '+x.txt).join('\n')+'\n\nPrzebiegi pochodzą z modelu symulacji. Czujniki, głowica i pojazd nie były użyte.'}
+function showTab(x){document.querySelectorAll('#tabs .btn').forEach(b=>b.classList.toggle('on',b.dataset.t===x));document.querySelectorAll('[data-p]').forEach(p=>p.classList.toggle('hidden',p.dataset.p!==x));if(x==='rap')LAB.set('rep',report());if(x==='wyn'&&S){const v=nowV();if(v)results(v)}if(x==='prd'&&proofData)drawLin();window.scrollTo(0,0)}
+function setSc(i){sc=SC[i];document.querySelectorAll('#scBtns .btn').forEach((b,k)=>b.classList.toggle('sel',k===i));LAB.set('scDesc',(i+1)+'. '+sc.n+' – '+sc.pr);reset()}
+function setSn(i){sn=i;document.querySelectorAll('#snBtns .btn').forEach((b,k)=>b.classList.toggle('sel',k===i));if(S)reset()}
+$('scBtns').innerHTML=SC.map((s,i)=>'<button class="btn" data-i="'+i+'">'+(i+1)+'  '+s.n+'</button>').join('');
+$('snBtns').innerHTML=SN.map((s,i)=>'<button class="btn" data-i="'+i+'">'+s+'</button>').join('');
+$('scBtns').addEventListener('click',e=>{const b=e.target.closest('[data-i]');if(b)setSc(+b.dataset.i)});
+$('snBtns').addEventListener('click',e=>{const b=e.target.closest('[data-i]');if(b)setSn(+b.dataset.i)});
+document.querySelectorAll('[data-sp]').forEach(b=>b.onclick=()=>{speed=+b.dataset.sp;document.querySelectorAll('[data-sp]').forEach(x=>x.classList.toggle('sel',x===b))});
+$('tabs').addEventListener('click',e=>{const b=e.target.closest('[data-t]');if(b)showTab(b.dataset.t)});
+$('mzBtns').addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(b)mzAction(b.dataset.a)});
+$('mzTool').addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(b)mzAction(b.dataset.a)});
+$('mzQb').onclick=()=>mzAction($('mzQb').dataset.a);
+$('mzPopX').onclick=()=>$('mzPop').classList.add('hidden');
+$('mzFull').onclick=()=>{pelny=!pelny;$('mzFull').textContent=pelny?'Zwykły widok':'Pełny ekran';$('mz').classList.toggle('norm',!pelny&&innerWidth>760);mzUi();draw()};
+$('cvM').addEventListener('click',e=>{if(!frozen||!cvM.geo)return;const g=cvM.geo,r=cvM.el.getBoundingClientRect(),x=(e.clientX-r.left)*cvM.dpr,a=g.x0+(x-g.L)/g.pw*(g.x1-g.x0);if(a<g.x0||a>g.x1)return;if(cur.A===null||cur.B!==null){cur={A:a,B:null}}else cur.B=a;mzUi();draw()});
+$('bMz').onclick=openMz;$('bMz2').onclick=()=>{openMz()};
+$('bGo').onclick=()=>{if(!S||done){if(done)reset();startMeasure();return}running=!running;$('bGo').textContent=running?'PAUZA':'WZNÓW';ui()};
+$('bRes').onclick=reset;
+$('bAgain').onclick=()=>{reset();startMeasure();showTab('pom')};
+$('bRep').onclick=()=>showTab('rap');
+window.addEventListener('resize',()=>{if(mzOn){$('mz').classList.toggle('norm',!pelny&&innerWidth>760);mzUi();draw()}});
+/* ================= test przydatności ================= */
+let proofData=null;
+const tick=()=>new Promise(r=>setTimeout(r,0));
+async function runProof(){
+ $('prSt').textContent='Test trwa…';showTab('prd');
+ const rows=[],NS=5;let match=0,total=0,errs=[];
+ for(let si=0;si<SC.length;si++){const s=SC[si],ms=[[],[],[]],vk={};let ok=0;
+  for(let k=0;k<NS;k++){const sn_=k%3,Sx=runHeadless(s,sn_,100+si*13+k),v=verdict(Sx.A,s,true),R=stats(Sx.A);
+   R.forEach((r,i)=>{if(r.n)ms[i].push(r.m)});const kind=v?v.kind:'brak';vk[kind]=(vk[kind]||0)+1;if(kind===s.k)ok++;
+   if(!s.bad&&!s.noref)R.forEach(r=>{if(r.n){const tr=trueOff(s,r.rpm);errs.push(Math.abs(r.m-tr))}});
+   await tick()}
+  match+=ok;total+=NS;
+  const trueS=!s.bad&&!s.noref?[250,843,1974].map(r=>trueOff(s,r)):null,meas=ms.map(a=>a.length?a.reduce((x,y)=>x+y)/a.length:null);
+  const maxe=trueS?Math.max(...meas.map((m,i)=>m===null?0:Math.abs(m-trueS[i]))):null;
+  rows.push({s,trueS,meas,maxe,ok,NS,vk});$('prSt').textContent='Test trwa… '+(si+1)+'/'+SC.length}
+ // fałszywe alarmy
+ let fa=0;const NF=20;for(let k=0;k<NF;k++){const Sx=runHeadless(SC[0],k%3,900+k),v=verdict(Sx.A,SC[0],true);if(!v||v.kind!=='ok')fa++;if(k%4===0)await tick()}
+ // liniowość
+ const lin=[];for(let sh=-20;sh<=60;sh+=5){const s={k:'shift',n:'lin',off:REF+sh,sg:[.4,.3,.3]},Sx=runHeadless(s,0,500+sh),R=stats(Sx.A);lin.push({sh,m:R.map(r=>r.n?r.m-REF:null)});await tick()}
+ proofData={rows,match,total,errs,fa,NF,lin};renderProof();$('prSt').textContent='Test zakończony.'}
+function renderProof(){
+ const P=proofData,me=P.errs.reduce((a,b)=>a+b,0)/P.errs.length,mx=Math.max(...P.errs);
+ const K=(l,v,s,c)=>'<div class="tile"><span class="lbl">'+l+'</span><div class="v '+(c||'')+'">'+v+'</div><div class="s">'+s+'</div></div>';
+ $('prK').innerHTML=K('Zgodność werdyktu',P.match+' / '+P.total,'z założeniem scenariusza',P.match===P.total?'ok':'warn')+K('Średni błąd kąta',f1(me,2)+'°','zmierzony − zadany, scenariusze z wzorcem',me<T1?'ok':'warn')+K('Największy błąd',f1(mx,2)+'°','próg T1 = '+T1+'°',mx<T1?'ok':'warn')+K('Fałszywe alarmy',P.fa+' / '+P.NF,'ustawienie prawidłowe, różne ziarna szumu',P.fa===0?'ok':'fail');
+ $('prT').innerHTML='<thead><tr><th>SCENARIUSZ</th><th>ZADANY KĄT (model) rozruch / jałowy / obroty</th><th>ZMIERZONY (średnia z '+P.rows[0].NS+' przebiegów)</th><th>MAKS. BŁĄD</th><th>WERDYKT</th><th>ZGODNOŚĆ</th></tr></thead><tbody>'+P.rows.map(r=>{const k=Object.entries(r.vk).sort((a,b)=>b[1]-a[1])[0][0],kn={ok:'ROZRZĄD W NORMIE',shift:'PRZESUNIĘCIE',drift:'DRYFT',bad:'BRAK WNIOSKU (sygnał zły)',noref:'BRAK WZORCA',brak:'BRAK DANYCH'};
+  return '<tr><td>'+r.s.n+'</td><td>'+(r.trueS?r.trueS.map(x=>f1(x)+'°').join(' / '):(r.s.bad?'rozrzut '+r.s.sg.map(x=>f1(x)).join(' / ')+'°':'bez wzorca'))+'</td><td>'+(r.s.bad?'—':r.meas.map(x=>x===null?'—':f1(x)+'°').join(' / '))+'</td><td>'+(r.maxe===null?'—':f1(r.maxe,2)+'°')+'</td><td>'+kn[k]+'</td><td class="'+(r.ok===r.NS?'okc':'nc')+'">'+r.ok+' / '+r.NS+(r.ok===r.NS?' ✓':' ✗')+'</td></tr>'}).join('')+'</tbody>';
+ drawLin();
+ const e=P.lin.map(p=>p.m.map(x=>x===null?0:Math.abs(x-p.sh))).flat();LAB.set('prLinT','W zakresie przesunięć −20°…+60° OWK największa różnica między kątem zmierzonym a zadanym wynosi '+f1(Math.max(...e),2)+'° (rozruch, bieg jałowy i obroty podwyższone razem). Zależność jest liniowa, a rozrzut jest dużo mniejszy niż odpowiadający jednemu zębowi koła wałka skok 17,1°.')}
+function drawLin(){
+ if(!proofData)return;cLin.fit();const c=cLin.ctx,d=cLin.dpr,W=cLin.W,H=cLin.H,L=54*d,R=14*d,T=14*d,B=34*d,pw=W-L-R,ph=H-T-B;c.fillStyle='#050c14';c.fillRect(0,0,W,H);
+ const X=v=>L+(v+20)/80*pw,Y=v=>T+ph-(v+20)/80*ph;c.font=(12*d)+'px Roboto,sans-serif';c.textAlign='center';c.fillStyle='#a3b0c2';c.strokeStyle='rgba(255,255,255,.08)';c.lineWidth=d;
+ for(let v=-20;v<=60;v+=20){c.beginPath();c.moveTo(X(v),T);c.lineTo(X(v),T+ph);c.stroke();c.fillText(v+'°',X(v),H-16*d);c.textAlign='right';c.beginPath();c.moveTo(L,Y(v));c.lineTo(L+pw,Y(v));c.stroke();c.fillText(v+'°',L-6*d,Y(v)+4*d);c.textAlign='center'}
+ c.fillText('zadane przesunięcie CMP (model) [° OWK]',L+pw/2,H-2*d);c.save();c.translate(12*d,T+ph/2);c.rotate(-Math.PI/2);c.fillText('zmierzone przez analizator',0,0);c.restore();
+ c.fillStyle='rgba(102,187,106,.18)';c.beginPath();c.moveTo(X(-20),Y(-20+T1));c.lineTo(X(60),Y(60+T1));c.lineTo(X(60),Y(60-T1));c.lineTo(X(-20),Y(-20-T1));c.fill();
+ c.setLineDash([6*d,5*d]);c.strokeStyle='#f4d89a';c.lineWidth=2*d;c.beginPath();c.moveTo(X(-20),Y(-20));c.lineTo(X(60),Y(60));c.stroke();c.setLineDash([]);
+ const cols=['#ffb74d','#5adfff','#b39ddb'];proofData.lin.forEach(p=>p.m.forEach((m,i)=>{if(m===null)return;c.fillStyle=cols[i];c.beginPath();c.arc(X(p.sh),Y(m),4.2*d,0,7);c.fill()}));
+ c.textAlign='left';c.font=(12*d)+'px Roboto,sans-serif';[['rozruch',0],['bieg jałowy',1],['obroty',2]].forEach(([n,i],k)=>{c.fillStyle=cols[i];c.beginPath();c.arc(L+12*d+k*118*d,T+10*d,5*d,0,7);c.fill();c.fillStyle='#d6dbe8';c.fillText(n,L+22*d+k*118*d,T+14*d)});c.fillStyle='#f4d89a';c.fillText('- - - idealnie · zielone pole: ± T1',L+12*d+3*118*d,T+14*d)}
+$('bProof').onclick=runProof;$('bProof2').onclick=runProof;
+window.addEventListener('resize',()=>{if(proofData)drawLin()});
+/* ================= pętla ================= */
+LAB.loop(dt=>{
+ if(running&&S){let n=Math.floor(dt*speed/DT);n=Math.min(n,20000);while(n-->0&&S.t<DUR)stepSim(S,DT);if(rec)recS+=dt*speed;
+  const e=latest();if(e&&e.st!==lastSt){if(lastSt>=0)ev(S.t,'stan silnika: '+STN[e.st].toLowerCase()+' ('+Math.round(e.rpm)+' obr/min)','gd');lastSt=e.st}
+  if(!loggedGap&&S.A.toothOk>0){loggedGap=true;ev(S.t,'wykryto lukę CKP: 58 zębów + luka 2 pozycji','ok')}
+  const v=nowV();if(v&&v.t!==loggedV&&(v.kind!==(loggedV.split('|')[1]||''))){loggedV=v.t+'|'+v.kind;ev(S.t,v.t,v.k==='ok'?'ok':v.k==='fail'?'fail':'warn')}
+  if(S.t>=DUR)finish();ui()}
+ if(mzOn){takeView();mzUi();draw()}
+});
+window.__sim={SC,SN,REF,T1,T2,newSim,stepSim,runHeadless,verdict,stats,trueOff,setSc,setSn,reset,startMeasure,openMz,closeMz,showTab,runProof,get S(){return S},get proof(){return proofData},get view(){return view},get done(){return done},get running(){return running},set speed(v){speed=v},finishNow(){while(S.t<DUR)stepSim(S,DT);view=null;finish()},run(sec){if(!S||done){setSc(SC.indexOf(sc))}if(!S){S=newSim(sc,sn,11+SC.indexOf(sc)*7+sn)}while(S.t<sec&&S.t<DUR)stepSim(S,DT);running=false;view=null;ui();draw();return nowV()}};
 setSn(0);setSc(0);
 })();
 </script></body></html>
