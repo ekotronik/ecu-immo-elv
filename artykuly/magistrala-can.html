@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jak działa magistrala CAN | EKOTRONIK</title>
+<meta name="description" content="Magistrala CAN high-speed: poziomy napięć CAN-H i CAN-L, bity dominujące i recesywne, terminatory 120 Ω, budowa ramki, bity wstawiane, CRC i ACK.">
+<link rel="canonical" href="https://ekotronik.github.io/ecu-immo-elv/artykuly/magistrala-can.html">
+<meta name="robots" content="index,follow">
+<link rel="icon" type="image/png" sizes="64x64" href="../assets_v8/favicon.png">
+<meta property="og:type" content="article"><meta property="og:locale" content="pl_PL"><meta property="og:site_name" content="EKOTRONIK">
+<meta property="og:url" content="https://ekotronik.github.io/ecu-immo-elv/artykuly/magistrala-can.html"><meta property="og:title" content="Jak działa magistrala CAN | EKOTRONIK"><meta property="og:description" content="Magistrala CAN high-speed: poziomy napięć CAN-H i CAN-L, bity dominujące i recesywne, terminatory 120 Ω, budowa ramki, bity wstawiane, CRC i ACK.">
+<meta property="og:image" content="https://ekotronik.github.io/ecu-immo-elv/assets_v8/og_ekotronik_system.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Jak działa magistrala CAN | EKOTRONIK"><meta name="twitter:description" content="Magistrala CAN high-speed: poziomy napięć CAN-H i CAN-L, bity dominujące i recesywne, terminatory 120 Ω, budowa ramki, bity wstawiane, CRC i ACK.">
+<link rel="stylesheet" href="art.css">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Jak działa magistrala CAN", "description": "Magistrala CAN high-speed: poziomy napięć CAN-H i CAN-L, bity dominujące i recesywne, terminatory 120 Ω, budowa ramki, bity wstawiane, CRC i ACK.", "inLanguage": "pl", "datePublished": "2026-11-08", "mainEntityOfPage": "https://ekotronik.github.io/ecu-immo-elv/artykuly/magistrala-can.html"}</script></head><body><div class="wrap">
+<header class="top"><a class="brand" href="../index.html" aria-label="EKOTRONIK SYSTEM – strona główna"><img src="../lab/img/logo-emblem.png" alt="Logo EKOTRONIK SYSTEM"><div><b>EKOTRONIK</b><span>SYSTEM</span></div></a><nav><a class="btn" href="index.html">Artykuły</a><a class="btn" href="../index.html#galeria">LAB</a></nav></header>
+<article>
+<h1>Jak działa magistrala CAN</h1>
+<div class="meta">EKOTRONIK · artykuły techniczne · 8 listopada 2026</div>
+<p><b>CAN</b> (Controller Area Network) to szeregowa magistrala, na której sterowniki w pojeździe wymieniają ramki. High-speed CAN wg ISO 11898-2 używa pary przewodów CAN-H i CAN-L, a sygnałem jest różnica napięć między nimi.</p>
+
+<h2>Poziomy napięć</h2>
+<table><tr><th>Stan</th><th>CAN-H</th><th>CAN-L</th><th>Różnica</th><th>Bit</th></tr>
+<tr><td>recesywny</td><td>ok. 2,5 V</td><td>ok. 2,5 V</td><td>ok. 0 V</td><td>1</td></tr>
+<tr><td>dominujący</td><td>ok. 3,5 V</td><td>ok. 1,5 V</td><td>ok. 2 V</td><td>0</td></tr></table>
+<p>Są to wartości nominalne. Odbiornik rozpoznaje stan dominujący po różnicy napięć. Gdy jeden węzeł nadaje bit dominujący, a inny recesywny, na magistrali pojawia się stan dominujący.</p>
+
+<h2>Terminatory</h2>
+<p>Magistrala ma na obu końcach rezystory 120 Ω, zgodne z impedancją przewodu. Dwa takie rezystory połączone równolegle dają ok. 60 Ω między CAN-H i CAN-L. Taką wartość pokazuje omomierz podłączony do wyłączonej, poprawnie zakończonej magistrali.</p>
+
+<h2>Szybkość</h2>
+<p>Klasyczny CAN pracuje z szybkością do 1 Mbit/s. Przy 500 kbit/s jeden bit trwa 2 µs.</p>
+
+<h2>Ramka danych (klasyczny CAN)</h2>
+<table><tr><th>Pole</th><th>Zawartość</th></tr>
+<tr><td>SOF</td><td>jeden bit dominujący, początek ramki</td></tr>
+<tr><td>identyfikator</td><td>11 bitów (format podstawowy); określa też priorytet</td></tr>
+<tr><td>sterowanie</td><td>m.in. długość danych DLC</td></tr>
+<tr><td>dane</td><td>od 0 do 8 bajtów</td></tr>
+<tr><td>CRC</td><td>15 bitów sumy kontrolnej + ogranicznik recesywny</td></tr>
+<tr><td>ACK</td><td>szczelina potwierdzenia + ogranicznik</td></tr>
+<tr><td>EOF</td><td>7 bitów recesywnych</td></tr></table>
+<p><b>Arbitraż.</b> Gdy kilka węzłów zaczyna nadawać jednocześnie, wygrywa ten, którego identyfikator ma niższą wartość, ponieważ bit dominujący (0) nadpisuje recesywny (1).</p>
+<p><b>Bity wstawiane.</b> Od SOF do końca pola CRC po pięciu kolejnych bitach o tym samym poziomie nadajnik wstawia bit o poziomie przeciwnym. Sześć kolejnych bitów o tym samym poziomie w tym obszarze to błąd.</p>
+<p><b>CRC.</b> Suma kontrolna 15-bitowa, liczona od SOF do końca pola danych (bez bitów wstawianych), z wielomianem x<sup>15</sup> + x<sup>14</sup> + x<sup>10</sup> + x<sup>8</sup> + x<sup>7</sup> + x<sup>4</sup> + x<sup>3</sup> + 1.</p>
+<p><b>ACK.</b> Nadajnik wysyła w szczelinie ACK bit recesywny. Każdy odbiornik, który odebrał ramkę z poprawnym CRC, nadpisuje go bitem dominującym.</p>
+
+<h2>Uśpienie sieci</h2>
+<p>Transceivery CAN z trybem uśpienia wyłączają w nim nadajnik i główny odbiornik. Pozostaje odbiornik małej mocy, który nasłuchuje na magistrali wzorca budzenia. Po rozpoznaniu wzorca transceiver sygnalizuje wybudzenie.</p>
+
+<p class="see">Zobacz też: <a href="../lab/analizator-can.html">symulacja analizatora CAN</a> · <a href="prad-spoczynkowy.html">Jak czytać prąd spoczynkowy auta</a></p>
+</article></div></body></html>

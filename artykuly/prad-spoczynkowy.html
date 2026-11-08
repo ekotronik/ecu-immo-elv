@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jak czytać prąd spoczynkowy auta | EKOTRONIK</title>
+<meta name="description" content="Czym jest prąd spoczynkowy, dlaczego pojazd nie zasypia od razu, jak mierzy się go cęgami i jak czytać wykres w skali logarytmicznej.">
+<link rel="canonical" href="https://ekotronik.github.io/ecu-immo-elv/artykuly/prad-spoczynkowy.html">
+<meta name="robots" content="index,follow">
+<link rel="icon" type="image/png" sizes="64x64" href="../assets_v8/favicon.png">
+<meta property="og:type" content="article"><meta property="og:locale" content="pl_PL"><meta property="og:site_name" content="EKOTRONIK">
+<meta property="og:url" content="https://ekotronik.github.io/ecu-immo-elv/artykuly/prad-spoczynkowy.html"><meta property="og:title" content="Jak czytać prąd spoczynkowy auta | EKOTRONIK"><meta property="og:description" content="Czym jest prąd spoczynkowy, dlaczego pojazd nie zasypia od razu, jak mierzy się go cęgami i jak czytać wykres w skali logarytmicznej.">
+<meta property="og:image" content="https://ekotronik.github.io/ecu-immo-elv/assets_v8/og_ekotronik_system.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Jak czytać prąd spoczynkowy auta | EKOTRONIK"><meta name="twitter:description" content="Czym jest prąd spoczynkowy, dlaczego pojazd nie zasypia od razu, jak mierzy się go cęgami i jak czytać wykres w skali logarytmicznej.">
+<link rel="stylesheet" href="art.css">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Jak czytać prąd spoczynkowy auta", "description": "Czym jest prąd spoczynkowy, dlaczego pojazd nie zasypia od razu, jak mierzy się go cęgami i jak czytać wykres w skali logarytmicznej.", "inLanguage": "pl", "datePublished": "2026-11-08", "mainEntityOfPage": "https://ekotronik.github.io/ecu-immo-elv/artykuly/prad-spoczynkowy.html"}</script></head><body><div class="wrap">
+<header class="top"><a class="brand" href="../index.html" aria-label="EKOTRONIK SYSTEM – strona główna"><img src="../lab/img/logo-emblem.png" alt="Logo EKOTRONIK SYSTEM"><div><b>EKOTRONIK</b><span>SYSTEM</span></div></a><nav><a class="btn" href="index.html">Artykuły</a><a class="btn" href="../index.html#galeria">LAB</a></nav></header>
+<article>
+<h1>Jak czytać prąd spoczynkowy auta</h1>
+<div class="meta">EKOTRONIK · artykuły techniczne · 8 listopada 2026</div>
+<p><b>Prąd spoczynkowy</b> to prąd pobierany z akumulatora przez zaparkowany, zamknięty pojazd, gdy jego układy przeszły w stan uśpienia. Podaje się go w miliamperach (mA).</p>
+
+<h2>Pojazd nie zasypia od razu</h2>
+<p>Po zamknięciu pojazdu sterowniki przechodzą w stan uśpienia stopniowo, a nie jednocześnie. Dlatego tuż po zamknięciu prąd jest wyższy i maleje w kolejnych etapach. Czas dojścia do pełnego uśpienia zależy od pojazdu; w praktyce warsztatowej podaje się od kilkunastu do kilkudziesięciu minut.</p>
+<div class="def">Odczyt wykonany przed pełnym uśpieniem opisuje stan przejściowy, a nie prąd spoczynkowy. Wynik czyta się dopiero wtedy, gdy prąd przestał maleć i utrzymuje się na stałym poziomie.</div>
+
+<h2>Pomiar cęgami prądowymi</h2>
+<ul>
+<li>Cęgi prądowe DC z czujnikiem Halla zakłada się na przewód masowy akumulatora. Pomiar odbywa się bez rozłączania obwodu.</li>
+<li>Cęgi obejmują jeden przewód. Prądy płynące w przeciwnych kierunkach przez obwiedziony obszar odejmują się.</li>
+<li>Znak odczytu zależy od kierunku prądu względem strzałki na cęgach.</li>
+<li>Cęgi zeruje się przy zamkniętych szczękach, bez przewodu z prądem w środku.</li>
+<li>W trakcie oczekiwania na uśpienie pojazd pozostaje zamknięty: otwarcie drzwi lub włączenie odbiorników może obudzić układy.</li>
+</ul>
+
+<h2>Dryf zera i pomiar dwukierunkowy</h2>
+<p>Cęgi z czujnikiem Halla mają offset, czyli niezerowy odczyt przy zerowym prądzie, a właściwości czujnika zmieniają się wraz z temperaturą. Offset dodaje się do wyniku niezależnie od wartości prądu, dlatego najsilniej wpływa na pomiary małych prądów, takich jak prąd spoczynkowy.</p>
+<p>Offset eliminuje się pomiarem w dwóch ustawieniach cęgów: normalnym i odwróconym o 180°. Jeśli <code>I</code> jest prądem, a <code>o</code> offsetem:</p>
+<div class="eq">odczyt 1 = I + o<br>odczyt 2 = −I + o<br>I = (odczyt 1 − odczyt 2) ÷ 2</div>
+<p>Przykład: odczyt 1 = +212 mA, odczyt 2 = −188 mA, więc I = (212 − (−188)) ÷ 2 = 200 mA, a offset wynosi (212 + (−188)) ÷ 2 = 12 mA. Metoda usuwa offset tylko wtedy, gdy nie zmienia się między dwoma odczytami, a prąd jest w tym czasie stały.</p>
+
+<h2>Wykres w skali logarytmicznej</h2>
+<p>W skali logarytmicznej równe odstępy na osi pionowej odpowiadają równym stosunkom prądów. Dzięki temu na jednym wykresie widać jednocześnie prądy rzędu setek miliamperów tuż po zamknięciu i dziesiątek miliamperów po uśpieniu.</p>
+<ul>
+<li><b>Schodek w dół</b> oznacza spadek poboru, czyli wyłączenie kolejnego odbiornika lub sterownika.</li>
+<li><b>Krótki pik w górę</b> oznacza chwilowy wzrost poboru. Jeżeli prąd wraca do poprzedniego poziomu, wzrost był chwilowy. Jeżeli nie wraca, pobór pozostał wyższy.</li>
+<li><b>Stały poziom</b> po ostatnim schodku to prąd spoczynkowy.</li>
+</ul>
+
+<h2>Prąd a magistrala CAN</h2>
+<p>Gdy na magistrali CAN są ramki, sieć jest aktywna. Brak ramek oznacza, że żaden węzeł nie nadaje. Jeśli prąd pozostaje wysoki, a ramek na magistrali nie ma, pobór nie wynika z nadawania ramek na tej magistrali. Porównanie przebiegu prądu z aktywnością magistrali pozwala odróżnić pobór związany z pracą sieci od poboru poza nią.</p>
+
+<h2>Prąd a pojemność akumulatora</h2>
+<p>Ładunek pobrany z akumulatora jest iloczynem prądu i czasu: <code>Q = I · t</code>. Pojemność akumulatora podaje się w amperogodzinach (Ah). Przykład: prąd 50 mA przez 24 godziny to 50 mA · 24 h = 1200 mAh = 1,2 Ah.</p>
+
+<h2>Ocena wyniku</h2>
+<p>Wartość dopuszczalną prądu spoczynkowego określa producent pojazdu. Wynik porównuje się z wartością podaną dla danego modelu.</p>
+
+<p class="see">Zobacz też: <a href="../lab/prad-spoczynkowy.html">symulacja analizatora prądu spoczynkowego</a> · <a href="cegi-dryf-zera.html">Cęgi prądowe i dryf zera</a> · <a href="magistrala-can.html">Jak działa magistrala CAN</a></p>
+</article></div></body></html>

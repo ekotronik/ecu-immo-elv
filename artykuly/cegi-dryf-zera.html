@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cęgi prądowe i dryf zera | EKOTRONIK</title>
+<meta name="description" content="Jak działają cęgi prądowe DC z czujnikiem Halla, skąd bierze się offset i dryf zera oraz jak usuwa go pomiar dwukierunkowy.">
+<link rel="canonical" href="https://ekotronik.github.io/ecu-immo-elv/artykuly/cegi-dryf-zera.html">
+<meta name="robots" content="index,follow">
+<link rel="icon" type="image/png" sizes="64x64" href="../assets_v8/favicon.png">
+<meta property="og:type" content="article"><meta property="og:locale" content="pl_PL"><meta property="og:site_name" content="EKOTRONIK">
+<meta property="og:url" content="https://ekotronik.github.io/ecu-immo-elv/artykuly/cegi-dryf-zera.html"><meta property="og:title" content="Cęgi prądowe i dryf zera | EKOTRONIK"><meta property="og:description" content="Jak działają cęgi prądowe DC z czujnikiem Halla, skąd bierze się offset i dryf zera oraz jak usuwa go pomiar dwukierunkowy.">
+<meta property="og:image" content="https://ekotronik.github.io/ecu-immo-elv/assets_v8/og_ekotronik_system.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Cęgi prądowe i dryf zera | EKOTRONIK"><meta name="twitter:description" content="Jak działają cęgi prądowe DC z czujnikiem Halla, skąd bierze się offset i dryf zera oraz jak usuwa go pomiar dwukierunkowy.">
+<link rel="stylesheet" href="art.css">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Cęgi prądowe i dryf zera", "description": "Jak działają cęgi prądowe DC z czujnikiem Halla, skąd bierze się offset i dryf zera oraz jak usuwa go pomiar dwukierunkowy.", "inLanguage": "pl", "datePublished": "2026-11-08", "mainEntityOfPage": "https://ekotronik.github.io/ecu-immo-elv/artykuly/cegi-dryf-zera.html"}</script></head><body><div class="wrap">
+<header class="top"><a class="brand" href="../index.html" aria-label="EKOTRONIK SYSTEM – strona główna"><img src="../lab/img/logo-emblem.png" alt="Logo EKOTRONIK SYSTEM"><div><b>EKOTRONIK</b><span>SYSTEM</span></div></a><nav><a class="btn" href="index.html">Artykuły</a><a class="btn" href="../index.html#galeria">LAB</a></nav></header>
+<article>
+<h1>Cęgi prądowe i dryf zera</h1>
+<div class="meta">EKOTRONIK · artykuły techniczne · 8 listopada 2026</div>
+<p><b>Cęgi prądowe DC</b> mierzą prąd stały bez przerywania obwodu. W szczęki wkłada się jeden przewód, a cęgi wyznaczają prąd z pola magnetycznego wokół niego.</p>
+
+<h2>Zasada działania</h2>
+<ul>
+<li>Prąd płynący w przewodzie wytwarza wokół niego pole magnetyczne.</li>
+<li>W cęgach z czujnikiem Halla rdzeń prowadzi to pole do szczeliny, w której znajduje się czujnik.</li>
+<li>Napięcie czujnika Halla jest proporcjonalne do pola, a więc do prądu. Cęgi przeliczają je na wartość w amperach lub miliamperach.</li>
+<li>Odczyt ma znak. Odwrócenie cęgów na przewodzie zmienia znak odczytu.</li>
+</ul>
+<p>Czujnik Halla reaguje także na pole stałe, dlatego cęgi tego typu mierzą prąd stały, w odróżnieniu od cęgów transformatorowych, które mierzą tylko prąd przemienny.</p>
+
+<h2>Jeden przewód w szczękach</h2>
+<p>Cęgi mierzą sumę prądów płynących przez obszar objęty szczękami. Gdy w szczękach są dwa przewody z prądem w przeciwnych kierunkach, ich prądy odejmują się, a odczyt pokazuje różnicę. Do pomiaru prądu jednego odbiornika obejmuje się wyłącznie jego przewód.</p>
+
+<h2>Offset i dryf zera</h2>
+<p><b>Offset</b> to odczyt cęgów przy zerowym prądzie. <b>Dryf zera</b> to zmiana tego odczytu w czasie. Właściwości czujnika Halla zmieniają się wraz z temperaturą, dlatego zmiany temperatury przesuwają zero cęgów.</p>
+<p>Offset dodaje się do wyniku bez względu na wielkość prądu. Przy dużych prądach stanowi niewielki ułamek odczytu, a przy prądach rzędu miliamperów, jak prąd spoczynkowy, może stanowić jego znaczną część.</p>
+
+<h2>Zerowanie</h2>
+<p>Zerowanie wykonuje się przy zamkniętych szczękach, gdy w środku nie ma przewodu z prądem. Cęgi ustawiają wtedy bieżący odczyt jako zero. Zerowanie obowiązuje do chwili, gdy zero się przesunie, więc nie zastępuje korekty w trakcie długiego pomiaru.</p>
+
+<h2>Pomiar dwukierunkowy</h2>
+<p>Znak odczytu zależy od ustawienia cęgów, a offset nie. Pomiar w dwóch ustawieniach pozwala go wyeliminować. Dla prądu <code>I</code> i offsetu <code>o</code>:</p>
+<div class="eq">ustawienie normalne: odczyt 1 = I + o<br>ustawienie odwrócone: odczyt 2 = −I + o<br>I = (odczyt 1 − odczyt 2) ÷ 2<br>o = (odczyt 1 + odczyt 2) ÷ 2</div>
+<table><tr><th>Wielkość</th><th>Przykład</th></tr>
+<tr><td>odczyt 1</td><td>+212 mA</td></tr>
+<tr><td>odczyt 2 (cęgi odwrócone)</td><td>−188 mA</td></tr>
+<tr><td>prąd I</td><td>(212 − (−188)) ÷ 2 = 200 mA</td></tr>
+<tr><td>offset o</td><td>(212 + (−188)) ÷ 2 = 12 mA</td></tr></table>
+<p>Warunki poprawności tej metody: prąd w obu pomiarach jest taki sam, a offset w tym czasie się nie zmienia. Jeżeli offset dryfuje między odczytami, w wyniku zostaje błąd równy zmianie offsetu dzielonej przez dwa.</p>
+
+<p class="see">Zobacz też: <a href="prad-spoczynkowy.html">Jak czytać prąd spoczynkowy auta</a> · <a href="../lab/prad-spoczynkowy.html">symulacja analizatora prądu spoczynkowego</a></p>
+</article></div></body></html>
