@@ -35,16 +35,17 @@
 <tr><td>identyfikator</td><td>11 bitów (format podstawowy); określa też priorytet</td></tr>
 <tr><td>sterowanie</td><td>m.in. długość danych DLC</td></tr>
 <tr><td>dane</td><td>od 0 do 8 bajtów</td></tr>
-<tr><td>CRC</td><td>15 bitów sumy kontrolnej + ogranicznik recesywny</td></tr>
-<tr><td>ACK</td><td>szczelina potwierdzenia + ogranicznik</td></tr>
-<tr><td>EOF</td><td>7 bitów recesywnych</td></tr></table>
+<tr><td>sekwencja CRC</td><td>15 bitów sumy kontrolnej</td></tr>
+<tr><td>ogranicznik CRC</td><td>1 bit recesywny, bez bitów wstawianych</td></tr>
+<tr><td>ACK</td><td>szczelina potwierdzenia + ogranicznik ACK, bez bitów wstawianych</td></tr>
+<tr><td>EOF</td><td>7 bitów recesywnych, bez bitów wstawianych</td></tr></table>
 <p><b>Arbitraż.</b> Gdy kilka węzłów zaczyna nadawać jednocześnie, wygrywa ten, którego identyfikator ma niższą wartość, ponieważ bit dominujący (0) nadpisuje recesywny (1).</p>
-<p><b>Bity wstawiane.</b> Od SOF do końca pola CRC po pięciu kolejnych bitach o tym samym poziomie nadajnik wstawia bit o poziomie przeciwnym. Sześć kolejnych bitów o tym samym poziomie w tym obszarze to błąd.</p>
+<p><b>Bity wstawiane.</b> Obejmują wyłącznie obszar od SOF do końca 15-bitowej sekwencji CRC. W tym obszarze po pięciu kolejnych bitach o tym samym poziomie nadajnik wstawia bit o poziomie przeciwnym, a sześć kolejnych bitów o tym samym poziomie jest błędem. Ogranicznik CRC, pole ACK i EOF nie mają bitów wstawianych.</p>
 <p><b>CRC.</b> Suma kontrolna 15-bitowa, liczona od SOF do końca pola danych (bez bitów wstawianych), z wielomianem x<sup>15</sup> + x<sup>14</sup> + x<sup>10</sup> + x<sup>8</sup> + x<sup>7</sup> + x<sup>4</sup> + x<sup>3</sup> + 1.</p>
 <p><b>ACK.</b> Nadajnik wysyła w szczelinie ACK bit recesywny. Każdy odbiornik, który odebrał ramkę z poprawnym CRC, nadpisuje go bitem dominującym.</p>
 
 <h2>Uśpienie sieci</h2>
-<p>Transceivery CAN z trybem uśpienia wyłączają w nim nadajnik i główny odbiornik. Pozostaje odbiornik małej mocy, który nasłuchuje na magistrali wzorca budzenia. Po rozpoznaniu wzorca transceiver sygnalizuje wybudzenie.</p>
+<p>W transceiverach CAN z trybem uśpienia, np. TCAN1043N-Q1 firmy Texas Instruments (według karty katalogowej), nadajnik i główny odbiornik są w tym trybie wyłączone, a odbiornik małej mocy monitoruje magistralę pod kątem wzorca budzenia (WUP).</p>
 
 <p class="see">Zobacz też: <a href="../lab/analizator-can.html">symulacja analizatora CAN</a> · <a href="prad-spoczynkowy.html">Jak czytać prąd spoczynkowy auta</a></p>
 </article></div></body></html>
