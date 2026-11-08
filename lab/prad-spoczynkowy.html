@@ -10,7 +10,8 @@
 <meta property="og:url" content="https://ekotronik.github.io/ecu-immo-elv/lab/prad-spoczynkowy.html"><meta property="og:title" content="Analizator prądu spoczynkowego – symulacja | EKOTRONIK SYSTEM"><meta property="og:description" content="Analizator prądu spoczynkowego EKOTRONIK AI w trybie symulacji: scenariusze usypiania auta, cęgi CC-65, korekta dryfu, werdykt.">
 <meta property="og:image" content="https://ekotronik.github.io/ecu-immo-elv/assets_v8/og_ekotronik_system.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Logo EKOTRONIK SYSTEM">
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Analizator prądu spoczynkowego – symulacja | EKOTRONIK SYSTEM"><meta name="twitter:description" content="Analizator prądu spoczynkowego EKOTRONIK AI w trybie symulacji: scenariusze usypiania auta, cęgi CC-65, korekta dryfu, werdykt."><meta name="twitter:image" content="https://ekotronik.github.io/ecu-immo-elv/assets_v8/og_ekotronik_system.png">
-<link rel="stylesheet" href="lab.css"></head><body><div class="wrap">
+<link rel="stylesheet" href="lab.css">
+</head><body><div class="wrap">
 <div class="hdr" id="hdr"></div><div class="crumb" id="crumb"></div>
 <div class="row" id="topBtns">
  <button class="btn gold" id="bGo">START POMIARU</button>
@@ -31,9 +32,12 @@
    <div class="kpi"><span class="lbl">Napięcie</span><div class="v ok" id="kV">—</div></div>
    <div class="kpi"><span class="lbl">Od zamknięcia</span><div class="v" id="kT">00:00</div></div>
    <div class="kpi"><span class="lbl">Etap</span><div class="v gd" id="kSt">—</div></div>
+   <div class="kpi"><span class="lbl">Magistrala CAN</span><div class="v" id="kCan">—</div></div>
+   <div class="kpi"><span class="lbl">Wybudzenia kontrolne</span><div class="v warn" id="kWk">0</div></div>
   </div>
   <div class="row" style="margin:6px 0"><button class="btn sel" data-r="all">CAŁY POMIAR</button><button class="btn" data-r="15">OSTATNIE 15 MIN</button><button class="btn" data-r="5">OSTATNIE 5 MIN</button></div>
   <div class="cwrap"><canvas id="cv" aria-label="Prąd w skali logarytmicznej"></canvas></div>
+  <div class="cwrap" style="margin-top:8px"><canvas id="cvC" aria-label="Monitor magistrali CAN: stan i wybudzenia kontrolne"></canvas></div>
   <div class="cwrap" style="margin-top:8px"><canvas id="cvV" aria-label="Napięcie akumulatora"></canvas></div>
   <div class="box" id="verdict" style="margin-top:10px"><div class="bt" id="vT">GOTOWY</div><div id="vD" class="dm">Wybierz scenariusz w zakładce Przygotowanie i naciśnij START POMIARU.</div></div>
  </div>
@@ -69,20 +73,20 @@ const W1={start:32,per:12,dur:3.6/60,amp:210}; // wybudzenia telematyki
 const stuck=t=>t<0?1800:t<5?700:420;
 const SC=[
  {id:'prawidlowy',n:'Prawidłowe usypianie',d:'usypianie prawidłowe, wybudzenia telematyki co 12 min',dur:90,I:prof,wake:W1,can:t=>t<21,flips:[62,85]},
- {id:'obserwacja_can',n:'Obserwacja magistrali CAN',d:'zasypianie sieci i wybudzenia bramki co 10 min',dur:80,I:prof,wake:{start:30,per:10,dur:4/60,amp:190},can:t=>t<21,flips:[58,74]},
+ {id:'obserwacja_can',n:'Obserwacja magistrali CAN',d:'zasypianie sieci i wybudzenia bramki co 10 min',dur:80,I:prof,wake:{start:30,per:10,dur:4/60,amp:190},can:t=>t<21,flips:[58,74],netId:0x3C0,wakeId:0x1A5},
  {id:'nie_zasypia',n:'Sterownik trzyma magistralę CAN',d:'sterownik nie pozwala sieci zasnąć, prąd stoi na 420 mA',dur:75,I:stuck,can:t=>true,flips:[65]},
  {id:'nie_zasypia_bez_can',n:'Sterownik trzyma sieć (bez CAN)',d:'jak wyżej, ale kanał CAN głowicy nie jest podłączony',dur:75,I:stuck,can:t=>true,noCan:true,flips:[65]},
  {id:'za_wysoki_poza_can',n:'Za wysoki prąd poza siecią',d:'magistrala śpi, stały odbiornik ok. 90 mA poza siecią',dur:80,I:t=>t<21?prof(t):125,can:t=>t<21,flips:[60,72]},
- {id:'bez_powrotu',n:'Wybudzenie bez powrotu',d:'po uśpieniu sterownik budzi sieć i nie zasypia',dur:95,I:t=>t<70?prof(t):298,wake:{start:32,per:60,dur:3.6/60,amp:210},can:t=>t<21||t>=70,flips:[64]},
- {id:'za_czeste',n:'Wybudzenia za częste',d:'wybudzenia co 3 min po 30 s',dur:70,I:t=>t<21?prof(t):30,wake:{start:24,per:3,dur:0.5,amp:650},can:t=>t<21,flips:[49,64]},
+ {id:'bez_powrotu',n:'Wybudzenie bez powrotu',d:'po uśpieniu sterownik budzi sieć i nie zasypia',dur:95,I:t=>t<70?prof(t):298,wake:{start:32,per:60,dur:3.6/60,amp:210},can:t=>t<21||t>=70,flips:[64],netId:0x3B5},
+ {id:'za_czeste',n:'Wybudzenia za częste',d:'wybudzenia co 3 min po 30 s',dur:70,I:t=>t<21?prof(t):30,wake:{start:24,per:3,dur:0.5,amp:650},can:t=>t<21,flips:[49,64],wakeId:0x17330110,wakeExt:true},
  {id:'akumulator',n:'Akumulator traci napięcie',d:'cykl prawidłowy, akumulator traci 40 mV/h',dur:100,I:prof,wake:W1,can:t=>t<21,flips:[62,90],mv:40},
  {id:'przerwanie',n:'Otwarcie drzwi w 30. minucie',d:'usypianie od nowa po przerwaniu pomiaru',dur:112,I:t=>t<30?prof(t):t<30.67?2500:prof(t-30.67),can:t=>t<21||(t>=30&&t<51.67),flips:[95,106]},
  {id:'dryf_bez_odwracania',n:'Dryf cęgów bez odwracania',d:'cęgi dryfują 150 mA/h, brak pomiaru dwukierunkowego',dur:80,I:prof,wake:W1,can:t=>t<21,flips:[],drift:150},
  {id:'za_krotki',n:'Pomiar za krótki',d:'pomiar przerwany po 25 minutach',dur:25,I:prof,can:t=>t<21,flips:[]},
  {id:'dlugi_pobor',n:'Długi stały pobór 380 mA',d:'stały pobór przez ponad 2 godziny, napięcie opada zgodnie z poborem',dur:140,I:t=>t<21?prof(t):380,can:t=>t<21,flips:[70,120],mv:8}
 ];
-let sc=SC[0],speed=300,tau=0,running=false,done=false,hist=[],evs=[],flips=[],range='all',rnd=LAB.rng(11),marks=[],nextFlipIdx=0,lastWake=-1,wakeN=0,lastBase=null,canSleepLogged=false,fullLogged=false;
-const cv=LAB.canvas(document.getElementById('cv'),w=>w>700?.42:.62),cvV=LAB.canvas(document.getElementById('cvV'),w=>w>700?.1:.2);
+let sc=SC[0],speed=300,tau=0,running=false,done=false,hist=[],evs=[],flips=[],range='all',rnd=LAB.rng(11),marks=[],nextFlipIdx=0,lastWake=-1,wakeN=0,lastBase=null,canSleepLogged=false,fullLogged=false,usypLogged=false;
+const cv=LAB.canvas(document.getElementById('cv'),w=>w>700?.42:.62),cvC=LAB.canvas(document.getElementById('cvC'),w=>w>700?.36:.7),cvV=LAB.canvas(document.getElementById('cvV'),w=>w>700?.1:.2);
 const driftRate=()=>(sc.drift||120)/60; // mA na minutę
 function trueI(t){let v=sc.I(t);if(sc.wake&&t>=sc.wake.start){const k=(t-sc.wake.start)%sc.wake.per;if(k<sc.wake.dur)v+=sc.wake.amp}return v}
 function resid(tt){ // pozostały dryf po korektach
@@ -96,8 +100,17 @@ function stage(t){ // t: czas od zamknięcia
   if(can)return 'B–C';const base=sc.I(t);
   return base<=60?'F':'D–E';
 }
+function wakeWin(t){return !!(sc.wake&&t>=sc.wake.start&&(t-sc.wake.start)%sc.wake.per<sc.wake.dur)} // jak wybudzenieW() w aplikacji
+function canOn(t){return !sc.noCan&&(sc.can(t)||wakeWin(t))} // ramki CAN w tej minucie (jak canTeraz w aplikacji)
+function canState(t){ // stan magistrali w minucie t od zamknięcia
+ if(sc.noCan)return 'brak';
+ if(t<0)return 'aktywna';
+ if(sc.can(t))return sc.can(t+1.5)?'aktywna':'usypia';
+ return wakeWin(t)?'wybudzenie':'spi';
+}
+function canIdent(cs){return cs==='wybudzenie'?{id:sc.wakeId||0x5C0,ext:!!sc.wakeExt}:{id:sc.netId||0x5C0,ext:false}}
 function ev(t,txt,cls){evs.push({t,txt,cls:cls||''});}
-function reset(){tau=0;running=false;done=false;hist=[];evs=[];flips=[];marks=[];nextFlipIdx=0;lastWake=-1;wakeN=0;lastBase=null;canSleepLogged=false;fullLogged=false;rnd=LAB.rng(11);
+function reset(){tau=0;running=false;done=false;hist=[];evs=[];flips=[];marks=[];nextFlipIdx=0;lastWake=-1;wakeN=0;lastBase=null;canSleepLogged=false;fullLogged=false;usypLogged=false;rnd=LAB.rng(11);
  document.getElementById('bGo').textContent='START POMIARU';document.getElementById('bFlip').disabled=true;document.getElementById('bMark').disabled=true;ui();draw()}
 function step(){
  tau+=DT;const t=tau-T0,V0=12.70,mv=(sc.mv||6)/1000/60;
@@ -105,14 +118,14 @@ function step(){
  const raw=Math.max(0,ti+r+LAB.gauss(rnd)*(ti>200?4:1.2));
  const v=V0-mv*tau-(t<0?0.02:0)-(ti>200?ti/1000*0.02:0)+LAB.gauss(rnd)*0.002;
  const st=stage(t);
- hist.push({tau,t,i:raw,tr:ti,v,st,can:sc.can(t)});
+ const cs=canState(t),idn=canIdent(cs);hist.push({tau,t,i:raw,tr:ti,v,st,can:sc.can(t),cs,fr:canOn(t)?480:0,id:idn.id,ext:idn.ext});
  // zdarzenia
  if(Math.abs(tau-T0)<DT/2+1e-9)ev(tau,'zamknięcie, alarm uzbrojony','gd');
  const bs=sc.I(t),pb=lastBase;
  if(pb!==null&&pb<1000&&bs<pb-25&&t>0)ev(tau,'schodek −'+Math.round(pb-bs)+' mA');
  lastBase=bs;
  if(!canSleepLogged&&t>0&&!sc.can(t)){canSleepLogged=true;ev(tau,sc.noCan?'brak kanału CAN w głowicy':'magistrala CAN uśpiona','gd')}
- if(sc.wake&&t>=sc.wake.start){const k=(t-sc.wake.start)%sc.wake.per,idx=Math.floor((t-sc.wake.start)/sc.wake.per);if(k<DT&&idx!==lastWake){lastWake=idx;wakeN++;ev(tau,'wybudzenie '+sc.wake.amp+' mA · '+(sc.wake.dur*60).toFixed(1).replace('.',',')+' s','warn');if(wakeN===3)ev(tau,'cykliczne co '+sc.wake.per+' min')}}
+ if(sc.wake&&t>=sc.wake.start){const k=(t-sc.wake.start)%sc.wake.per,idx=Math.floor((t-sc.wake.start)/sc.wake.per);if(k<DT&&idx!==lastWake){lastWake=idx;wakeN++;ev(tau,'wybudzenie '+sc.wake.amp+' mA · '+(sc.wake.dur*60).toFixed(1).replace('.',',')+' s'+(sc.noCan?'':' · 0x'+canIdent('wybudzenie').id.toString(16).toUpperCase()),'warn');if(wakeN===3)ev(tau,'cykliczne co '+sc.wake.per+' min')}}
  if(!fullLogged&&st==='F'&&hist.filter(h=>h.t>t-10&&h.st==='F').length>=Math.round(10/DT)*0.95){fullLogged=true;ev(tau,'pełne uśpienie, '+Math.round(sc.I(t))+' mA','ok')}
  if(sc.flips[nextFlipIdx]!==undefined&&tau>=sc.flips[nextFlipIdx]&&document.getElementById('auto').checked){doFlip()}
  else if(sc.flips[nextFlipIdx]!==undefined&&tau>=sc.flips[nextFlipIdx])nextFlipIdx=nextFlipIdx;
@@ -145,6 +158,7 @@ function ui(){
  const h=hist[hist.length-1],e=evaluate();
  LAB.set('kNow',h?Math.round(h.i)+' mA':'—');
  const b=hist.length?base():null;LAB.set('kBase',b===null?'—':Math.round(b)+' mA'+(flips.length?'*':''));
+ {const CT={aktywna:['AKTYWNA','ok'],usypia:['USYPIA','warn'],spi:['ŚPI','dm'],wybudzenie:['WYBUDZENIE','warn'],brak:['BRAK CAN','dm']};const k=h?CT[h.cs]:null;const el=document.getElementById('kCan');el.textContent=k?k[0]:'—';el.className='v '+(k?k[1]:'');LAB.set('kWk',String(wakeN))}
  LAB.set('kV',h?h.v.toFixed(2).replace('.',',')+' V':'—');LAB.set('kT',h?LAB.mmss(Math.max(0,tau-T0)):'00:00');LAB.set('kSt',h?(h.st==='A'?'A · po wyłączeniu':h.st==='B–C'?'B–C · usypianie':h.st==='D–E'?'D–E · sieć śpi':'F · uśpiony'):'—');
  const box=document.getElementById('verdict');box.className='box '+(e?e.l:'');
  if(e){LAB.set('vT',e.t);LAB.set('vD',e.d)}
@@ -175,7 +189,58 @@ function drawChart(){
  for(const m of marks){if(m>=xmin){c.strokeStyle='#f4d89a';c.beginPath();c.moveTo(X(m),T);c.lineTo(X(m),T+ph);c.stroke();c.fillStyle='#f4d89a';c.fillText('Z',X(m)+3*d,T+30*d)}}
  if(!hist.length){c.fillStyle='#a3b0c2';c.font=(17*d)+'px Roboto,sans-serif';c.fillText('Brak danych: naciśnij START POMIARU (symulacja)',L+20*d,T+ph/2)}
  c.fillStyle='#ff8a65';c.font=(13*d)+'px Roboto,sans-serif';c.fillText('Prąd (skala log) · SYMULACJA',W-R-200*d,T+14*d);
- c._geo={X,xmin,xmaxV,L,pw};
+ c._geo={X,xmin,xmaxV,L,pw,st:step};
+}
+// ===== Monitor magistrali CAN: port WykresCan + MagistralaCan z aplikacji (SYMULACJA) =====
+const CAN={BIT:2,VREC:2.5,VH:3.5,VL:1.5,VSLEEP:0.02,VMAX:4.2,OKNO:280,
+ crc15(b){let c=0;for(const x of b){const n=x^((c>>14)&1);c=(c<<1)&0x7FFF;if(n)c^=0x4599}return c},
+ ramka(id,ext,dane){const b=[];const add=(v,n)=>{for(let i=n-1;i>=0;i--)b.push(Math.floor(v/Math.pow(2,i))%2)};
+  b.push(0);if(ext){add(Math.floor(id/Math.pow(2,18)),11);b.push(1,1);add(id%Math.pow(2,18),18);b.push(0,0,0)}else{add(id&0x7FF,11);b.push(0,0,0)}
+  const dl=Math.min(8,dane.length);add(dl,4);dane.slice(0,8).forEach(x=>add(x&0xFF,8));add(CAN.crc15(b),15);
+  const w=[];let last=-1,n=0;for(const bit of b){w.push({d:bit===0,ack:false});if(bit===last)n++;else{last=bit;n=1}if(n===5){const ins=1-bit;w.push({d:ins===0,ack:false});last=ins;n=1}}
+  w.push({d:false,ack:false});w.push({d:true,ack:true});for(let i=0;i<11;i++)w.push({d:false,ack:false});return w},
+ dane(l){return Array.from({length:8},(_,i)=>i===0?l&0x0F:i===7?(l*7+0x3C)&0xFF:(0x11*i+l*(i+1))&0xFF)},
+ nap(bity,t,szum){const i=Math.floor(t/CAN.BIT),pr=bity[i-1],bz=bity[i],dt=t-i*CAN.BIT;
+  const lv=b=>(!b||!b.d)?[2.5,2.5]:b.ack?[3.62,1.38]:[3.5,1.5];const [h1,l1]=lv(bz),[h0,l0]=lv(pr);
+  const dom=!!(bz&&bz.d),tau=dom?0.035:0.09,z=Math.exp(-dt/tau),dz=(!dom&&pr&&pr.d)?0.12*Math.exp(-dt/0.15)*Math.sin(2*Math.PI*dt/0.11):0;
+  return [h1+(h0-h1)*z+dz+szum,l1+(l0-l1)*z-dz+szum*0.8]}};
+function drawCan(){
+ const c=cvC.ctx,d=cvC.dpr,W=cvC.W,H=cvC.H,g=cv.ctx._geo;c.fillStyle='#000';c.fillRect(0,0,W,H);if(!g)return;
+ const CH='#f2c230',CL='#3fcf6e',GR='rgba(255,255,255,.10)',TX='#a3b0c2',WB='#ff8a65',AC='#d6a852';
+ const lewy=g.L,prawy=g.L+g.pw,podzial=H*.46,narrow=g.pw/d<560;
+ c.lineCap='butt';
+ const siatka=(gora,dol)=>{const y=v=>dol-v/CAN.VMAX*(dol-gora);c.font=(12*d)+'px Roboto,sans-serif';c.lineWidth=d;
+  for(const v of [0,1.5,2.5,3.5]){c.strokeStyle=GR;c.beginPath();c.moveTo(lewy,y(v));c.lineTo(prawy,y(v));c.stroke();c.fillStyle=TX;c.fillText(v===0?'0 V':String(v).replace('.',',')+' V',4*d,y(v)+4*d)}return y};
+ const legenda=(y,wt)=>{if(narrow&&wt>prawy-lewy-118*d)return;c.font='bold '+(12*d)+'px Roboto,sans-serif';c.fillStyle=CH;c.fillText('CAN-H',prawy-110*d,y);c.fillStyle=CL;c.fillText('CAN-L',prawy-60*d,y)};
+ if(!hist.length){c.fillStyle=TX;c.font=(14*d)+'px Roboto,sans-serif';c.fillText('Magistrala CAN: wybierz scenariusz i naciśnij START',lewy,H/2);return}
+ // --- góra: napięcia CAN-H/L w czasie pomiaru ---
+ {const gora=18*d,dol=podzial-16*d,y=siatka(gora,dol),xmin=g.xmin,xmax=g.xmaxV,X=g.X;
+  let lx=-1e9;for(let m=Math.ceil(xmin/g.st)*g.st;m<=xmax;m+=g.st){c.strokeStyle=GR;c.beginPath();c.moveTo(X(m),gora);c.lineTo(X(m),dol);c.stroke();c.fillStyle=TX;c.font=(12*d)+'px Roboto,sans-serif';if(X(m)-lx>66*d){c.fillText(m+' min',X(m)-16*d,dol+13*d);lx=X(m)}}
+  c.fillStyle=WB;c.font='bold '+(12*d)+'px Roboto,sans-serif';c.fillText(narrow?'CAN w czasie pomiaru · SYMULACJA':'Magistrala CAN w czasie pomiaru · SYMULACJA',lewy,gora-5*d);legenda(gora-5*d,c.measureText('CAN w czasie pomiaru · SYMULACJA').width);
+  const kol=1.5*d,los=LAB.rng(hist.length);let i=0,last=null;const pH=[],pL=[],bH=[],bL=[];
+  for(let x=lewy;x<prawy&&i<hist.length;x+=kol){const tDo=xmin+(x+kol-lewy)/(prawy-lewy)*(xmax-xmin);let akt=null;
+   while(i<hist.length&&hist[i].tau<=tDo){if(hist[i].tau>=xmin-1){akt=(akt||false)||hist[i].fr>0}i++}
+   if(akt===null)akt=last;if(akt===null)continue;last=akt;
+   if(akt){bH.push([x,y(CAN.VREC),y(CAN.VH+los()*.08)]);bL.push([x,y(CAN.VREC),y(CAN.VL-los()*.08)])}
+   const vh=akt?CAN.VREC:CAN.VSLEEP+los()*.03,vl=akt?CAN.VREC:CAN.VSLEEP+los()*.03;pH.push([x,y(vh)]);pL.push([x,y(vl)])}
+  const band=(a,col)=>{c.strokeStyle=col;c.lineWidth=kol+.6;c.beginPath();for(const q of a){c.moveTo(q[0],q[1]);c.lineTo(q[0],q[2])}c.stroke()};
+  const line=(a,col)=>{c.strokeStyle=col;c.lineWidth=1.6*d;c.beginPath();a.forEach((q,k)=>k?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1]));c.stroke()};
+  c.save();c.beginPath();c.rect(lewy,0,prawy-lewy,podzial);c.clip();band(bH,CH);band(bL,CL);line(pH,CH);line(pL,CL);c.restore();
+  if(sc.noCan){c.fillStyle='rgba(0,0,0,.55)';c.fillRect(lewy,gora,prawy-lewy,dol-gora);c.fillStyle='#c4ccd8';c.font='bold '+(13*d)+'px Roboto,sans-serif';c.fillText('BRAK KANAŁU CAN W GŁOWICY: brak odczytu magistrali',lewy+10*d,(gora+dol)/2)}}
+ // --- dół: oscylogram ostatniej ramki w µs ---
+ {const gora=podzial+6*d+18*d,dol=H-16*d,y=siatka(gora,dol),x=us=>lewy+us/CAN.OKNO*(prawy-lewy);
+  for(let us=0;us<=CAN.OKNO;us+=20){c.strokeStyle=GR;c.lineWidth=d;c.beginPath();c.moveTo(x(us),gora);c.lineTo(x(us),dol);c.stroke();c.fillStyle=TX;if(us%(narrow?80:40)===0&&us<CAN.OKNO)c.fillText(us+' µs',x(us)+2*d,dol+13*d)}
+  const ost=hist[hist.length-1],akt=hist.slice(-3).some(h=>h.fr>0),id=ost.id;
+  c.fillStyle=WB;c.font='bold '+(12*d)+'px Roboto,sans-serif';
+  c.fillText(akt?(narrow?'Ramka 0x'+id.toString(16).toUpperCase()+' · SYMULACJA':'Oscylogram ramki 0x'+id.toString(16).toUpperCase()+' · 500 kbit/s · 20 µs/dz · SYMULACJA'):(narrow?'Magistrala uśpiona ≈ 0 V · SYMULACJA':'Oscylogram · magistrala uśpiona: CAN-H ≈ CAN-L ≈ 0 V · SYMULACJA'),lewy,gora-5*d);legenda(gora-5*d,c.measureText('Ramka 0x1A5 · 500 kb/s · SYMULACJA').width);
+  const licznik=Math.floor(ost.t*600),los=LAB.rng(Math.abs(licznik)),bity=akt?CAN.ramka(id,ost.ext,CAN.dane(Math.abs(licznik))):[];
+  const krok=CAN.OKNO/((prawy-lewy)/d*2);const H1=[],L1=[];
+  for(let t=0;t<=CAN.OKNO;t+=krok){const sz=(los()-.5)*.03;let vh,vl;
+   if(akt){if(t<8){vh=vl=CAN.VREC+sz}else[vh,vl]=CAN.nap(bity,t-8,sz)}else{vh=vl=CAN.VSLEEP+sz*.5}
+   H1.push([x(t),y(vh)]);L1.push([x(t),y(vl)])}
+  const ln=(a,col)=>{c.strokeStyle=col;c.lineWidth=1.5*d;c.beginPath();a.forEach((q,k)=>k?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1]));c.stroke()};
+  ln(H1,CH);ln(L1,CL);
+  c.strokeStyle=AC;c.lineWidth=d;c.setLineDash([4*d,4*d]);c.beginPath();c.moveTo(x(8),gora);c.lineTo(x(8),dol);c.stroke();c.setLineDash([])}
 }
 function trueNear(t){const h=hist.find(x=>x.tau>=t);return h?h.i:100}
 function drawV(){
@@ -185,7 +250,7 @@ function drawV(){
  c.fillStyle='#a3b0c2';c.fillText('Napięcie akumulatora',L+4*d,H-4*d);
  c.strokeStyle='#66bb6a';c.lineWidth=1.8*d;c.beginPath();let f=true;for(const h of hist){if(h.tau<g.xmin-1)continue;const x=g.X(h.tau),y=Y(h.v);f?c.moveTo(x,y):c.lineTo(x,y);f=false}c.stroke();
 }
-function draw(){drawChart();drawV()}
+function draw(){drawChart();drawCan();drawV()}
 function report(){
  const e=evaluate(),b=hist.length?Math.round(base()):null;
  return 'RAPORT – ANALIZATOR PRĄDU SPOCZYNKOWEGO (SYMULACJA)\nScenariusz: '+sc.n+' – '+sc.d+'\nCzas pomiaru od zamknięcia: '+LAB.mmss(Math.max(0,tau-T0))+'\nPrąd bazowy: '+(b===null?'—':b+' mA'+(flips.length?' (z poprawką dryfu, odwróceń: '+flips.length+')':' (bez korekty dryfu)'))+'\nNorma: '+NORM+' mA (ogólna)\nWerdykt: '+(e?e.t:'—')+'\n'+(e?e.d:'')+'\n\nZdarzenia:\n'+evs.map(x=>LAB.mmss(x.t)+'  '+x.txt).join('\n')+'\n\nUwaga: wynik z SYMULACJI nie potwierdza usterki pojazdu. Sprzęt i pojazd niesprawdzone.';
@@ -195,13 +260,13 @@ document.getElementById('scBtns').innerHTML=SC.map((s,i)=>'<button class="btn" d
 document.getElementById('scBtns').addEventListener('click',e=>{const b=e.target.closest('[data-i]');if(b){setSc(+b.dataset.i)}});
 document.querySelectorAll('[data-sp]').forEach(b=>b.onclick=()=>{speed=+b.dataset.sp;document.querySelectorAll('[data-sp]').forEach(x=>x.classList.toggle('sel',x===b))});
 document.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{range=b.dataset.r;document.querySelectorAll('[data-r]').forEach(x=>x.classList.toggle('sel',x===b))});
-document.getElementById('tabs').addEventListener('click',e=>{const b=e.target.closest('[data-t]');if(!b)return;document.querySelectorAll('#tabs .btn').forEach(x=>x.classList.toggle('on',x===b));document.querySelectorAll('[data-p]').forEach(p=>p.classList.toggle('hidden',p.dataset.p!==b.dataset.t));if(b.dataset.t==='rap')LAB.set('rep',report());cv.fit();cvV.fit();draw()});
+document.getElementById('tabs').addEventListener('click',e=>{const b=e.target.closest('[data-t]');if(!b)return;document.querySelectorAll('#tabs .btn').forEach(x=>x.classList.toggle('on',x===b));document.querySelectorAll('[data-p]').forEach(p=>p.classList.toggle('hidden',p.dataset.p!==b.dataset.t));if(b.dataset.t==='rap')LAB.set('rep',report());cv.fit();cvC.fit();cvV.fit();draw()});
 document.getElementById('bGo').onclick=()=>{if(done)reset();running=!running;document.getElementById('bGo').textContent=running?'PAUZA':'WZNÓW'};
 document.getElementById('bRes').onclick=reset;
 document.getElementById('bFlip').onclick=()=>{doFlip();ui()};
 document.getElementById('bMark').onclick=()=>{marks.push(tau);ev(tau,'znacznik diagnosty','gd');ui()};
 document.getElementById('bRep').onclick=()=>{document.querySelector('[data-t=rap]').click()};
-window.addEventListener('resize',()=>{cv.fit();cvV.fit();draw()});
+window.addEventListener('resize',()=>{cv.fit();cvC.fit();cvV.fit();draw()});
 let acc=0;LAB.loop(dt=>{if(running){acc+=dt*speed/60;let n=Math.floor(acc/DT);acc-=n*DT;while(n-->0&&running)step();ui()}draw()});
 window.__sim={setSc,reset,get tau(){return tau},get hist(){return hist},eval:evaluate,get flips(){return flips},run(min){running=true;while(tau<min&&!done){step()}running=false;ui();draw();return evaluate()},flip(){doFlip()},auto:v=>document.getElementById('auto').checked=v,SC};
 setSc(0);
