@@ -323,12 +323,6 @@
   grid-template-columns: 1fr;
   gap:10px;
 }
-@media (min-width: 980px){
-  .offer-ul{
-    grid-template-columns: 1fr 1fr; /* 2 kolumny na szerokich ekranach */
-    gap:12px 16px;
-  }
-}
 .offer-ul li{
   position:relative;
   padding:10px 12px 10px 44px;
@@ -388,7 +382,10 @@
       pointer-events:none;
     }
     .card > *{ position: relative; }
-    .cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .cols3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+    .cols3 > .feature{min-width:0}
+    .offer-ul li{overflow-wrap:anywhere}
+    @media (max-width: 1180px){ .cols3{grid-template-columns:minmax(0,1fr)} }
     .divider{height:1px;background:rgba(255,255,255,.10);margin:18px 0}
     .feature{
       border:1px solid rgba(255,255,255,.10);
@@ -473,7 +470,7 @@
 /* ===== Powiększone ikony kontrolek (Zakres + Oferta) ===== */
 .offer-ul li::before{ display:none; }
 .offer-ul li{
-  padding-left:56px;
+  padding-left:14px; /* ikona ::before jest ukryta - bez pustego marginesu */
 }
 
 .zakres-icons img,
