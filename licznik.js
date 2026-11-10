@@ -41,17 +41,33 @@
     return p.then(function(){return wyn});
   }
   function koniec(t,blad,szcz){ pokaz(t+(dbg&&szcz?' • '+szcz:''),blad); }
+  /* diagnostyka ZAPISU (tylko ?licznik=test): czy count.js działa i czemu mógłby pomijać wejścia */
+  function diagZapisu(){
+    var gc=window.goatcounter, ok=gc&&typeof gc.count==='function', f=null, sk=null, ls='?';
+    try{ if(ok&&gc.filter) f=gc.filter(); }catch(e){ f='błąd filtra'; }
+    try{ sk=localStorage.getItem('skipgc'); ls=''; }catch(e){ ls='localStorage zablokowany'; }
+    var t='count.js: '+(ok?'załadowany':'NIE załadowany (blokada/AdBlock/brak sieci)');
+    if(ok) t+=', filtr: '+(f?('POMIJA wejście – '+f):'brak (wejście zostanie wysłane)');
+    t+=', skipgc: '+(sk==='t'?'USTAWIONE (ta przeglądarka nie jest zliczana)':'nie')+(ls?' ('+ls+')':'');
+    var d=document.createElement('div');d.style.cssText='font-size:13px;font-weight:500;margin-top:6px;line-height:1.4';d.textContent=t;
+    if(sk==='t'){var b=document.createElement('button');b.textContent='Włącz zliczanie w tej przeglądarce';b.style.cssText='display:block;margin-top:6px;padding:8px 12px;font-size:14px';
+      b.onclick=function(){try{localStorage.removeItem('skipgc')}catch(e){} location.reload()};d.appendChild(b);}
+    el.insertAdjacentElement('afterend',d);
+  }
+  if(dbg) setTimeout(diagZapisu,3000);
   pokaz('Licznik odwiedzin: ładowanie…',true);
   if(!window.fetch){ pokaz('Licznik odwiedzin: przeglądarka nie obsługuje pobierania danych',true); return; }
   pobierz('TOTAL').catch(function(e){ if(e&&e.http===403) throw e; return {c:0,u:0,sc:'TOTAL',blad:e}; })
   .then(function(tot){
     return kolejno(SCIEZKI).then(function(w){
       var sc=0,mu=0,zn=[];
-      w.forEach(function(x){sc+=x.c;mu=Math.max(mu,x.u);if(x.c)zn.push(x.sc+'='+x.c)});
+      var gr={}; /* warianty z ukośnikiem i bez to ta sama strona: bierzemy większy, nie sumujemy */
+      w.forEach(function(x){var k=x.sc.replace(/\/$/,'')||'/';if(!gr[k]||x.c>gr[k].c)gr[k]=x;mu=Math.max(mu,x.u)});
+      Object.keys(gr).forEach(function(k){sc+=gr[k].c;if(gr[k].c)zn.push(k+'='+gr[k].c)});
       var c=Math.max(tot.c,sc), u=Math.max(tot.u,mu);
       var t=c>0?'Wyświetlenia strony: '+c+' • Odwiedzający: '+u:'Wyświetlenia strony: — • Odwiedzający: — (GoatCounter aktualizuje liczniki z opóźnieniem)';
       if(c>0) zapisz(t);
-      koniec(t,c===0,'v3, TOTAL='+(tot.raw||'brak')+', suma ścieżek='+sc+(zn.length?' ('+zn.join(', ')+')':'')+', zapytań='+(w.length+1));
+      koniec(t,c===0,'v4, TOTAL='+(tot.raw||'brak')+', suma ścieżek='+sc+(zn.length?' ('+zn.join(', ')+')':'')+', zapytań='+(w.length+1));
     });
   }).catch(function(e){
     var o=ost();
