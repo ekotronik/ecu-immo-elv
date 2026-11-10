@@ -34,22 +34,40 @@
     var c=d&&liczba(d.count); if(c==null){ var e=new Error('nieoczekiwana odpowiedź'); throw e; }
     var u=liczba(d.count_unique);
     var t='Wyświetlenia strony: '+c+(u!=null?' • Odwiedzający: '+u:'');
-    zapisz(t); pokaz(t,false);
+    zapisz(t);
+    if(c==='0'&&!dbg) t+=' (dopiero zaczyna zliczać)';
+    koniec(t,false);
   }
+  /* ZAPIS wejścia: własny piksel GoatCounter (GET /count) zamiast count.js – nie zależy od ładowania skryptu zewnętrznego.
+     Wynik zapisu (wyslano/blad) trafia do diagnostyki; odczyt startuje po zakończeniu zapisu. */
+  var zapis='czeka';
+  var dbg=/[?&]licznik=test/.test(location.search);
+  function wyslij(){
+    return new Promise(function(ok){
+      var path=location.pathname||'/', done=false;
+      var q='p='+encodeURIComponent(path)+'&t='+encodeURIComponent(document.title||'')+
+        '&r='+encodeURIComponent(document.referrer||'')+
+        '&s='+[screen.width||0,screen.height||0,window.devicePixelRatio||1].join(',')+'&rnd='+Math.random().toString(36).slice(2);
+      var im=new Image();
+      function k(z){ if(done)return; done=true; zapis=z; ok(); }
+      im.onload=function(){k('wysłany')};
+      im.onerror=function(){k('zablokowany lub błąd sieci')};
+      setTimeout(function(){k('brak odpowiedzi (8 s)')},8000);
+      im.src=HOST+'/count?'+q;
+    });
+  }
+  function koniec(t,blad){ pokaz(t+(dbg?' • zapis wejścia: '+zapis:''),blad); }
   pokaz('Licznik odwiedzin: ładowanie…',true);
   if(!window.fetch){ pokaz('Licznik odwiedzin: przeglądarka nie obsługuje pobierania danych',true); return; }
   var sciezka=encodeURIComponent((location.pathname||'/').replace(/index\.html$/,''));
-  pobierz('TOTAL').then(wynik).catch(function(e1){
+  wyslij().then(function(){return new Promise(function(r){setTimeout(r,1500)})}).then(function(){return pobierz('TOTAL')}).then(wynik).catch(function(e1){
     if(e1&&e1.http===403) throw e1;
     return pobierz(sciezka).then(wynik);
   }).catch(function(e){
     var o=ost();
-    if(o) pokaz(o+' (ostatnio zapamiętane)',false);
-    else pokaz('Licznik odwiedzin niedostępny: '+opis(e),true);
+    if(o) koniec(o+' (ostatnio zapamiętane)',false);
+    else koniec('Licznik odwiedzin niedostępny: '+opis(e),true);
   });
-  /* diagnostyka skryptu zliczającego: czy count.js się załadował */
-  setTimeout(function(){
-    if(!window.goatcounter && /^Licznik odwiedzin niedostępny/.test(el.textContent||''))
-      el.textContent+=' • skrypt zliczający gc.zgo.at/count.js nie załadował się (AdBlock lub brak sieci)';
-  },4000);
+  
+
 })();
