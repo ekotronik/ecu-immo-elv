@@ -1648,6 +1648,32 @@ html.boot-seen #bootScreen{display:none!important}
     </div>
     <p class="section-sub">Cztery analizatory z asystenta EKOTRONIK. Każdy ma własne okno z interaktywną symulacją, opisem i celem projektu. To symulacje: sprzęt i pojazd nie były jeszcze sprawdzane.</p>
 
+    <div class="ai-hero" id="aiAsystent">
+      <div class="ai-hero-media">
+        <video id="aiVideo" muted loop playsinline preload="none" poster="assets_v8/asystent/tapeta_plakat.webp" data-src="assets_v8/asystent/tapeta.mp4" aria-label="Animowana tapeta projektu EKOTRONIK AI ASYSTENT" width="540" height="960"></video>
+      </div>
+      <div class="ai-hero-body">
+        <span class="lab-badge">PROJEKT</span>
+        <h3>EKOTRONIK AI ASYSTENT</h3>
+        <p>Aplikacja na Androida, która prowadzi diagnostę krok po kroku: sama dobiera parametry, porównuje wartości zadane ze zmierzonymi i ocenia wynik w trzech poziomach. Współpracuje z głowicą pomiarową EKOTRONIK (ESP32) i jej analizatorami.</p>
+        <p class="lab-goal">Cel: pokazać, że prosty sprzęt i dobrze poprowadzony pomiar dają wiarygodną diagnozę. Poniżej cztery analizatory z asystenta w interaktywnej symulacji.</p>
+      </div>
+    </div>
+    <style>
+    .ai-hero{display:grid;grid-template-columns:minmax(0,300px) 1fr;gap:22px;align-items:center;margin:18px 0 22px;padding:16px;border:1px solid var(--border);border-radius:18px;background:linear-gradient(135deg,rgba(214,168,82,.10),rgba(8,20,36,.7))}
+    .ai-hero-media video{display:block;width:100%;height:auto;aspect-ratio:9/16;max-height:520px;object-fit:cover;border-radius:14px;border:1px solid var(--border);background:#040a11;box-shadow:0 8px 30px rgba(0,0,0,.45)}
+    .ai-hero-body h3{margin:8px 0 6px;font-size:clamp(1.5rem,3.4vw,2.2rem);letter-spacing:.04em}
+    .ai-hero-body p{font-size:1.05rem;line-height:1.55;margin:6px 0}
+    @media(max-width:720px){.ai-hero{grid-template-columns:1fr}.ai-hero-media{max-width:300px;margin:0 auto}}
+    </style>
+    <script>
+    (function(){var v=document.getElementById('aiVideo');if(!v)return;
+     var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+     function load(){if(v.dataset.loaded)return;v.dataset.loaded=1;v.src=v.dataset.src;if(!reduce){var p=v.play();if(p&&p.catch)p.catch(function(){})}}
+     if('IntersectionObserver' in window){new IntersectionObserver(function(e,o){if(e[0].isIntersecting){load();o.disconnect()}},{rootMargin:'200px'}).observe(v)}else{load()}
+    })();
+    </script>
+
     <div class="gal-filters" aria-label="Filtry sekcji LAB">
       <button class="gal-filter-btn active" data-filter="all">Wszystko</button>
       <button class="gal-filter-btn" data-filter="PRAD">Prąd</button>
