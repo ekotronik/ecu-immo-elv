@@ -1,0 +1,671 @@
+<!doctype html>
+<html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EKOTRONIK AI ASYSTENT – symulacja | EKOTRONIK SYSTEM</title>
+<meta name="description" content="Interaktywna symulacja aplikacji EKOTRONIK AI ASYSTENT: diagnoza prowadzona krok po kroku, odczyt DTC, Live Data z wykresami, hipotezy, test rozstrzygający i raport. Sześć scenariuszy usterek.">
+<link rel="canonical" href="https://ekotronik.github.io/ecu-immo-elv/lab/asystent-ai.html">
+<meta name="robots" content="index,follow">
+<link rel="icon" type="image/png" sizes="64x64" href="../assets_v8/favicon.png">
+<link rel="apple-touch-icon" href="../assets_v8/apple-touch-icon.png">
+<meta property="og:type" content="website"><meta property="og:locale" content="pl_PL"><meta property="og:site_name" content="EKOTRONIK SYSTEM">
+<meta property="og:url" content="https://ekotronik.github.io/ecu-immo-elv/lab/asystent-ai.html"><meta property="og:title" content="EKOTRONIK AI ASYSTENT – symulacja | EKOTRONIK SYSTEM"><meta property="og:description" content="Interaktywna symulacja aplikacji EKOTRONIK AI ASYSTENT: diagnoza prowadzona, Live Data, hipotezy, test rozstrzygający i raport.">
+<meta property="og:image" content="https://ekotronik.github.io/ecu-immo-elv/assets_v8/og_ekotronik_system.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Logo EKOTRONIK SYSTEM">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="EKOTRONIK AI ASYSTENT – symulacja | EKOTRONIK SYSTEM"><meta name="twitter:description" content="Interaktywna symulacja aplikacji EKOTRONIK AI ASYSTENT: diagnoza prowadzona, Live Data, hipotezy, test rozstrzygający i raport."><meta name="twitter:image" content="https://ekotronik.github.io/ecu-immo-elv/assets_v8/og_ekotronik_system.png">
+<link rel="stylesheet" href="lab.css"><style>
+/* ===== okno aplikacji EKOTRONIK AI ASYSTENT (tablet, poziomo) ===== */
+.app{display:flex;flex-direction:column;height:min(820px,calc(100vh - 40px));min-height:600px;background:linear-gradient(180deg,#0b1a2a,#040a11);border:2px solid var(--border);border-radius:22px;box-shadow:0 0 0 8px #05080c,0 0 0 9px #2a2418,0 18px 50px rgba(0,0,0,.55);overflow:hidden;position:relative;margin:4px 0 14px}
+.app.fs{position:fixed;inset:0;z-index:60;height:100%;min-height:0;margin:0;border-radius:0;box-shadow:none;border:0}
+.a-top{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--hdr);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.a-logo{display:flex;align-items:center;gap:10px;min-width:0}
+.a-logo img{height:40px;width:auto;border-radius:9px}
+.a-logo b{display:block;font-size:1.15rem;font-weight:900;letter-spacing:.06em;line-height:1;background:linear-gradient(180deg,#f4d89a,#d6a852 55%,#8e6b2c);-webkit-background-clip:text;background-clip:text;color:transparent;white-space:nowrap}
+.a-logo span{display:block;font-size:.72rem;font-weight:800;letter-spacing:.32em;color:var(--gold);margin-top:3px}
+.a-chips{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto;align-items:center}
+.ch{border:1.5px solid var(--border);border-radius:9px;padding:3px 9px;font-size:.74rem;font-weight:800;letter-spacing:.03em;color:var(--muted);white-space:nowrap;background:rgba(0,0,0,.25)}
+.ch.ok{border-color:#3f8f55;color:#8ff0c4}.ch.demo{border-color:var(--demo);color:#ff9a5c}.ch.gd{border-color:var(--gold);color:var(--gold-l)}
+.ch i{font-style:normal;display:inline-block;width:7px;height:7px;border-radius:50%;background:currentColor;margin-right:6px;vertical-align:1px}
+.a-fs{font:inherit;font-size:.8rem;font-weight:800;min-height:34px;padding:0 12px;border-radius:10px;border:2px solid var(--gold);background:var(--raised);color:var(--text);cursor:pointer}
+.a-body{flex:1;display:flex;min-height:0}
+.a-nav{flex:0 0 112px;display:flex;flex-direction:column;gap:6px;padding:8px;background:rgba(5,6,8,.55);border-right:1px solid var(--border)}
+.a-nav button{font:inherit;color:var(--text);background:var(--raised);border:2px solid #2c3b4f;border-radius:14px;min-height:74px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:.78rem;font-weight:800;letter-spacing:.04em;padding:4px;position:relative}
+.a-nav button svg{width:28px;height:28px}
+.a-nav button.on{background:linear-gradient(180deg,#f0d28f,#c9a04d 55%,#9a7634);color:#0e0c08;border-color:var(--gold-l)}
+.a-nav button.on svg *{stroke:#0e0c08}
+.a-nav button.lock{opacity:.6}
+.a-nav button .lk{position:absolute;top:4px;right:6px;font-size:.75rem}
+.a-nav button .dot{position:absolute;top:6px;right:8px;width:9px;height:9px;border-radius:50%;background:#4be0a0;box-shadow:0 0 8px #4be0a0;display:none}
+.a-nav button.run .dot{display:block}
+.a-main{flex:1;min-width:0;min-height:0;position:relative}
+.scr{position:absolute;inset:0;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:10px}
+.scr.hidden{display:none}
+.a-status{display:flex;align-items:center;gap:10px;padding:6px 12px;background:var(--hdr);border-top:1px solid var(--border);font-size:.84rem;color:var(--muted);min-height:34px}
+.a-status b{color:var(--gold);font-weight:800;white-space:nowrap}
+.a-status span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.h2t{font-size:1.15rem;font-weight:900;letter-spacing:.05em;text-transform:uppercase;margin:0}.h2t i{font-style:normal;color:var(--gold);margin-right:8px}
+.sub{color:var(--muted);font-size:.9rem;margin:0}
+/* START */
+.st-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:10px;align-items:start}
+.scg{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
+.scc{font:inherit;text-align:left;color:var(--text);background:var(--panel);border:2px solid #2c3b4f;border-radius:14px;padding:10px 12px;cursor:pointer;display:flex;flex-direction:column;gap:4px;min-height:104px}
+.scc:hover{border-color:var(--gold-d)}
+.scc.on{border-color:var(--gold);background:linear-gradient(180deg,rgba(214,168,82,.16),rgba(11,24,39,.9))}
+.scc b{font-size:.98rem;line-height:1.25}.scc small{color:var(--muted);font-size:.82rem;line-height:1.3}
+.scc em{font-style:normal;font-size:.72rem;font-weight:800;letter-spacing:.06em;color:var(--gold)}
+.chk{list-style:none;margin:6px 0 0;padding:0;font-size:.9rem}
+.chk li{display:flex;gap:8px;align-items:center;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05);color:var(--muted)}
+.chk li b{width:20px;text-align:center;color:var(--muted)}
+.chk li.ok{color:var(--text)}.chk li.ok b{color:var(--ok)}
+.chk li.go b{color:var(--warn)}
+.seg{display:flex;gap:6px}.seg .btn{flex:1;min-height:46px;font-size:.88rem;padding:0 8px}
+.big{min-height:64px!important;font-size:1.1rem!important;width:100%}
+/* DIAGNOZA */
+.stp{display:flex;gap:5px;overflow-x:auto;padding-bottom:2px;flex:none;scrollbar-width:thin}
+.stp div{flex:1 0 auto;min-width:78px;border:1.5px solid #2c3b4f;border-radius:10px;padding:4px 8px;font-size:.72rem;font-weight:800;color:var(--muted);background:rgba(11,24,39,.7);line-height:1.2}
+.stp div u{text-decoration:none;display:block;font-size:.66rem;color:#6f7d90}
+.stp div.done{border-color:#3f8f55;color:#a9e8bd}.stp div.done u{color:#6fbf86}
+.stp div.cur{border-color:var(--gold);color:var(--gold-l);background:rgba(214,168,82,.14)}.stp div.cur u{color:var(--gold)}
+.dg{flex:1;display:grid;grid-template-columns:minmax(0,1fr) 250px;grid-template-rows:minmax(0,1fr);gap:10px;min-height:0}
+.feed{overflow:auto;display:flex;flex-direction:column;gap:8px;padding-right:2px;min-height:0}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:10px 12px;animation:cin .25s ease}
+@keyframes cin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.card h4{margin:0 0 6px;font-size:1rem;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card p{margin:4px 0;font-size:.93rem;color:#d6dbe8}
+.card ul{margin:4px 0;padding-left:20px;font-size:.92rem;color:#d6dbe8}.card li{margin:3px 0}
+.card table{font-size:.88rem}.card td,.card th{padding:5px 6px}
+.card .row{margin-top:8px}.card .row .btn{min-height:46px;font-size:.92rem;flex-direction:column}
+.card.ai{border-color:#7a6230}.card.ok{border-color:var(--ok)}.card.warn{border-color:var(--warn)}.card.fail{border-color:var(--fail)}
+.tg{font-size:.66rem;font-weight:900;letter-spacing:.07em;border-radius:6px;padding:2px 7px;white-space:nowrap}
+.tg.lvs{background:#0d3a44;color:#7fe9f5;border:1px solid #2a8a98}
+.tg.rule{background:#173b23;color:#9ff0b5;border:1px solid #3f8f55}
+.tg.ai{background:#3a2d12;color:#f4d89a;border:1px solid #8e6b2c}
+.tg.op{background:#1b2a4a;color:#bcd2ff;border:1px solid #4a6ab0}
+.tg.sys{background:#2a2f36;color:#c7cfda;border:1px solid #4b5563}
+.tg.sim{background:#3d1f0b;color:#ffb07a;border:1px solid #a64b10}
+.typing::after{content:"▍";color:var(--gold);animation:bl 1s steps(2) infinite}
+@keyframes bl{50%{opacity:0}}
+.hy{display:grid;grid-template-columns:42px minmax(0,1fr) 54px;gap:6px 8px;align-items:center;font-size:.9rem;margin:4px 0}
+.hy .id{font-weight:900;color:var(--muted)}.hy .bar{height:12px;border-radius:6px;background:#1a2738;overflow:hidden;position:relative}
+.hy .bar i{position:absolute;left:0;top:0;bottom:0;background:#5b6d84;border-radius:6px;transition:width .8s ease}
+.hy .bar s{position:absolute;top:-2px;bottom:-2px;width:2px;background:#9fb1c8;opacity:.7;text-decoration:none}
+.hy.lead .bar i{background:linear-gradient(90deg,#9a7634,#f0d28f)}.hy.lead .id{color:var(--gold)}
+.hy .pc{text-align:right;font-weight:800;font-variant-numeric:tabular-nums}
+.hy .nm{grid-column:2/4;font-size:.86rem;color:#d6dbe8;margin-top:-4px}
+.side{display:flex;flex-direction:column;gap:8px;overflow:auto;min-height:0}
+.side .card{animation:none}
+.kv{display:grid;grid-template-columns:auto minmax(0,1fr);gap:3px 10px;font-size:.84rem}
+.kv span{color:var(--muted)}.kv b{font-weight:700;overflow-wrap:anywhere}
+.ctl{display:flex;gap:8px;flex:none}
+.ctl .btn{flex:1;min-height:52px;font-size:.92rem;padding:0 8px}
+.vrd{border:2px solid var(--border);border-radius:12px;padding:8px 12px;margin-top:6px}
+.vrd b{display:block;font-size:1.1rem;font-weight:900}
+.vrd.ok{border-color:var(--ok)}.vrd.ok b{color:var(--ok)}.vrd.warn{border-color:var(--warn)}.vrd.warn b{color:var(--warn)}.vrd.fail{border-color:var(--fail)}.vrd.fail b{color:#ff8a87}
+.truth{font-size:.7rem;font-weight:800;color:#ffb07a;display:block;margin-top:2px}
+/* LIVE DATA */
+.lv-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex:none}
+.lv-bar .st{flex:1;font-weight:800;color:#7fd0ff;min-width:180px}
+.lv-ban{flex:none}
+.lv{flex:1;display:grid;grid-template-columns:minmax(0,1fr) 260px;grid-template-rows:minmax(0,1fr);gap:10px;min-height:0}
+.lv-ch{position:relative;background:#050c14;border:1px solid #20344a;border-radius:12px;overflow:hidden;min-height:260px}
+.lv-ch canvas{position:absolute;left:0;top:0}
+.lv-side{display:flex;flex-direction:column;gap:8px;overflow:auto;min-height:0}
+.pv{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:6px 10px;border-left:5px solid var(--c)}
+.pv .l{font-size:.78rem;color:var(--muted);line-height:1.2}.pv .v{font-size:1.55rem;font-weight:700;font-family:"Roboto Mono",ui-monospace,Consolas,monospace;font-variant-numeric:tabular-nums;line-height:1.2}
+.pv .v small{font-size:.8rem;color:var(--muted);font-weight:400;margin-left:4px}.pv .s{font-size:.74rem;color:var(--muted)}
+.lv-idle{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+/* RAPORT */
+.rep{white-space:pre-wrap;font:.88rem/1.5 "Roboto Mono",ui-monospace,Consolas,monospace;color:#e2e8f0;background:#050c14;border:1px solid #20344a;border-radius:12px;padding:12px;margin:0;overflow:auto}
+.aud{list-style:none;margin:0;padding:0;font-size:.84rem;max-height:260px;overflow:auto}
+.aud li{display:grid;grid-template-columns:62px 92px minmax(0,1fr);gap:8px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.aud time{color:var(--muted);font-variant-numeric:tabular-nums}
+/* USTAWIENIA */
+.lockban{display:flex;gap:12px;align-items:center;border:2px solid var(--demo);border-radius:12px;padding:10px 14px;background:rgba(230,81,0,.1)}
+.lockban b{color:#ff9a5c;font-size:1.05rem}
+.sets{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;opacity:.55;pointer-events:none;user-select:none}
+.sets label{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:.9rem}
+.sets label span{color:var(--muted)}.sets select,.sets input[type=text]{font:inherit;font-size:.85rem;background:var(--raised);color:var(--text);border:1.5px solid var(--border);border-radius:8px;padding:5px 8px;max-width:55%}
+.tgl{width:44px;height:24px;border-radius:12px;background:#2c3b4f;position:relative;flex:none}.tgl::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#9fb1c8}
+.tgl.on{background:#3f8f55}.tgl.on::after{left:23px;background:#d7ffe4}
+/* okno dialogowe */
+.dlg{position:absolute;inset:0;z-index:20;background:rgba(2,6,10,.72);display:flex;align-items:center;justify-content:center;padding:14px}
+.dlg.hidden{display:none}
+.dlg-in{width:min(560px,100%);max-height:100%;overflow:auto;background:#0a1624;border:2px solid var(--gold);border-radius:16px;padding:14px 16px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.dlg-in h3{margin:0 0 8px;color:var(--gold);font-size:1.15rem;letter-spacing:.03em}
+.dlg-in.warn{border-color:var(--warn)}.dlg-in.warn h3{color:var(--warn)}
+.dlg-in p{margin:6px 0;color:#d6dbe8;font-size:.95rem}
+.pick{display:grid;gap:6px;margin:8px 0}
+.pick label{display:flex;gap:10px;align-items:flex-start;border:1.5px solid #2c3b4f;border-radius:10px;padding:7px 10px;cursor:pointer;font-size:.92rem}
+.pick label input{width:20px;height:20px;flex:none;margin-top:1px}
+.pick label small{display:block;color:var(--muted);font-size:.8rem}
+@media(max-width:960px){
+ .dg{grid-template-columns:1fr}.lv{flex:none;grid-template-columns:1fr;grid-template-rows:auto auto}.lv-ch{height:300px}.side{display:none}.lv-side{flex-direction:row;flex-wrap:wrap;overflow:visible}.lv-side .pv{flex:1 1 140px}
+ .st-grid{grid-template-columns:1fr}
+}
+@media(max-width:760px){
+ .app{height:auto;min-height:0}
+ .app.fs{height:100%}
+ .a-body{flex-direction:column}
+ .a-nav{flex:none;flex-direction:row;border-right:0;border-bottom:1px solid var(--border);padding:6px;gap:5px}
+ .a-nav button{flex:1;min-height:54px;font-size:.62rem;padding:2px;border-radius:11px}.a-nav button svg{width:20px;height:20px}
+ .a-main{min-height:620px}
+ .app.fs .a-main{min-height:0}
+ .a-logo img{height:32px}.a-logo b{font-size:.95rem}.a-logo span{font-size:.6rem}
+ .a-chips .ch{font-size:.62rem;padding:2px 6px}
+ .ctl{flex-wrap:wrap}.ctl .btn{flex:1 1 40%;min-height:46px;font-size:.82rem}
+ .scr{padding:8px}
+ .lv-ch{min-height:300px}
+ .aud li{grid-template-columns:52px minmax(0,1fr)}.aud li .tg{display:none}
+}
+</style>
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebPage", "name": "EKOTRONIK AI ASYSTENT – symulacja | EKOTRONIK SYSTEM", "description": "Interaktywna symulacja aplikacji EKOTRONIK AI ASYSTENT: diagnoza prowadzona krok po kroku, odczyt DTC, Live Data z wykresami, hipotezy, test rozstrzygający i raport.", "url": "https://ekotronik.github.io/ecu-immo-elv/lab/asystent-ai.html", "inLanguage": "pl-PL", "isPartOf": {"@type": "WebSite", "name": "EKOTRONIK", "url": "https://ekotronik.github.io/ecu-immo-elv/"}}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Strona główna", "item": "https://ekotronik.github.io/ecu-immo-elv/"}, {"@type": "ListItem", "position": 2, "name": "EKOTRONIK AI ASYSTENT – symulacja", "item": "https://ekotronik.github.io/ecu-immo-elv/lab/asystent-ai.html"}]}]}</script></head><body><h1 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap">EKOTRONIK AI ASYSTENT – symulacja</h1><div class="wrap">
+<div class="hdr" id="hdr"></div><div class="crumb" id="crumb"></div>
+
+<div class="app" id="app">
+ <div class="a-top">
+  <div class="a-logo"><img src="img/logo-emblem.png" alt=""><div><b>EKOTRONIK AI</b><span>ASYSTENT</span></div></div>
+  <div class="a-chips">
+   <span class="ch ok"><i></i>VCI</span><span class="ch ok"><i></i>LVS PRO</span><span class="ch ok" id="chAi"><i></i>MODEL AI · lokalny</span><span class="ch demo"><i></i>DEMO · symulator</span>
+   <button class="a-fs" id="bFs" type="button">PEŁNY EKRAN</button>
+  </div>
+ </div>
+ <div class="a-body">
+  <nav class="a-nav" aria-label="Menu aplikacji">
+   <button data-s="start" class="on" type="button"><svg viewBox="0 0 28 28" fill="none" stroke="#d6a852" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="14" cy="14" r="11"/><path d="M11 9l8 5-8 5z"/></svg>START</button>
+   <button data-s="diag" type="button"><span class="dot"></span><svg viewBox="0 0 28 28" fill="none" stroke="#d6a852" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h20M7 22V12M12 22V6M17 22v-8M22 22V9"/><circle cx="21" cy="5" r="2.5" stroke="#5adce8"/></svg>DIAGNOZA</button>
+   <button data-s="live" type="button"><span class="dot"></span><svg viewBox="0 0 28 28" fill="none" stroke="#d6a852" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="22" height="18" rx="3"/><path d="M6 17l4-5 4 3 4-7 4 5" stroke="#5adce8"/></svg>LIVE DATA</button>
+   <button data-s="rap" type="button"><svg viewBox="0 0 28 28" fill="none" stroke="#d6a852" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h10l5 5v17H7z"/><path d="M17 3v5h5M10 13h9M10 17h9M10 21h6"/></svg>RAPORT</button>
+   <button data-s="set" class="lock" type="button"><span class="lk">🔒</span><svg viewBox="0 0 28 28" fill="none" stroke="#d6a852" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="14" cy="14" r="4"/><path d="M14 3v3M14 22v3M3 14h3M22 14h3M6.2 6.2l2.1 2.1M19.7 19.7l2.1 2.1M6.2 21.8l2.1-2.1M19.7 8.3l2.1-2.1"/></svg>USTAWIENIA</button>
+  </nav>
+  <div class="a-main">
+
+   <!-- START -->
+   <section class="scr" data-scr="start">
+    <div><p class="h2t"><i>●</i>Nowa sesja diagnostyczna</p><p class="sub">Wybierz scenariusz pojazdu. Asystent poprowadzi diagnozę od identyfikacji do raportu.</p></div>
+    <div class="st-grid">
+     <div class="scg" id="scg"></div>
+     <div class="panel">
+      <div class="lbl">Tryb prowadzenia</div>
+      <div class="seg" style="margin:6px 0 10px"><button class="btn sel" data-m="auto" type="button">AUTO</button><button class="btn" data-m="step" type="button">KROK PO KROKU</button></div>
+      <p class="sub" id="mDesc" style="font-size:.84rem">Asystent sam przechodzi przez etapy i zatrzymuje się tylko tam, gdzie decyzja należy do Ciebie.</p>
+      <div class="lbl" style="margin-top:10px">Kontrola przed startem</div>
+      <ul class="chk" id="chk"></ul>
+      <div style="margin-top:12px"><button class="btn gold big" id="bStart" type="button">START DIAGNOZY</button></div>
+      <p class="sub" id="stNote" style="font-size:.8rem;margin-top:8px"></p>
+     </div>
+    </div>
+   </section>
+
+   <!-- DIAGNOZA -->
+   <section class="scr hidden" data-scr="diag">
+    <div class="stp" id="stp"></div>
+    <div class="dg">
+     <div class="feed" id="feed"></div>
+     <div class="side">
+      <div class="card"><h4>Sesja</h4><div class="kv" id="sKv"></div></div>
+      <div class="card"><h4>Hipotezy</h4><div id="sHy"><p class="sub">Pojawią się po analizie usterek.</p></div></div>
+     </div>
+    </div>
+    <div class="ctl">
+     <button class="btn gold" id="bNext" type="button" disabled>DALEJ ▶</button>
+     <button class="btn" id="bPause" type="button" disabled>PAUZA</button>
+     <button class="btn red" id="bStop" type="button" disabled>STOP</button>
+     <button class="btn" id="bNew" type="button">NOWA SESJA</button>
+    </div>
+   </section>
+
+   <!-- LIVE DATA -->
+   <section class="scr hidden" data-scr="live">
+    <div class="lv-bar"><span class="st" id="lvSt">Live Data</span><span class="ch gd" id="lvMode">—</span><span class="ch" id="lvCnt">0 próbek</span></div>
+    <div class="mz-ban none lv-ban" id="lvBan"><div><div class="bt" id="lvBt">LIVE DATA</div><div class="bd" id="lvBd">Pomiar uruchamia asystent w etapie 7 diagnozy. Możesz też włączyć sam podgląd parametrów.</div></div></div>
+    <div class="lv-idle" id="lvIdle"><button class="btn gold" id="bPrev" type="button">PODGLĄD LIVE DATA (scenariusz z ekranu START)</button></div>
+    <div class="lv" id="lvBox">
+     <div class="lv-ch" id="lvCh"><canvas id="cv" aria-label="Wykresy parametrów Live Data"></canvas></div>
+     <div class="lv-side" id="lvSide"></div>
+    </div>
+    <div class="ctl" id="lvCtl">
+     <button class="btn" id="bMark" type="button" disabled>ZNACZNIK</button>
+     <button class="btn" id="bLvPause" type="button" disabled>PAUZA</button>
+     <button class="btn gold" id="bFin" type="button" disabled>ZAKOŃCZ I POKAŻ WYNIKI</button>
+     <button class="btn red" id="bLvStop" type="button" disabled>STOP</button>
+    </div>
+   </section>
+
+   <!-- RAPORT -->
+   <section class="scr hidden" data-scr="rap">
+    <div><p class="h2t"><i>●</i>Raport sesji</p><p class="sub" id="rSub">Raport powstaje po zakończeniu diagnozy.</p></div>
+    <div class="row" id="rBtns"><button class="btn" id="bDl" type="button" disabled>POBIERZ RAPORT (.txt)</button><button class="btn" id="bCp" type="button" disabled>KOPIUJ</button><button class="btn red" id="bClr" type="button" disabled>KASUJ KODY USTEREK</button></div>
+    <pre class="rep" id="rep">—</pre>
+    <div class="card" style="animation:none"><h4>Dziennik audytu <span class="tg sys">SYSTEM</span></h4><p class="sub" style="margin-bottom:6px">Każda decyzja asystenta i operatora z czasem i źródłem.</p><ul class="aud" id="aud"></ul></div>
+   </section>
+
+   <!-- USTAWIENIA -->
+   <section class="scr hidden" data-scr="set">
+    <div class="lockban"><span style="font-size:1.8rem">🔒</span><div><b>Ustawienia zablokowane w wersji demonstracyjnej</b><p class="sub">Możesz je obejrzeć, ale nie zmienisz ich na stronie. W aplikacji na tablecie zmienia je tylko właściciel.</p></div></div>
+    <div class="sets" aria-disabled="true">
+     <div class="panel"><div class="pt" style="font-size:1rem"><i>01 /</i>Interfejs i dane</div>
+      <label>Program diagnostyczny <select disabled><option>LVS PRO</option></select></label>
+      <label>Odczyt ekranów (usługa dostępności) <span class="tgl on"></span></label>
+      <label>Odświeżanie Live Data <select disabled><option>ok. 4 próbki/s</option></select></label>
+      <label>Katalog raportów <input type="text" value="/EKOTRONIK/raporty" disabled></label>
+     </div>
+     <div class="panel"><div class="pt" style="font-size:1rem"><i>02 /</i>Model AI</div>
+      <label>Model lokalny (na tablecie) <span class="tgl on"></span></label>
+      <label>Model w chmurze <span class="tgl"></span></label>
+      <label>Język odpowiedzi <select disabled><option>polski</option></select></label>
+      <label>Oznaczanie źródła każdej informacji <span class="tgl on"></span></label>
+     </div>
+     <div class="panel"><div class="pt" style="font-size:1rem"><i>03 /</i>Bezpieczeństwo</div>
+      <label>Odczyty <span>autonomiczne</span></label>
+      <label>Kasowanie kodów, resety <span>tylko po zatwierdzeniu</span></label>
+      <label>Testy aktywne <span>tylko po zatwierdzeniu</span></label>
+      <label>Kodowanie, adaptacje, programowanie <span>tylko po zatwierdzeniu</span></label>
+      <label>IMMO <span>tylko po zatwierdzeniu</span></label>
+     </div>
+    </div>
+   </section>
+
+  </div>
+ </div>
+ <div class="a-status"><b id="stT">00:00</b><span id="stL">Gotowy. Wybierz scenariusz i naciśnij START DIAGNOZY.</span></div>
+ <div class="dlg hidden" id="dlg"><div class="dlg-in" id="dlgIn"></div></div>
+</div>
+
+<div class="about">
+<section class="panel about"><h2>Cel projektu</h2><p>EKOTRONIK AI ASYSTENT to aplikacja na tablet z Androidem, która współpracuje z programem diagnostycznym LVS PRO. Czyta z niego dane pojazdu, kody usterek i parametry Live Data, porządkuje je w dowody i prowadzi mechanika krok po kroku do przyczyny usterki: od identyfikacji auta, przez hipotezy, po test, który je rozstrzyga. Odczyty wykonuje sam. Kasowanie kodów, testy aktywne, kodowanie, adaptacje i IMMO wykonuje wyłącznie po zatwierdzeniu przez człowieka.</p></section>
+<section class="panel about"><h2>Co tu widzisz</h2><ul>
+<li><b>START</b>: wybór jednego z sześciu scenariuszy i trybu prowadzenia (AUTO albo KROK PO KROKU).</li>
+<li><b>DIAGNOZA</b>: dziesięć etapów sesji. Każda informacja ma oznaczone źródło: odczyt z LVS, reguły, model AI albo operator.</li>
+<li><b>LIVE DATA</b>: pomiar z wykresami i znacznikami, z poleceniami dla mechanika (np. „gaz do oporu”). Parametry dobiera asystent (AUTO) albo Ty (MANUAL).</li>
+<li><b>RAPORT</b>: wynik, wagi hipotez, test rozstrzygający i dziennik audytu. Raport można pobrać jako plik tekstowy.</li>
+<li><b>USTAWIENIA</b>: widoczne, ale zablokowane w tej wersji.</li></ul>
+<p>Testy rozstrzygające oznaczają wynik, który zachodzi w danym scenariuszu. Możesz wybrać inny i zobaczyć, jak asystent zmienia wniosek.</p>
+<p class="note">To SYMULACJA. Pojazdy, kody i przebiegi parametrów pochodzą ze skryptów scenariuszy, a nie z auta. Wartości i progi są demonstracyjne, a nie danymi producenta. Tablet, LVS PRO i interfejs diagnostyczny nie są tu używane. Asystent nigdy nie zaleca wymiany części bez potwierdzenia usterki.</p></section>
+</div></div>
+<script src="lab.js"></script>
+<script>
+(function(){
+LAB.header({cat:'PROJEKTY',icon:'ai',sym:'AI ASYSTENT',symd:'diagnoza prowadzona · Live Data',title:'EKOTRONIK AI ASYSTENT'});
+const $=id=>document.getElementById(id);
+const f1=LAB.f1;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ramp=(t,a,b,v0,v1)=>{if(t<=a)return v0;if(t>=b)return v1;const u=(t-a)/(b-a);return v0+(v1-v0)*u*u*(3-2*u)};
+const lag=(c,g,tau,dt)=>c+(g-c)*(1-Math.exp(-dt/tau));
+const mean=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:NaN;
+function pearson(a,b){const n=Math.min(a.length,b.length);if(n<3)return NaN;const ma=mean(a),mb=mean(b);let sab=0,sa=0,sb=0;for(let i=0;i<n;i++){const x=a[i]-ma,y=b[i]-mb;sab+=x*y;sa+=x*x;sb+=y*y}return sa&&sb?sab/Math.sqrt(sa*sb):NaN}
+const rmse=(a,b)=>Math.sqrt(mean(a.map((x,i)=>(x-b[i])**2)));
+const COL=['#5adce8','#f0c46a','#6be36b','#ff8a65'];
+const STAGES=['Połączenie','Identyfikacja','Odczyt DTC','Analiza usterek','Plan diagnostyki','Wybór ścieżki','Live Data','Korelacje i hipotezy','Test rozstrzygający','Wynik i raport'];
+const TAG={lvs:'ODCZYT LVS · symulator',rule:'REGUŁY',ai:'MODEL AI · skrypt demo',op:'OPERATOR',sys:'SYSTEM',sim:'SYMULACJA'};
+
+/* ===================== SCENARIUSZE ===================== */
+const SC=[
+{id:'turbo',n:'Niedoładowanie turbosprężarki',car:'Volkswagen Golf VII 2.0 TDI',tagline:'P0299 · jazda próbna pod obciążeniem',
+ ident:{vin:'WVWZZZAUZ•••••••••',car:'Volkswagen Golf VII',eng:'2.0 TDI, diesel',ecu:'Sterownik silnika (diesel)',proto:'CAN 500 kb/s · UDS'},
+ dtc:[{c:'P0299',d:'Ciśnienie doładowania – za niskie',s:'aktywny, zapamiętany 7×'},{c:'P2563',d:'Czujnik położenia sterowania turbosprężarki – zakres/działanie',s:'sporadyczny, zapamiętany 2×'}],
+ gate:'Odczyt kompletny: 2 kody, każdy z opisem i statusem. Sterownik odpowiedział, licznik kodów zgodny z listą.',
+ analysis:'Oba kody dotyczą układu doładowania. P0299 mówi tylko, że ciśnienie rzeczywiste nie nadąża za zadanym, a nie dlaczego. P2563 wskazuje na sterowanie kierownicą turbiny (VNT), ale jest sporadyczny, więc sam nie przesądza przyczyny. Możliwe kierunki: nieszczelność dolotu, sterowanie podciśnieniowe (zawór N75), mechanizm kierownicy turbiny albo wadliwy pomiar ciśnienia. Do rozróżnienia potrzebny jest pomiar pod pełnym obciążeniem.',
+ hyps:[{id:'H1',n:'Nieszczelność układu dolotowego (intercooler, przewody)',w:.30},{id:'H2',n:'Sterowanie podciśnieniowe: zawór N75 lub jego przewody',w:.25},{id:'H3',n:'Zablokowana / zapieczona kierownica turbiny (VNT)',w:.30},{id:'H4',n:'Czujnik ciśnienia doładowania podaje zaniżony odczyt',w:.15}],
+ plan:['Live Data podczas jazdy próbnej: ciśnienie zadane i rzeczywiste, wysterowanie N75, obroty.','Porównać obie wartości przy małym i pełnym obciążeniu.','Na podstawie wyniku zaproponować jeden test, który rozdzieli najsilniejsze hipotezy.'],
+ path:'LIVE',
+ pids:[{id:'rpm',n:'Obroty silnika',u:'obr/min',min:0,max:4500,d:0},{id:'bset',n:'Doładowanie zadane',u:'mbar',min:900,max:2600,d:0},{id:'bact',n:'Doładowanie rzeczywiste',u:'mbar',min:900,max:2600,d:0},{id:'n75',n:'Wysterowanie N75',u:'%',min:0,max:100,d:0},{id:'vnt',n:'Położenie kierownicy VNT',u:'%',min:0,max:100,d:0},{id:'maf',n:'Masa powietrza',u:'mg/skok',min:150,max:1000,d:0}],
+ auto:['rpm','bset','bact','n75'],
+ why:{rpm:'tło: pokazuje fazy obciążenia',bset:'wartość, którą sterownik chce osiągnąć',bact:'wartość zmierzona – sedno P0299',n75:'czy sterownik w ogóle wysterowuje doładowanie',vnt:'pominięty: P2563 sporadyczny, sprawdzi go test rozstrzygający',maf:'pominięty: wynika z ciśnienia, nie rozróżnia hipotez'},
+ dur:30,ts:1,period:24,
+ steps:[[0,'Jazda próbna, 3. bieg, lekkie obciążenie (ok. 1400 obr/min)'],[4,'GAZ DO OPORU na 3. biegu – pełne obciążenie'],[14,'Puść gaz'],[18,'Jedź spokojnie, lekkie obciążenie']],
+ init:s=>Object.assign(s,{rpm:1400,bset:1050,bact:1040,n75:48,vnt:30,maf:260}),
+ step:(s,t,dt,R)=>{const p=t%24;let rt,ld=false;
+  if(p<4)rt=1400;else if(p<14){rt=ramp(p,4,14,1400,3900);ld=true}else if(p<18)rt=ramp(p,14,18,3900,1600);else rt=1600;
+  s.rpm=lag(s.rpm,rt,.35,dt)+LAB.gauss(R)*8;
+  const set=ld?1000+Math.min(1450,Math.max(0,(s.rpm-1300)*.95)):p>=14&&p<18?1000:1050;
+  s.bset=lag(s.bset,set,.25,dt);
+  const reach=Math.min(set,1520+60*Math.sin(t*1.7));
+  s.bact=lag(s.bact,reach,.7,dt)+LAB.gauss(R)*12;
+  s.n75=lag(s.n75,ld?(s.bset-s.bact>150?95:70):(p>=14&&p<18?20:48),.3,dt)+LAB.gauss(R)*.8;
+  s.vnt=lag(s.vnt,ld?40:30,.8,dt)+LAB.gauss(R)*.6;
+  s.maf=lag(s.maf,ld?260+(s.bact-1000)*.6:250,.5,dt)+LAB.gauss(R)*4;s.ld=ld},
+ eval:(sm,sel)=>{const L=[],ev=[],has=k=>sel.includes(k);
+  if(has('bset')&&has('bact')){
+   const ld=sm.filter(x=>x.v.bset>1350),lo=sm.filter(x=>x.v.bset<1150&&x.v.bset>1000);
+   if(ld.length>=3){const d=ld.map(x=>x.v.bset-x.v.bact),dm=mean(d),dx=Math.max(...d);L.push(`Pod pełnym obciążeniem ciśnienie rzeczywiste jest niższe od zadanego średnio o ${Math.round(dm)} mbar (maks. ${Math.round(dx)} mbar) i zatrzymuje się w okolicy ${Math.round(mean(ld.map(x=>x.v.bact)))} mbar.`);if(dm>200)ev.push('deficit')}
+   else L.push('W pomiarze nie było fazy pełnego obciążenia, więc braku doładowania nie da się tu ocenić.');
+   if(lo.length>=3){const d2=mean(lo.map(x=>Math.abs(x.v.bset-x.v.bact)));L.push(`Przy lekkim obciążeniu różnica wynosi tylko ${Math.round(d2)} mbar: czujnik daje wiarygodny odczyt.`);if(d2<80)ev.push('sensor_ok')}
+   const r=pearson(sm.map(x=>x.v.bset),sm.map(x=>x.v.bact));if(!isNaN(r))L.push(`Korelacja zadane–rzeczywiste: r = ${f1(r,2)}, RMSE = ${Math.round(rmse(sm.map(x=>x.v.bset),sm.map(x=>x.v.bact)))} mbar. Korelacja nie dowodzi przyczyny.`);
+  } else L.push('Brak pary ciśnienie zadane / rzeczywiste: główny dowód dla P0299 niedostępny.');
+  if(has('n75')){const ld=sm.filter(x=>x.ld);if(ld.length>=3){const n=mean(ld.map(x=>x.v.n75));L.push(`Wysterowanie N75 pod obciążeniem: średnio ${Math.round(n)} % – sterownik próbuje dociągnąć ciśnienie.`);if(n>85)ev.push('n75_high')}}
+  if(has('vnt')){const ld=sm.filter(x=>x.ld);if(ld.length>=3){L.push(`Położenie kierownicy VNT pod obciążeniem: ok. ${Math.round(mean(ld.map(x=>x.v.vnt)))} %, mimo pełnego wysterowania – mechanizm słabo reaguje.`);ev.push('vnt_stuck')}}
+  return{L,ev}},
+ ev:{deficit:{H1:1.2,H2:1.1,H3:1.5,H4:.8},sensor_ok:{H4:.3},n75_high:{H2:.7,H3:1.25},vnt_stuck:{H3:1.6,H1:.8}},
+ consult:'Bez pomiaru pod obciążeniem nie rozróżnię nieszczelności od problemu z kierownicą turbiny. Pytania do mechanika: czy słychać syczenie przy przyspieszaniu? Czy przewody intercoolera są zaolejone lub pęknięte? Czy auto traci moc dopiero powyżej ok. 2500 obr/min?',
+ test:{n:'Test aktywny: wysterowanie zaworu N75 i obserwacja drążka siłownika turbiny',d:'Asystent wysteruje N75 w kilku krokach. Mechanik obserwuje drążek siłownika kierownicy turbiny i sprawdza podciśnienie na wężu.',appr:{op:'Test aktywny – wysterowanie zaworu N75',d:'Silnik wyłączony, zapłon włączony. Zawór będzie przełączany przez ok. 20 s. Nie wykonuj przy pracującym silniku.'},
+  opts:[{t:'Drążek nie rusza się albo rusza z dużym oporem',m:{H3:4,H2:.6,H1:.5},v:'warn',res:'Najbardziej prawdopodobna przyczyna: zablokowana kierownica turbiny (VNT). Podciśnienie dochodzi, a mechanizm nie reaguje. Potwierdzić oględzinami siłownika i kierownicy.'},
+        {t:'Drążek pracuje swobodnie w pełnym zakresie',m:{H3:.25,H1:2.2,H2:.8},v:'warn',res:'Sterowanie turbiną działa. Najsilniejsza pozostaje nieszczelność układu dolotowego. Następny krok: test dymny lub ciśnieniowy dolotu.'},
+        {t:'Brak podciśnienia na wężu siłownika',m:{H2:4,H3:.5},v:'warn',res:'Brak podciśnienia na siłowniku: przyczyna w sterowaniu podciśnieniowym (zawór N75, przewody, pompa podciśnienia). Sprawdzić szczelność przewodów i działanie zaworu.'}],truth:0}},
+
+{id:'lean',n:'Mieszanka zbyt uboga',car:'Škoda Octavia III 1.4 TSI',tagline:'P0171 · bieg jałowy i 2500 obr/min',
+ ident:{vin:'TMBZZZAAZ•••••••••',car:'Škoda Octavia III',eng:'1.4 TSI, benzyna',ecu:'Sterownik silnika (benzyna)',proto:'CAN 500 kb/s · UDS'},
+ dtc:[{c:'P0171',d:'Układ zbyt ubogi (bank 1)',s:'zapamiętany, 4×'}],
+ gate:'Odczyt kompletny: 1 kod z opisem i statusem. Sterownik odpowiedział.',
+ analysis:'P0171 oznacza, że sterownik musi stale wzbogacać mieszankę. To objaw, a nie przyczyna. Za mało paliwa albo za dużo niemierzonego powietrza dają ten sam kod. Kluczowe jest, jak korekty paliwa zachowują się przy różnym przepływie powietrza: nieszczelność daje dużą korektę na biegu jałowym, która maleje przy wyższych obrotach, a problem z paliwem zwykle rośnie z obciążeniem.',
+ hyps:[{id:'H1',n:'Nieszczelność podciśnienia za przepustnicą (odma, przewody, uszczelki)',w:.35},{id:'H2',n:'Przepływomierz / czujnik ciśnienia w kolektorze zaniża pomiar',w:.25},{id:'H3',n:'Za niskie ciśnienie paliwa',w:.25},{id:'H4',n:'Nieszczelność wydechu przed sondą lambda',w:.15}],
+ plan:['Live Data: korekty krótko- i długoterminowe, masa powietrza, obroty.','Porównać sumę korekt na biegu jałowym i przy 2500 obr/min.','Zależnie od wyniku: test dymny dolotu albo pomiar ciśnienia paliwa.'],
+ path:'LIVE',
+ pids:[{id:'rpm',n:'Obroty silnika',u:'obr/min',min:0,max:3500,d:0},{id:'stft',n:'Korekta krótkoterminowa',u:'%',min:-25,max:25,d:1},{id:'ltft',n:'Korekta długoterminowa',u:'%',min:-25,max:25,d:1},{id:'maf',n:'Masa powietrza',u:'g/s',min:0,max:16,d:1},{id:'lam',n:'Lambda',u:'λ',min:.85,max:1.15,d:3},{id:'fp',n:'Ciśnienie paliwa (niskie)',u:'bar',min:3,max:7,d:2}],
+ auto:['rpm','stft','ltft','maf'],
+ why:{rpm:'rozdziela bieg jałowy od 2500 obr/min',stft:'bieżąca korekta',ltft:'wyuczona korekta – suma z krótkoterminową mówi o skali niedoboru',maf:'czy pomiar powietrza jest wiarygodny',lam:'pominięty: sonda reguluje, korekty już to pokazują',fp:'pominięty: sprawdzany, jeśli korelacja nie wskaże nieszczelności'},
+ dur:30,ts:1,period:26,
+ steps:[[0,'Bieg jałowy, silnik rozgrzany'],[6,'Podnieś obroty do 2500 obr/min i utrzymaj'],[18,'Puść gaz, bieg jałowy']],
+ init:s=>Object.assign(s,{rpm:760,stft:3,ltft:16,maf:2.6,lam:1,fp:5}),
+ step:(s,t,dt,R)=>{const p=t%26;const rt=p<6?760:p<18?ramp(p,6,8,760,2500):ramp(p,18,20,2500,760);
+  s.rpm=lag(s.rpm,rt,.3,dt)+LAB.gauss(R)*6;const k=Math.min(1,Math.max(0,(s.rpm-760)/1740));
+  const tot=22-16*k;s.ltft=lag(s.ltft,16-12*k,1.6,dt);s.stft=tot-s.ltft+3*Math.sin(t*5.2)+LAB.gauss(R)*.6;
+  s.maf=lag(s.maf,2.6+8.6*k,.35,dt)+LAB.gauss(R)*.05;s.lam=1+.025*Math.sin(t*5.2+1)+LAB.gauss(R)*.003;s.fp=5+LAB.gauss(R)*.03;s.ld=k>.8},
+ eval:(sm,sel)=>{const L=[],ev=[],has=k=>sel.includes(k);
+  if(has('stft')&&has('ltft')&&has('rpm')){const tr=x=>x.v.stft+x.v.ltft;const lo=sm.filter(x=>x.v.rpm<1000),hi=sm.filter(x=>x.v.rpm>2200);
+   if(lo.length>=3)L.push(`Suma korekt na biegu jałowym: ${f1(mean(lo.map(tr)))} % (sterownik dodaje paliwa).`);
+   if(lo.length>=3&&hi.length>=3){const a=mean(lo.map(tr)),b=mean(hi.map(tr));L.push(`Przy 2500 obr/min suma korekt spada do ${f1(b)} %. Niedobór maleje, gdy rośnie przepływ powietrza.`);if(a>10&&a-b>6)ev.push('drop')}
+   else L.push('Brak fazy 2500 obr/min w pomiarze: nie da się porównać korekt przy różnym przepływie.');
+   if(lo.length>=3&&mean(lo.map(tr))>10)ev.push('lean')}
+  else L.push('Brak korekt paliwa lub obrotów: główny dowód niedostępny.');
+  if(has('maf')){const lo=sm.filter(x=>x.v.rpm<1000);if(lo.length>=3){const m=mean(lo.map(x=>x.v.maf));L.push(`Masa powietrza na biegu jałowym: ${f1(m)} g/s – wartość wiarygodna dla tego silnika (demonstracyjnie).`);ev.push('maf_ok')}}
+  if(has('stft')&&has('maf')){const r=pearson(sm.map(x=>x.v.maf),sm.map(x=>x.v.stft+(x.v.ltft||0)));if(!isNaN(r))L.push(`Korelacja masa powietrza – suma korekt: r = ${f1(r,2)} (ujemna: im więcej powietrza, tym mniejszy niedobór). Korelacja nie dowodzi przyczyny.`)}
+  if(has('fp')){L.push(`Ciśnienie paliwa stabilne, ok. ${f1(mean(sm.map(x=>x.v.fp)),2)} bar.`);ev.push('fp_ok')}
+  return{L,ev}},
+ ev:{lean:{H1:1.1,H2:1.1,H3:1.1},drop:{H1:1.9,H3:.5,H2:.8,H4:.9},maf_ok:{H2:.45},fp_ok:{H3:.3}},
+ consult:'Bez porównania korekt przy różnym przepływie powietrza nie rozróżnię nieszczelności od problemu z paliwem. Pytania: czy słychać syczenie przy pracującym silniku? Czy silnik nierówno pracuje na zimno? Czy ostatnio coś było demontowane w okolicy kolektora?',
+ test:{n:'Test dymny układu dolotowego',d:'Mechanik podaje dym do dolotu za przepustnicą przy wyłączonym silniku i szuka miejsca wycieku (odma, przewody podciśnienia, uszczelki kolektora).',appr:null,
+  opts:[{t:'Dym wydobywa się przy zaworze odmy (PCV)',m:{H1:5},v:'warn',res:'Przyczyna: nieszczelność za przepustnicą w obrębie zaworu odmy. Niemierzone powietrze zubaża mieszankę na biegu jałowym. Po usunięciu nieszczelności skasować kody i sprawdzić korekty ponownie.'},
+        {t:'Brak wycieku dymu',m:{H1:.15,H3:2,H2:1.5},v:'warn',res:'Nieszczelność dolotu wykluczona testem. Następny krok: pomiar ciśnienia paliwa pod obciążeniem, potem kontrola przepływomierza.'}],truth:0}},
+
+{id:'term',n:'Silnik nie osiąga temperatury',car:'Ford Focus III 1.6 Ti-VCT',tagline:'P0128 · jazda próbna, czas ×20',
+ ident:{vin:'WF0DXXGCB•••••••••',car:'Ford Focus III',eng:'1.6 Ti-VCT, benzyna',ecu:'Sterownik silnika (PCM)',proto:'CAN 500 kb/s · UDS'},
+ dtc:[{c:'P0128',d:'Temperatura płynu chłodzącego poniżej progu termostatu',s:'zapamiętany, 3×'}],
+ gate:'Odczyt kompletny: 1 kod z opisem i statusem. Sterownik odpowiedział.',
+ analysis:'P0128 sterownik zapisuje, gdy silnik zbyt długo nie osiąga temperatury roboczej. Najczęściej to termostat otwarty na stałe, ale ten sam kod da czujnik temperatury, który zaniża odczyt, albo wentylator pracujący bez przerwy. Trzeba zobaczyć przebieg nagrzewania i porównać odczyt czujnika z temperaturą zmierzoną niezależnie.',
+ hyps:[{id:'H1',n:'Termostat otwarty / nie domyka się',w:.5},{id:'H2',n:'Czujnik temperatury cieczy zaniża odczyt',w:.3},{id:'H3',n:'Wentylator chłodnicy pracuje stale',w:.2}],
+ plan:['Live Data podczas nagrzewania: temperatura cieczy, temperatura powietrza, obroty, wentylator.','Sprawdzić, przy jakiej temperaturze przebieg się zatrzymuje.','Test rozstrzygający: niezależny pomiar temperatury przewodu chłodnicy.'],
+ path:'LIVE',
+ pids:[{id:'ect',n:'Temperatura cieczy',u:'°C',min:0,max:110,d:0},{id:'iat',n:'Temperatura powietrza',u:'°C',min:-10,max:50,d:0},{id:'rpm',n:'Obroty silnika',u:'obr/min',min:0,max:4000,d:0},{id:'fan',n:'Wentylator chłodnicy',u:'0/1',min:0,max:1,d:0},{id:'vss',n:'Prędkość pojazdu',u:'km/h',min:0,max:120,d:0},{id:'load',n:'Obciążenie',u:'%',min:0,max:100,d:0}],
+ auto:['ect','iat','fan','vss'],
+ why:{ect:'sedno P0128: przebieg nagrzewania',iat:'warunki otoczenia (zimno wydłuża nagrzewanie)',fan:'wyklucza lub potwierdza stały nawiew',vss:'jazda chłodzi silnik przy otwartym termostacie',rpm:'pominięty: nie rozróżnia hipotez',load:'pominięty: nie rozróżnia hipotez'},
+ dur:30,ts:20,period:1e9,xlab:'czas silnika',
+ steps:[[0,'Zimny start, krótki bieg jałowy'],[60,'Jazda próbna ok. 70 km/h (czas przyspieszony ×20)']],
+ init:s=>Object.assign(s,{ect:12,iat:6,rpm:900,fan:0,vss:0,load:20}),
+ step:(s,t,dt,R)=>{const drv=t>60;s.vss=lag(s.vss,drv?70:0,8,dt)+LAB.gauss(R)*.4;s.rpm=lag(s.rpm,drv?2100:900,6,dt)+LAB.gauss(R)*10;s.load=lag(s.load,drv?38:20,6,dt);
+  const tgt=drv?72:60;s.ect=lag(s.ect,tgt,150,dt)+LAB.gauss(R)*.05;s.iat=lag(s.iat,drv?6:11,60,dt);s.fan=0;s.ld=drv},
+ eval:(sm,sel)=>{const L=[],ev=[],has=k=>sel.includes(k);
+  if(has('ect')){const mx=Math.max(...sm.map(x=>x.v.ect)),tl=sm[sm.length-1].t*20/60;L.push(`Temperatura cieczy po ${f1(tl,0)} min pracy: maks. ${Math.round(mx)} °C.`);
+   const tail=sm.filter(x=>x.t*20>300);if(tail.length>=4){const sl=(tail[tail.length-1].v.ect-tail[0].v.ect)/((tail[tail.length-1].t-tail[0].t)*20/60);if(mx<80&&sl<1){L.push(`Ostatnie minuty: przyrost tylko ${f1(sl,1)} °C/min – temperatura zatrzymuje się poniżej roboczej.`);ev.push('plateau')}else L.push(`Ostatnie minuty: przyrost ${f1(sl,1)} °C/min – temperatura jeszcze rośnie, pomiar za krótki, by ocenić, gdzie się zatrzyma.`)}
+   else L.push('Pomiar za krótki, by ocenić, gdzie temperatura się zatrzymuje.')}
+  else L.push('Brak temperatury cieczy: główny dowód niedostępny.');
+  if(has('fan')){if(Math.max(...sm.map(x=>x.v.fan))===0){L.push('Wentylator przez cały pomiar wyłączony.');ev.push('fan_off')}}
+  if(has('vss')&&has('ect'))L.push('Po rozpoczęciu jazdy nagrzewanie wyraźnie zwalnia, choć wentylator nie pracuje: ciepło uchodzi przez chłodnicę już przy zimnym silniku.');
+  return{L,ev}},
+ ev:{plateau:{H1:1.4,H2:1.2,H3:1},fan_off:{H3:.1}},
+ consult:'Bez przebiegu nagrzewania nie ocenię, gdzie temperatura się zatrzymuje. Pytania: czy ogrzewanie w kabinie słabo grzeje? Czy górny przewód chłodnicy robi się ciepły od razu po zimnym starcie?',
+ test:{n:'Niezależny pomiar temperatury przewodu górnego chłodnicy (termometr IR)',d:'Przy rozgrzanym silniku mechanik mierzy temperaturę przewodu przy obudowie termostatu i porównuje ją z odczytem czujnika w asystencie.',appr:null,
+  opts:[{t:'Przewód ok. 72 °C – zgodnie z odczytem czujnika',m:{H1:3.5,H2:.3},v:'warn',res:'Czujnik mówi prawdę, silnik rzeczywiście jest za zimny. Najbardziej prawdopodobna przyczyna: termostat nie domyka się. Potwierdzić po demontażu (stan zaworu w zimnej wodzie).'},
+        {t:'Przewód wyraźnie cieplejszy (ok. 90 °C) niż odczyt',m:{H2:5,H1:.3},v:'warn',res:'Odczyt czujnika jest zaniżony względem rzeczywistej temperatury. Przyczyna: czujnik temperatury cieczy lub jego obwód (rezystancja wtyku, masa).'}],truth:0}},
+
+{id:'mis',n:'Wypadanie zapłonów cylindra 3',car:'Opel Astra J 1.6',tagline:'P0303 · bieg jałowy i obciążenie',
+ ident:{vin:'W0LPD6EA•••••••••',car:'Opel Astra J',eng:'1.6, benzyna',ecu:'Sterownik silnika (benzyna)',proto:'CAN 500 kb/s · UDS'},
+ dtc:[{c:'P0303',d:'Wykryto wypadanie zapłonów – cylinder 3',s:'aktywny, zapamiętany 12×'},{c:'P0300',d:'Wypadanie zapłonów – losowe / wiele cylindrów',s:'sporadyczny, zapamiętany 1×'}],
+ gate:'Odczyt kompletny: 2 kody z opisem i statusem. Sterownik odpowiedział.',
+ analysis:'P0303 przypisuje wypadanie zapłonów jednemu cylindrowi, więc przyczyna jest najpewniej lokalna: zapłon (cewka, świeca), wtrysk albo mechanika tego cylindra. P0300 przy jednym zapisie wynika zwykle z tego samego zjawiska. Rozróżnienie zapłonu od paliwa i mechaniki daje zachowanie przy obciążeniu oraz test zamiany elementów między cylindrami.',
+ hyps:[{id:'H1',n:'Cewka zapłonowa cylindra 3',w:.35},{id:'H2',n:'Świeca zapłonowa cylindra 3',w:.30},{id:'H3',n:'Wtryskiwacz cylindra 3',w:.20},{id:'H4',n:'Mechanika cylindra 3 (kompresja, zawory)',w:.15}],
+ plan:['Live Data: liczniki wypadania cylindrów 3 i 2 (porównanie), obroty, obciążenie.','Sprawdzić, czy wypadanie rośnie z obciążeniem (typowe dla zapłonu).','Test rozstrzygający: zamiana cewek między cylindrami i ponowny odczyt.'],
+ path:'LIVE',
+ pids:[{id:'rpm',n:'Obroty silnika',u:'obr/min',min:0,max:3500,d:0},{id:'m3',n:'Wypadania – cylinder 3',u:'/1000 obr',min:0,max:40,d:0},{id:'m2',n:'Wypadania – cylinder 2',u:'/1000 obr',min:0,max:40,d:0},{id:'load',n:'Obciążenie',u:'%',min:0,max:100,d:0},{id:'m1',n:'Wypadania – cylinder 1',u:'/1000 obr',min:0,max:40,d:0},{id:'stft',n:'Korekta krótkoterminowa',u:'%',min:-25,max:25,d:1}],
+ auto:['rpm','m3','m2','load'],
+ why:{rpm:'rozdziela fazy pomiaru',m3:'cylinder z kodu P0303',m2:'cylinder porównawczy (do testu zamiany)',load:'czy wypadanie rośnie z obciążeniem',m1:'pominięty: wystarczy jeden cylinder porównawczy',stft:'pominięty: nie rozróżnia hipotez lokalnych'},
+ dur:30,ts:1,period:22,
+ steps:[[0,'Bieg jałowy'],[6,'Obciąż silnik: ok. 2500 obr/min pod obciążeniem (jazda / hamownia)'],[16,'Bieg jałowy']],
+ init:s=>Object.assign(s,{rpm:780,load:22,m1:0,m2:0,m3:6,stft:2}),
+ step:(s,t,dt,R)=>{const p=t%22,ld=p>=6&&p<16;s.rpm=lag(s.rpm,ld?2450:780,.4,dt)+LAB.gauss(R)*8;s.load=lag(s.load,ld?66:22,.4,dt)+LAB.gauss(R)*.5;
+  const sw=s.swap;s.m3=Math.max(0,lag(s.m3,sw?.6:(ld?28:6),.8,dt)+LAB.gauss(R)*1.2);s.m2=Math.max(0,lag(s.m2,sw?(ld?28:6):.6,.8,dt)+LAB.gauss(R)*.5);s.m1=Math.max(0,lag(s.m1,.5,.8,dt)+LAB.gauss(R)*.4);s.stft=lag(s.stft,ld?4:2,.6,dt)+LAB.gauss(R)*.4;s.ld=ld},
+ eval:(sm,sel)=>{const L=[],ev=[],has=k=>sel.includes(k);
+  if(has('m3')){const lo=sm.filter(x=>!x.ld),hi=sm.filter(x=>x.ld);const a=mean(lo.map(x=>x.v.m3)),b=mean(hi.map(x=>x.v.m3));
+   if(lo.length>=3)L.push(`Cylinder 3 na biegu jałowym: średnio ${Math.round(a)} wypadań / 1000 obr.`);
+   if(hi.length>=3){L.push(`Pod obciążeniem: ${Math.round(b)} / 1000 obr – wypadanie rośnie z obciążeniem.`);if(b>a*2)ev.push('load_up')}else L.push('Brak fazy obciążenia w pomiarze.');
+   if(has('m2')){const c=mean(sm.map(x=>x.v.m2));L.push(`Cylinder 2 (porównawczy): średnio ${f1(c)} / 1000 obr – praktycznie bez wypadań.`);if(c<3)ev.push('single')}}
+  else L.push('Brak licznika wypadań cylindra 3: główny dowód niedostępny.');
+  if(has('load')&&has('m3')){const r=pearson(sm.map(x=>x.v.load),sm.map(x=>x.v.m3));if(!isNaN(r))L.push(`Korelacja obciążenie – wypadania cyl. 3: r = ${f1(r,2)}. Korelacja nie dowodzi przyczyny.`)}
+  return{L,ev}},
+ ev:{load_up:{H1:1.3,H2:1.25,H3:.8,H4:.7},single:{H1:1.05,H2:1.05}},
+ consult:'Bez liczników wypadania przy różnym obciążeniu nie oddzielę zapłonu od wtrysku i mechaniki. Pytania: czy silnik szarpie głównie przy przyspieszaniu? Kiedy wymieniano świece? Czy na cewce lub fajce są ślady przebicia?',
+ test:{n:'Zamiana cewek cylindrów 3 i 2, ponowny odczyt liczników wypadania',d:'Mechanik zamienia cewki (lub moduł) między cylindrami 3 i 2, kasuje adaptację liczników i powtarza krótki pomiar pod obciążeniem.',appr:null,
+  opts:[{t:'Wypadania przeszły na cylinder 2',m:{H1:6,H2:.3,H3:.3,H4:.2},v:'warn',res:'Usterka podąża za cewką: przyczyną jest cewka zapłonowa (dawniej cylinder 3). Świeca i wtrysk cylindra 3 są w tym teście wykluczone jako główna przyczyna.',swap:true},
+        {t:'Wypadania zostały na cylindrze 3',m:{H1:.1,H2:1.6,H3:1.2,H4:1.3},v:'warn',res:'Cewka wykluczona. Następny krok: zamiana świec, potem wtryskiwacza. Jeśli wypadanie zostaje na cylindrze 3, sprawdzić kompresję względną (analizator kompresji w LAB).'}],truth:0}},
+
+{id:'ok',n:'Kontrola okresowa – brak usterek',car:'Hyundai i30 1.4 MPI',tagline:'brak DTC · szybka kontrola parametrów',
+ ident:{vin:'TMAD351•••••••••••',car:'Hyundai i30',eng:'1.4 MPI, benzyna',ecu:'Sterownik silnika (benzyna)',proto:'CAN 500 kb/s · UDS'},
+ dtc:[],
+ gate:'Lista kodów pusta i potwierdzona: sterownik odpowiedział, odczyt zakończony, licznik kodów 0. Pusta lista z niepotwierdzonego odczytu byłaby odrzucona.',
+ analysis:'Brak zapisanych kodów. To dobra wiadomość, ale nie dowód pełnej sprawności: sterownik zapisuje kod dopiero po przekroczeniu swoich progów. Proponuję krótką kontrolę podstawowych parametrów, żeby wychwycić odchylenia, które jeszcze nie dały kodu.',
+ hyps:[],
+ plan:['Live Data: obroty, temperatura cieczy, korekta długoterminowa, napięcie zasilania.','Bieg jałowy i krótko 2500 obr/min.','Raport z wartościami odniesienia.'],
+ path:'LIVE',
+ pids:[{id:'rpm',n:'Obroty silnika',u:'obr/min',min:0,max:3500,d:0},{id:'ect',n:'Temperatura cieczy',u:'°C',min:0,max:110,d:0},{id:'ltft',n:'Korekta długoterminowa',u:'%',min:-25,max:25,d:1},{id:'ubat',n:'Napięcie zasilania',u:'V',min:11,max:15.5,d:2},{id:'stft',n:'Korekta krótkoterminowa',u:'%',min:-25,max:25,d:1},{id:'iat',n:'Temperatura powietrza',u:'°C',min:-10,max:60,d:0}],
+ auto:['rpm','ect','ltft','ubat'],
+ why:{rpm:'stabilność biegu jałowego',ect:'czy silnik jest rozgrzany',ltft:'czy sterownik nie kompensuje ukrytego problemu',ubat:'ładowanie alternatora',stft:'pominięty: wystarczy korekta długoterminowa',iat:'pominięty: nie wpływa na wniosek'},
+ dur:30,ts:1,period:24,
+ steps:[[0,'Bieg jałowy, silnik rozgrzany'],[8,'2500 obr/min i utrzymaj'],[16,'Bieg jałowy']],
+ init:s=>Object.assign(s,{rpm:740,ect:89,ltft:1.2,ubat:14.1,stft:0,iat:24}),
+ step:(s,t,dt,R)=>{const p=t%24,ld=p>=8&&p<16;s.rpm=lag(s.rpm,ld?2500:740,.3,dt)+LAB.gauss(R)*5;s.ect=lag(s.ect,ld?91:89,4,dt)+LAB.gauss(R)*.05;s.ltft=1.2+LAB.gauss(R)*.05;s.stft=1.5*Math.sin(t*5)+LAB.gauss(R)*.4;s.ubat=lag(s.ubat,ld?14.25:14.1,.5,dt)+LAB.gauss(R)*.02;s.iat=24;s.ld=ld},
+ eval:(sm,sel)=>{const L=[],ev=[],has=k=>sel.includes(k);
+  if(has('rpm')){const lo=sm.filter(x=>x.v.rpm<1000).map(x=>x.v.rpm);if(lo.length>=3)L.push(`Bieg jałowy: ${Math.round(mean(lo))} obr/min, wahania ±${Math.round((Math.max(...lo)-Math.min(...lo))/2)} obr/min – stabilny.`)}
+  if(has('ect'))L.push(`Temperatura cieczy: ${Math.round(mean(sm.map(x=>x.v.ect)))} °C – silnik rozgrzany.`);
+  if(has('ltft'))L.push(`Korekta długoterminowa: ${f1(mean(sm.map(x=>x.v.ltft)))} % – blisko zera.`);
+  if(has('ubat'))L.push(`Napięcie zasilania przy pracującym silniku: ${f1(mean(sm.map(x=>x.v.ubat)),2)} V – ładowanie prawidłowe.`);
+  ev.push('normal');return{L,ev}},
+ ev:{},
+ consult:'Brak kodów i brak objawów zgłoszonych przez klienta. Jeśli klient coś zauważył (np. szarpanie, zapach, kontrolka), dopisz to – wtedy zaproponuję ukierunkowany pomiar.',
+ test:null,
+ fin:{v:'ok',res:'Brak zapisanych kodów i brak odchyleń w sprawdzonych parametrach. To nie dowodzi pełnej sprawności pojazdu, ale nie ma podstaw do dalszej diagnostyki bez objawów.'}},
+
+{id:'ncom',n:'Brak komunikacji ze sterownikiem silnika',car:'Audi A4 B8 2.0 TDI',tagline:'U0100 · identyfikacja niepełna',
+ ident:{vin:'WAUZZZ8K•••••••••',car:'Audi A4 B8 (wg bramki)',eng:'nieodczytany – sterownik silnika nie odpowiada',ecu:'BRAK ODPOWIEDZI',proto:'CAN 500 kb/s · UDS (bramka, ABS)'},
+ noEcu:true,
+ dtc:[{c:'U0100',d:'Utrata komunikacji ze sterownikiem silnika (zapis w bramce)',s:'aktywny'},{c:'U0100',d:'Utrata komunikacji ze sterownikiem silnika (zapis w ABS)',s:'aktywny'}],
+ gate:'Kody pochodzą z bramki i ABS. Sterownik silnika nie odpowiedział, więc jego lista kodów jest NIEZNANA (a nie pusta).',
+ analysis:'Dwa inne sterowniki zgłaszają brak komunikacji z ECU silnika, a sam ECU nie odpowiada na zapytania. To wskazuje, że ECU nie pracuje albo nie jest słyszany na magistrali. Najczęstsze przyczyny: brak zasilania lub masy ECU, przerwa lub zwarcie na przewodach CAN do ECU, rzadziej uszkodzony sam sterownik. Nie zgaduję danych silnika – nie zostały odczytane.',
+ hyps:[{id:'H1',n:'Brak zasilania lub masy sterownika silnika',w:.35},{id:'H2',n:'Przerwa / zwarcie na przewodach CAN do sterownika',w:.35},{id:'H3',n:'Uszkodzony sterownik silnika',w:.15},{id:'H4',n:'Bramka (gateway) nie przekazuje komunikacji',w:.15}],
+ plan:['Live Data niedostępne: sterownik silnika nie odpowiada.','Analiza i konsultacja na podstawie kodów z innych modułów.','Test rozstrzygający: pomiar zasilania i masy ECU.'],
+ path:'CONS',noLive:'Sterownik silnika nie odpowiada – brak źródła Live Data',
+ pids:[],auto:[],why:{},dur:30,ts:1,period:20,steps:[],init:()=>{},step:()=>{},eval:()=>({L:[],ev:[]}),ev:{},
+ consult:'Pytania do mechanika: czy rozrusznik kręci, a silnik nie zapala? Czy kontrolka silnika zapala się przy włączeniu zapłonu? Czy auto było ostatnio po wymianie akumulatora, myciu silnika albo naprawie wiązki?',
+ test:{n:'Pomiar zasilania i masy sterownika silnika',d:'Mechanik mierzy multimetrem napięcie zasilania (stałe i po zapłonie) oraz spadek napięcia na masie na złączu ECU – piny według dokumentacji pojazdu.',appr:null,
+  opts:[{t:'Zasilanie i masa prawidłowe',m:{H1:.1,H2:2.5,H3:1.3,H4:.8},v:'warn',res:'Zasilanie ECU sprawne. Najsilniejsza hipoteza: magistrala CAN do sterownika silnika. Następny krok: pomiar rezystancji terminacji i oscylogram CAN (analizator CAN w LAB).'},
+        {t:'Brak napięcia na pinie zasilania',m:{H1:6,H2:.3,H3:.2,H4:.2},v:'warn',res:'Przyczyna: brak zasilania ECU silnika. Sprawdzić bezpiecznik i przekaźnik zasilania ECU oraz przewód do złącza.'}],truth:0}}
+];
+
+/* ===================== STAN ===================== */
+let scIdx=0,mode='auto';
+const F={run:false,stop:false,pause:false,sc:null,stage:-1,next:null,pend:[],hyp:null,hyp0:null,path:null,pidMode:null,sel:[],dur:30,ev:null,testOpt:null,final:null,t0:0,report:'',audit:[],cleared:false};
+const LV={on:false,sc:null,sel:[],s:null,t:0,acc:0,sm:[],marks:[],dur:30,done:null,preview:false,R:null,inst:'',instIdx:-1,paused:false,fin:null,min:4};
+const STOPX={stop:1};
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const clock=()=>{const s=Math.floor((performance.now()-F.t0)/1000);return LAB.pad(Math.floor(s/60))+':'+LAB.pad(s%60)};
+function log(who,txt){const t=F.t0?clock():'00:00';F.audit.push({t,who,txt});$('stL').textContent=txt;const li=document.createElement('li');li.innerHTML=`<time>${t}</time><span class="tg ${who}">${TAG[who]}</span><span>${esc(txt)}</span>`;$('aud').appendChild(li)}
+
+/* ===================== NAWIGACJA ===================== */
+let cur='start';
+function show(s){cur=s;document.querySelectorAll('.a-nav button').forEach(b=>b.classList.toggle('on',b.dataset.s===s));document.querySelectorAll('.scr').forEach(x=>x.classList.toggle('hidden',x.dataset.scr!==s));if(s==='live')requestAnimationFrame(()=>{fitCv();drawLive()})}
+document.querySelectorAll('.a-nav button').forEach(b=>b.onclick=()=>show(b.dataset.s));
+$('bFs').onclick=()=>{const a=$('app');a.classList.toggle('fs');$('bFs').textContent=a.classList.contains('fs')?'ZAMKNIJ PEŁNY EKRAN':'PEŁNY EKRAN';document.body.style.overflow=a.classList.contains('fs')?'hidden':'';requestAnimationFrame(()=>{fitCv();drawLive()})};
+
+/* ===================== START ===================== */
+function renderSc(){$('scg').innerHTML=SC.map((s,i)=>`<button class="scc${i===scIdx?' on':''}" data-i="${i}" type="button"><em>SCENARIUSZ ${i+1}</em><b>${esc(s.n)}</b><small>${esc(s.car)}<br>${esc(s.tagline)}</small></button>`).join('');
+ $('scg').querySelectorAll('.scc').forEach(b=>b.onclick=()=>{if(F.run)return;scIdx=+b.dataset.i;renderSc();renderChk(false)})}
+const CHK=['Interfejs diagnostyczny (VCI)','Program LVS PRO – ekran główny rozpoznany','Model AI lokalny – gotowy','Silnik wnioskowania – gotowy','Polityka zatwierdzeń operacji – aktywna'];
+function renderChk(st){$('chk').innerHTML=CHK.map((c,i)=>`<li class="${st&&st[i]===2?'ok':st&&st[i]===1?'go':''}"><b>${st&&st[i]===2?'✓':st&&st[i]===1?'…':'○'}</b>${c}</li>`).join('')}
+document.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{mode=b.dataset.m;document.querySelectorAll('[data-m]').forEach(x=>x.classList.toggle('sel',x===b));$('mDesc').textContent=mode==='auto'?'Asystent sam przechodzi przez etapy i zatrzymuje się tylko tam, gdzie decyzja należy do Ciebie.':'Po każdym etapie asystent czeka na przycisk DALEJ. Dobre do spokojnego przejrzenia każdego kroku.'});
+renderSc();renderChk(false);
+
+/* ===================== DIAGNOZA – elementy ===================== */
+function renderStp(){$('stp').innerHTML=STAGES.map((s,i)=>`<div class="${i<F.stage?'done':i===F.stage?'cur':''}"><u>${i+1}${i<F.stage?' ✓':''}</u>${s}</div>`).join('');const c=$('stp').querySelector('.cur');if(c){const b=$('stp');b.scrollLeft=Math.max(0,c.offsetLeft-b.offsetLeft-(b.clientWidth-c.offsetWidth)/2)}}
+function card(tag,title,html,cls){const d=document.createElement('div');d.className='card'+(cls?' '+cls:'');d.innerHTML=`<h4><span class="tg ${tag}">${TAG[tag]}</span>${esc(title)}</h4>`+(html||'');$('feed').appendChild(d);scrollFeed();return d}
+function scrollFeed(){const f=$('feed');f.scrollTop=f.scrollHeight}
+async function typeInto(el,txt){el.classList.add('typing');for(let i=0;i<txt.length;i+=4){if(F.stop){el.textContent=txt;break}while(F.pause&&!F.stop)await sleep(100);el.textContent=txt.slice(0,i+4);scrollFeed();await sleep(14)}el.textContent=txt;el.classList.remove('typing')}
+function kv(){const s=F.sc;if(!s){$('sKv').innerHTML='<span>—</span><b>brak sesji</b>';return}
+ $('sKv').innerHTML=`<span>Scenariusz</span><b>${esc(s.n)}</b><span>Pojazd</span><b>${F.stage>=1?esc(s.ident.car):'—'}</b><span>Sterownik</span><b>${F.stage>=1?esc(s.ident.ecu):'—'}</b><span>Kody</span><b>${F.stage>=2?(s.dtc.length?s.dtc.map(d=>d.c).join(', '):'brak'):'—'}</b><span>Ścieżka</span><b>${F.path==='LIVE'?'Live Data ('+F.pidMode+')':F.path==='CONS'?'Analiza i konsultacja':'—'}</b><span>PID</span><b>${F.sel.length?F.sel.map(id=>pidOf(s,id).n).join(', '):'—'}</b><span>Tryb</span><b>${mode==='auto'?'AUTO':'KROK PO KROKU'}</b>`}
+const pidOf=(s,id)=>s.pids.find(p=>p.id===id);
+function hypHTML(h,prev){if(!h||!h.length)return'<p class="sub">Brak hipotez usterki.</p>';const mx=Math.max(...h.map(x=>x.w));
+ return [...h].sort((a,b)=>b.w-a.w).map(x=>{const p=prev&&prev.find(y=>y.id===x.id);return`<div class="hy${x.w===mx?' lead':''}"><span class="id">${x.id}</span><span class="bar"><i style="width:${Math.round(x.w*100)}%"></i>${p?`<s style="left:${Math.round(p.w*100)}%"></s>`:''}</span><span class="pc">${Math.round(x.w*100)} %</span><span class="nm">${esc(x.n)}</span></div>`}).join('')}
+function sideHyp(){$('sHy').innerHTML=F.hyp?hypHTML(F.hyp):'<p class="sub">Pojawią się po analizie usterek.</p>'}
+function applyM(h,m){const o=h.map(x=>({...x,w:x.w*(m[x.id]||1)}));const s=o.reduce((a,x)=>a+x.w,0);o.forEach(x=>x.w=x.w/s);return o}
+function ctl(){const r=F.run;$('bPause').disabled=!r;$('bStop').disabled=!r;$('bPause').textContent=F.pause?'WZNÓW':'PAUZA';document.querySelector('[data-s=diag]').classList.toggle('run',r);$('bStart').disabled=r;$('bNext').classList.toggle('hidden',mode==='auto');$('stNote').textContent=r?'Sesja w toku – przejdź do ekranu DIAGNOZA.':''}
+
+/* ===================== PRZEPŁYW ===================== */
+function chk(){if(F.stop)throw STOPX}
+async function wait(ms){let t=0;while(t<ms){await sleep(100);chk();if(!F.pause)t+=100}}
+async function gate(){chk();if(mode==='auto'){await wait(1500)}else{$('bNext').disabled=false;await new Promise(r=>{F.next=r;F.pend.push(r)});$('bNext').disabled=true;F.next=null}chk()}
+function choice(el,opts){return new Promise(res=>{F.pend.push(()=>res(null));const row=document.createElement('div');row.className='row';opts.forEach(o=>{const b=document.createElement('button');b.type='button';b.className='btn'+(o.cls?' '+o.cls:'');b.innerHTML=o.html;if(o.dis){b.disabled=true}b.onclick=()=>{row.querySelectorAll('button').forEach(x=>x.disabled=true);b.classList.add('sel');res(o.v)};row.appendChild(b)});el.appendChild(row);scrollFeed()})}
+$('bNext').onclick=()=>{if(F.next)F.next()};
+$('bPause').onclick=()=>{if(!F.run)return;F.pause=!F.pause;LV.paused=F.pause;ctl();lvCtl();log('op',F.pause?'Pauza sesji.':'Wznowienie sesji.')};
+$('bStop').onclick=()=>doStop();
+function doStop(){if(!F.run)return;F.stop=true;F.pend.splice(0).forEach(f=>f());if(LV.on)liveEnd('stop');closeDlg(null)}
+$('bNew').onclick=()=>{if(F.run){doStop();return}show('start')};
+
+$('bStart').onclick=async()=>{if(F.run)return;
+ const sc=SC[scIdx];Object.assign(F,{run:true,stop:false,pause:false,sc,stage:-1,hyp:null,path:null,pidMode:null,sel:[],ev:null,testOpt:null,final:null,t0:performance.now(),report:'',audit:[],cleared:false,pend:[],live:null,hyp0:null});
+ $('aud').innerHTML='';$('feed').innerHTML='';sideHyp();kv();ctl();resetReport();LV.sm=[];LV.sel=[];lvIdleState();
+ const st=[0,0,0,0,0];for(let i=0;i<5;i++){st[i]=1;renderChk(st);await sleep(220);st[i]=2;renderChk(st)}
+ log('sys',`Start sesji: ${sc.n} (${mode==='auto'?'AUTO':'KROK PO KROKU'}).`);
+ show('diag');
+ try{for(let i=0;i<STAGES.length;i++){F.stage=i;renderStp();kv();await STG[i]();if(i<STAGES.length-1)await gate()}F.stage=STAGES.length;renderStp();log('sys','Sesja zakończona.')}
+ catch(e){if(e!==STOPX)console.error(e);card('sys','Sesja zatrzymana przez operatora',`<p>Zebrane dane zostały w dzienniku. Wniosek z niepełnej sesji nie jest wydawany.</p>`,'fail');log('op','STOP – sesja przerwana.');buildReport(true)}
+ F.run=false;F.pause=false;F.pend=[];ctl();$('bNext').disabled=true;renderChk(false);lvIdleState()};
+
+const STG=[
+/* 1 połączenie */ async()=>{const s=F.sc;const c=card('sys','Połączenie z pojazdem','<ul class="chk" id="cn"></ul>');const L=['Interfejs VCI: połączony','Zapłon: włączony, napięcie 12,4 V',`Protokół: ${s.ident.proto}`,'LVS PRO: sesja diagnostyczna otwarta'];
+ for(const x of L){await wait(350);c.querySelector('#cn').insertAdjacentHTML('beforeend',`<li class="ok"><b>✓</b>${esc(x)}</li>`);scrollFeed()}c.querySelector('#cn').removeAttribute('id');log('sys','Połączenie z pojazdem nawiązane.')},
+/* 2 identyfikacja */ async()=>{const s=F.sc,i=s.ident;await wait(500);card('lvs','Identyfikacja pojazdu i sterownika',`<div class="kv"><span>VIN</span><b>${esc(i.vin)}</b><span>Pojazd</span><b>${esc(i.car)}</b><span>Silnik</span><b>${esc(i.eng)}</b><span>Sterownik</span><b>${esc(i.ecu)}</b><span>Protokół</span><b>${esc(i.proto)}</b></div>`);
+ await wait(600);if(s.noEcu){card('rule','Pewność identyfikacji: NIEPEŁNA','<p>VIN odczytany z bramki, ale sterownik silnika nie odpowiada. Danych silnika nie zgaduję – pomiary z tego sterownika byłyby „nieprzypisane”.</p>','warn');log('rule','Identyfikacja niepełna: ECU silnika nie odpowiada.')}
+ else{card('rule','Pewność identyfikacji: WYSOKA','<p>VIN z bramki i odpowiedź sterownika silnika są zgodne. Dane z tej sesji są przypisane do tego pojazdu i sterownika.</p>','ok');log('rule','Identyfikacja potwierdzona.')}kv()},
+/* 3 DTC */ async()=>{const s=F.sc;const c=card('lvs','Odczyt kodów usterek','<p class="sub">Odczyt pamięci usterek…</p>');await wait(900);
+ c.querySelector('p').remove();c.insertAdjacentHTML('beforeend',s.dtc.length?`<table><tr><th>Kod</th><th>Opis</th><th>Status</th></tr>${s.dtc.map(d=>`<tr><td><b class="gd">${d.c}</b></td><td>${esc(d.d)}</td><td>${esc(d.s)}</td></tr>`).join('')}</table>`:'<p><b class="ok">Brak zapisanych kodów usterek.</b></p>');
+ await wait(600);card('rule','Kontrola kompletności odczytu',`<p>${esc(s.gate)}</p>`,s.noEcu?'warn':'ok');log('lvs',s.dtc.length?`Odczytano kody: ${s.dtc.map(d=>d.c).join(', ')}.`:'Brak kodów usterek (potwierdzone).');kv()},
+/* 4 analiza */ async()=>{const s=F.sc;const c=card('ai','Analiza usterek','<p></p>','ai');await typeInto(c.querySelector('p'),s.analysis);
+ if(s.hyps.length){F.hyp=s.hyps.map(x=>({...x}));F.hyp0=F.hyp.map(x=>({...x}));await wait(400);card('rule','Hipotezy wstępne (wagi z kodów)',hypHTML(F.hyp)+'<p class="sub">Wagi są względne i robocze. Zmienią się po każdym dowodzie.</p>');sideHyp()}
+ log('ai','Analiza usterek gotowa'+(s.hyps.length?`, ${s.hyps.length} hipotezy.`:'.'))},
+/* 5 plan */ async()=>{const s=F.sc;await wait(400);card('ai','Plan diagnostyki',`<ul>${s.plan.map(p=>`<li>${esc(p)}</li>`).join('')}</ul>`,'ai');log('ai','Plan diagnostyki przygotowany.')},
+/* 6 wybór ścieżki */ async()=>{const s=F.sc;const c=card('op','Wybierz ścieżkę',`<p>Asystent rekomenduje: <b class="gd">${s.path==='LIVE'?'Live Data':'Analiza i konsultacja'}</b>. Decyzja należy do Ciebie.</p>`);
+ const v=await choice(c,[{v:'LIVE',html:'Live Data'+(s.path==='LIVE'?' ★':''),dis:!!s.noLive,cls:s.path==='LIVE'?'gold':''},{v:'CONS',html:'Analiza i konsultacja'+(s.path==='CONS'?' ★':''),cls:s.path==='CONS'?'gold':''}]);chk();
+ if(s.noLive)c.insertAdjacentHTML('beforeend',`<p class="sub">Live Data nieaktywne: ${esc(s.noLive)}.</p>`);
+ F.path=v;log('op',`Wybrano ścieżkę: ${v==='LIVE'?'Live Data':'Analiza i konsultacja'}.`);kv();
+ if(v!=='LIVE')return;
+ const c2=card('op','Dobór parametrów i czas pomiaru','<p>AUTO – asystent dobiera PID i uzasadnia wybór. MANUAL – wybierasz 2–4 PID sam.</p><div class="lbl">Czas pomiaru</div>');
+ const dsel=document.createElement('div');dsel.className='seg';dsel.style.margin='6px 0';[[30,'30 s'],[60,'60 s'],[0,'do ręcznego zakończenia']].forEach(([d,t])=>{const b=document.createElement('button');b.type='button';b.className='btn'+(d===s.dur?' sel':'');b.textContent=t;b.onclick=()=>{F.dur=d;dsel.querySelectorAll('.btn').forEach(x=>x.classList.toggle('sel',x===b))};dsel.appendChild(b)});F.dur=s.dur;c2.appendChild(dsel);
+ const m=await choice(c2,[{v:'AUTO',html:'AUTO – asystent dobiera PID',cls:'gold'},{v:'MANUAL',html:'MANUAL – wybieram PID'}]);chk();dsel.querySelectorAll('.btn').forEach(x=>x.disabled=true);
+ F.pidMode=m;
+ if(m==='AUTO'){F.sel=[...s.auto];card('ai','Dobór PID (AUTO)',`<table><tr><th>PID</th><th>Uzasadnienie</th></tr>${s.pids.map(p=>`<tr><td>${s.auto.includes(p.id)?'<b class="ok">✓</b> ':'<span class="dm">–</span> '}${esc(p.n)}</td><td class="${s.auto.includes(p.id)?'':'dm'}">${esc(s.why[p.id]||'')}</td></tr>`).join('')}</table>`,'ai')}
+ else{const sel=await pickPids(s);chk();F.sel=sel;card('op','Dobór PID (MANUAL)',`<p>${sel.map(id=>esc(pidOf(s,id).n)).join(', ')}</p>`+(s.auto.every(a=>sel.includes(a))?'':'<p class="sub">Uwaga: wybór różni się od rekomendacji. Część dowodów może być niedostępna – asystent to oznaczy.</p>'))}
+ log('op',`Pomiar: ${m}, ${F.dur?F.dur+' s':'do ręcznego zakończenia'}, PID: ${F.sel.map(id=>pidOf(s,id).n).join(', ')}.`);kv()},
+/* 7 live */ async()=>{const s=F.sc;
+ if(F.path!=='LIVE'){card('sys','Live Data pominięte',`<p>${s.noLive?esc(s.noLive)+'.':'Wybór operatora: analiza bez pomiaru.'}</p>`);const c=card('ai','Konsultacja','<p></p>','ai');await typeInto(c.querySelector('p'),s.consult);log('ai','Konsultacja bez pomiaru.');return}
+ card('sys','Pomiar Live Data uruchomiony','<p>Ekran LIVE DATA – postępuj według poleceń na żółtym pasku.</p>');
+ await wait(500);show('live');const r=await liveRun(s,F.sel,F.dur,false);chk();show('diag');
+ F.live=r;card('sys','Pomiar zakończony',`<p>${r.n} próbek w ${f1(r.t,1)} s${r.marks?`, znaczniki: ${r.marks}`:''}. Zakończenie: ${r.why==='time'?'upłynął czas':'operator'}.</p>`,'ok');log('sys',`Pomiar zakończony: ${r.n} próbek.`)},
+/* 8 korelacje i hipotezy */ async()=>{const s=F.sc;
+ if(F.path==='LIVE'&&LV.sm.length>=4){const e=s.eval(LV.sm,F.sel);F.ev=e;const c=card('rule','Wyniki pomiaru i korelacje',`<ul>${e.L.map(l=>`<li>${esc(l)}</li>`).join('')}</ul>`);
+  if(F.hyp){const prev=F.hyp.map(x=>({...x}));let h=F.hyp;e.ev.forEach(k=>{if(s.ev[k])h=applyM(h,s.ev[k])});F.hyp=h;await wait(700);
+   card('rule','Aktualizacja hipotez po pomiarze',hypHTML(F.hyp,prev)+'<p class="sub">Pionowa kreska: waga przed pomiarem.</p>');sideHyp()}
+  else{await wait(500);card('rule','Hipotezy','<p>Pomiar nie wykazał odchyleń – brak hipotez usterki.</p>','ok')}
+  log('rule',F.hyp?'Hipotezy zaktualizowane po pomiarze.':'Pomiar bez odchyleń.')}
+ else if(F.hyp){card('rule','Hipotezy bez pomiaru','<p>Wagi pochodzą tylko z kodów i identyfikacji – pewność niska.</p>'+hypHTML(F.hyp),'warn');log('rule','Hipotezy bez pomiaru (niska pewność).')}
+ else card('rule','Hipotezy','<p>Brak hipotez usterki.</p>','ok')},
+/* 9 test */ async()=>{const s=F.sc,T=s.test;if(!T){card('rule','Test rozstrzygający niepotrzebny','<p>Nie ma hipotez do rozstrzygnięcia.</p>');return}
+ const lead=[...F.hyp].sort((a,b)=>b.w-a.w);const c=card('ai','Test rozstrzygający',`<p><b class="gd">${esc(T.n)}</b></p><p>${esc(T.d)}</p><p class="sub">Test rozdziela: ${lead.slice(0,2).map(x=>x.id).join(' i ')}. Asystent go proponuje – wykonuje mechanik.</p>`,'ai');
+ if(T.appr){const ok=await approve(T.appr.op,T.appr.d);chk();if(!ok){card('op','Test aktywny odrzucony','<p>Asystent nie wykona testu bez zgody. Możesz ocenić wynik obserwacją ręczną (np. podciśnieniem z pompki ręcznej).</p>','warn')}else{const cc=card('sim','Test aktywny w toku','<p>Wysterowanie N75: 0 % → 50 % → 100 % → 0 % (symulator, nie pojazd).</p>');await wait(1800);cc.insertAdjacentHTML('beforeend','<p class="ok">Test zakończony.</p>')}}
+ const c2=card('op','Wpisz wynik testu','<p>Wybierz, co zaobserwował mechanik.</p>');
+ const v=await choice(c2,T.opts.map((o,i)=>({v:i,html:esc(o.t)+(i===T.truth?'<span class="truth">wynik w tym scenariuszu</span>':''),cls:i===T.truth?'gold':''})));chk();
+ const o=T.opts[v];F.testOpt=v;const prev=F.hyp.map(x=>({...x}));F.hyp=applyM(F.hyp,o.m);log('op',`Wynik testu: ${o.t}.`);
+ if(o.swap&&F.path==='LIVE'){await wait(500);card('sim','Powtórny odczyt po zamianie','<p>Liczniki wypadania: cylinder 3 ok. 1 / 1000 obr, cylinder 2 ok. 28 / 1000 obr pod obciążeniem (symulator).</p>')}
+ await wait(500);card('rule','Diagnoza po teście',hypHTML(F.hyp,prev));sideHyp()},
+/* 10 wynik */ async()=>{const s=F.sc;let v,res;if(s.test&&F.testOpt!=null){const o=s.test.opts[F.testOpt];v=o.v;res=o.res}else if(s.fin){v=s.fin.v;res=s.fin.res}else{v='warn';res='Brak rozstrzygnięcia.'}
+ F.final={v,res};const lead=F.hyp?[...F.hyp].sort((a,b)=>b.w-a.w)[0]:null;
+ const c=card('ai','Wynik sesji',`<div class="vrd ${v}"><b>${v==='ok'?'BRAK USTEREK':'WNIOSEK'}${lead?` · ${lead.id} ${Math.round(lead.w*100)} %`:''}</b><p></p></div><p class="sub">Asystent nie zleca wymiany części. Wniosek wymaga potwierdzenia przez mechanika.</p>`,v);
+ await typeInto(c.querySelector('.vrd p'),res);log('ai','Wynik sesji i raport gotowe.');buildReport(false);
+ const r=document.createElement('div');r.className='row';r.innerHTML='<button class="btn gold" type="button">OTWÓRZ RAPORT</button>';r.firstChild.onclick=()=>show('rap');c.appendChild(r);scrollFeed()}
+];
+
+/* ===================== DIALOGI ===================== */
+let dlgRes=null;
+function openDlg(html,cls){$('dlgIn').className='dlg-in'+(cls?' '+cls:'');$('dlgIn').innerHTML=html;$('dlg').classList.remove('hidden')}
+function closeDlg(v){if($('dlg').classList.contains('hidden'))return;$('dlg').classList.add('hidden');const r=dlgRes;dlgRes=null;if(r)r(v)}
+function approve(op,d){return new Promise(res=>{dlgRes=res;F.pend.push(()=>closeDlg(false));
+ openDlg(`<h3>⚠ WYMAGA ZATWIERDZENIA</h3><p><b>${esc(op)}</b></p><p>${esc(d)}</p><p class="sub">Asystent nie wykona tej operacji bez Twojej zgody. W wersji demonstracyjnej operacja trafia tylko do symulatora.</p><div class="row" style="margin-top:10px"><button class="btn gold" id="dA" type="button">ZATWIERDZAM</button><button class="btn red" id="dR" type="button">ODRZUCAM</button></div>`,'warn');
+ $('dA').onclick=()=>{log('op',`Zatwierdzono: ${op}.`);closeDlg(true)};$('dR').onclick=()=>{log('op',`Odrzucono: ${op}.`);closeDlg(false)}})}
+function pickPids(s){return new Promise(res=>{dlgRes=res;F.pend.push(()=>closeDlg(null));
+ openDlg(`<h3>Wybierz PID (2–4)</h3><div class="pick">${s.pids.map(p=>`<label><input type="checkbox" value="${p.id}"${s.auto.includes(p.id)?' checked':''}><span>${esc(p.n)} <small>${esc(p.u)}${s.auto.includes(p.id)?' · rekomendowany':''}</small></span></label>`).join('')}</div><p class="sub" id="pkN"></p><div class="row"><button class="btn gold" id="pkOk" type="button">ZATWIERDŹ WYBÓR</button></div>`);
+ const upd=()=>{const n=$('dlgIn').querySelectorAll('input:checked').length;$('pkOk').disabled=n<2||n>4;$('pkN').textContent=`Wybrano: ${n}`};$('dlgIn').querySelectorAll('input').forEach(i=>i.onchange=upd);upd();
+ $('pkOk').onclick=()=>closeDlg([...$('dlgIn').querySelectorAll('input:checked')].map(i=>i.value))})}
+
+/* ===================== LIVE DATA ===================== */
+let cv=null;
+function fitCv(){const el=$('cv');if(!cv)cv=LAB.fillCanvas(el);else cv.fit()}
+function lvIdleState(){$('lvIdle').classList.toggle('hidden',LV.on||F.run);$('lvSt').textContent=LV.sm.length?'Live Data · ostatni pomiar':'Live Data';$('lvMode').textContent=LV.sm.length?(LV.preview?'PODGLĄD':F.pidMode||'—'):'—';lvCtl();lvSide();drawLive()}
+function lvCtl(){$('bMark').disabled=!LV.on;$('bLvPause').disabled=!LV.on;$('bLvStop').disabled=!LV.on;$('bFin').disabled=!(LV.on&&LV.sm.length>=LV.min);$('bLvPause').textContent=(LV.paused||F.pause)?'WZNÓW':'PAUZA';document.querySelector('[data-s=live]').classList.toggle('run',LV.on)}
+function liveRun(sc,sel,dur,preview){return new Promise(res=>{Object.assign(LV,{on:true,sc,sel:[...sel],s:{},t:0,acc:0,sm:[],marks:[],dur,preview,R:LAB.rng(7+SC.indexOf(sc)*31),instIdx:-1,paused:false,fin:res});
+ sc.init(LV.s);$('lvIdle').classList.add('hidden');$('lvMode').textContent=preview?'PODGLĄD':(F.pidMode||'AUTO');lvSide();fitCv();lvCtl();
+ if(!preview)F.pend.push(()=>{if(LV.on)liveEnd('stop')})})}
+function liveEnd(why){if(!LV.on)return;LV.on=false;LV.paused=false;lvCtl();$('lvSt').textContent=`Pomiar zakończony · ${LV.sm.length} próbek`;
+ $('lvBt').textContent=why==='stop'?'POMIAR ZATRZYMANY':'POMIAR ZAKOŃCZONY';$('lvBd').textContent=why==='stop'?'Próbki zostały zachowane, ale wniosek z pomiaru nie jest wydawany.':'Wyniki analizuje asystent – wróć na ekran DIAGNOZA.';$('lvBan').className='mz-ban lv-ban '+(why==='stop'?'fail':'ok');
+ const r={n:LV.sm.length,t:LV.t,marks:LV.marks.map(m=>m.l).join(', '),why};const f=LV.fin;LV.fin=null;
+ if(LV.preview){log('sys',`Podgląd Live Data zakończony: ${r.n} próbek.`);lvIdleState()}if(f)f(r);drawLive()}
+$('bMark').onclick=()=>{if(!LV.on)return;const l='T'+(LV.marks.length+1);LV.marks.push({t:LV.t,l});log('op',`Znacznik ${l} w ${f1(LV.t,1)} s.`)};
+$('bLvPause').onclick=()=>{if(!LV.on)return;if(F.run&&!LV.preview){$('bPause').click();return}LV.paused=!LV.paused;lvCtl()};
+$('bFin').onclick=()=>{if(LV.on&&LV.sm.length>=LV.min){log('op','Zakończ i pokaż wyniki.');liveEnd('user')}};
+$('bLvStop').onclick=()=>{if(!LV.on)return;if(F.run&&!LV.preview){doStop();return}liveEnd('stop')};
+$('bPrev').onclick=()=>{if(F.run||LV.on)return;const s=SC[scIdx];if(!s.pids.length){$('lvBt').textContent='PODGLĄD NIEDOSTĘPNY';$('lvBd').textContent=s.noLive+'.';return}
+ if(!F.t0)F.t0=performance.now();F.pidMode=null;log('sys',`Podgląd Live Data: ${s.n}.`);liveRun(s,s.auto,0,true)};
+function lvSide(){const s=LV.sc;if(!s||!LV.sel.length){$('lvSide').innerHTML='<div class="pv" style="--c:#2c3b4f"><div class="l">Brak aktywnych parametrów</div><div class="s">Uruchom diagnozę albo podgląd.</div></div>';return}
+ $('lvSide').innerHTML=LV.sel.map((id,i)=>{const p=pidOf(s,id);return`<div class="pv" style="--c:${COL[i]}"><div class="l">${esc(p.n)}</div><div class="v" id="pv_${id}">—<small>${esc(p.u)}</small></div><div class="s" id="pm_${id}">min — · maks —</div></div>`}).join('')}
+const fmt=(p,v)=>p.u==='0/1'?(v>.5?'WŁ':'WYŁ'):p.d?f1(v,p.d):String(Math.round(v));
+function lvVals(){const s=LV.sc;if(!s||!LV.sm.length)return;const last=LV.sm[LV.sm.length-1];LV.sel.forEach(id=>{const p=pidOf(s,id),e=$('pv_'+id);if(!e)return;e.innerHTML=`${fmt(p,last.v[id])}<small>${esc(p.u)}</small>`;const a=LV.sm.map(x=>x.v[id]);$('pm_'+id).textContent=`min ${fmt(p,Math.min(...a))} · maks ${fmt(p,Math.max(...a))}`});
+ $('lvCnt').textContent=`${LV.sm.length} próbek`}
+function instFor(sc,t){let k=-1;const pt=sc.period<1e8?(t%sc.period):t;sc.steps.forEach((s,i)=>{if(pt>=s[0])k=i});return k}
+LAB.loop(dt=>{
+ if(LV.on&&!LV.paused&&!(F.run&&F.pause&&!LV.preview)){const sc=LV.sc;LV.acc+=dt;let ch=false;
+  while(LV.acc>=.25){LV.acc-=.25;LV.t+=.25;sc.step(LV.s,LV.t*sc.ts,.25*sc.ts,LV.R);const v={};sc.pids.forEach(p=>v[p.id]=LV.s[p.id]);LV.sm.push({t:LV.t,v,ld:!!LV.s.ld});ch=true;
+   const k=instFor(sc,LV.t*sc.ts);if(k!==LV.instIdx){LV.instIdx=k;if(k>=0){$('lvBt').textContent=sc.steps[k][1];$('lvBan').className='mz-ban warn lv-ban';$('lvBd').textContent='Polecenie asystenta dla mechanika'+(sc.ts>1?` · czas silnika przyspieszony ×${sc.ts}`:'');if(LV.t>.3)LV.marks.push({t:LV.t,l:'',auto:true})}}
+   if(LV.dur&&LV.t>=LV.dur){liveEnd('time');break}if(!LV.dur&&LV.t>=120){liveEnd('time');break}}
+  if(ch&&LV.on){lvVals();lvCtl();$('lvSt').textContent=`POMIAR · ${f1(LV.t,1)} s${LV.dur?' / '+LV.dur+' s':''} · ${LV.sel.length} PID`}}
+ if(cur==='live')drawLive();
+ if(F.run)$('stT').textContent=clock()});
+function drawLive(){if(!cv)fitCv();if(!cv.fit())return;const c=cv.ctx,W=cv.W,H=cv.H,d=cv.dpr;c.clearRect(0,0,W,H);c.fillStyle='#050c14';c.fillRect(0,0,W,H);
+ const s=LV.sc,n=LV.sel.length;if(!s||!n){c.fillStyle='#4b5d73';c.font=`${14*d}px Roboto,Arial`;c.textAlign='center';c.fillText('Brak danych – uruchom pomiar',W/2,H/2);c.textAlign='left';return}
+ const padL=10*d,padR=12*d,padT=6*d,padB=22*d,lh=(H-padT-padB)/n;const xmax=LV.dur||Math.max(30,Math.ceil(LV.t/10)*10);const X=t=>padL+(W-padL-padR)*t/xmax;
+ c.font=`${11*d}px Roboto,Arial`;c.fillStyle='#6f7d90';const step=xmax<=30?5:xmax<=60?10:20;
+ for(let t=0;t<=xmax+1e-6;t+=step){const x=X(t);c.strokeStyle='rgba(255,255,255,.05)';c.lineWidth=1;c.beginPath();c.moveTo(x,padT);c.lineTo(x,H-padB);c.stroke();const lab=s.ts>1?f1(t*s.ts/60,0)+' min':t+' s';c.fillText(lab,Math.min(x+3*d,W-40*d),H-7*d)}
+ if(s.xlab){c.textAlign='right';c.fillText(s.xlab,W-padR,H-7*d);c.textAlign='left'}
+ LV.sel.forEach((id,i)=>{const p=pidOf(s,id),y0=padT+i*lh,y1=y0+lh-4*d;c.fillStyle='rgba(11,24,39,.55)';c.fillRect(padL,y0,W-padL-padR,lh-4*d);
+  c.strokeStyle='rgba(255,255,255,.06)';for(let g=1;g<4;g++){const y=y0+(y1-y0)*g/4;c.beginPath();c.moveTo(padL,y);c.lineTo(W-padR,y);c.stroke()}
+  const Y=v=>y1-(y1-y0-6*d)*Math.max(0,Math.min(1,(v-p.min)/(p.max-p.min)))-3*d;
+  c.strokeStyle=COL[i];c.lineWidth=2*d;c.lineJoin='round';c.beginPath();LV.sm.forEach((m,k)=>{const x=X(m.t),y=Y(m.v[id]);k?c.lineTo(x,y):c.moveTo(x,y)});c.stroke();
+  c.fillStyle=COL[i];c.font=`700 ${12*d}px Roboto,Arial`;c.fillText(p.n,padL+6*d,y0+15*d);c.fillStyle='#6f7d90';c.font=`${10*d}px Roboto,Arial`;c.fillText(`${fmt(p,p.max)} ${p.u}`,padL+6*d,y0+28*d);c.fillText(fmt(p,p.min),padL+6*d,y1-4*d);
+  if(LV.sm.length){const v=LV.sm[LV.sm.length-1].v[id];c.textAlign='right';c.fillStyle='#eceff3';c.font=`700 ${15*d}px "Roboto Mono",Consolas,monospace`;c.fillText(fmt(p,v)+' '+p.u,W-padR-6*d,y0+17*d);c.textAlign='left'}});
+ LV.marks.forEach(m=>{const x=X(m.t);c.setLineDash(m.auto?[2*d,4*d]:[6*d,4*d]);c.strokeStyle=m.auto?'rgba(255,202,40,.35)':'#f4d89a';c.lineWidth=(m.auto?1:1.6)*d;c.beginPath();c.moveTo(x,padT);c.lineTo(x,H-padB);c.stroke();c.setLineDash([]);if(m.l){c.fillStyle='#f4d89a';c.font=`800 ${12*d}px Roboto,Arial`;c.fillText(m.l,x+3*d,padT+12*d)}});
+ if(LV.on){const x=X(LV.t);c.strokeStyle='rgba(127,208,255,.5)';c.lineWidth=d;c.beginPath();c.moveTo(x,padT);c.lineTo(x,H-padB);c.stroke()}}
+window.addEventListener('resize',()=>{if(cur==='live'){fitCv();drawLive()}});
+
+/* ===================== RAPORT ===================== */
+function resetReport(){$('rep').textContent='—';$('rSub').textContent='Raport powstaje po zakończeniu diagnozy.';['bDl','bCp','bClr'].forEach(i=>$(i).disabled=true)}
+function buildReport(stopped){const s=F.sc;if(!s)return;const d=new Date();const L=[];const pad=LAB.pad;
+ L.push('EKOTRONIK AI ASYSTENT – RAPORT SESJI','*** SYMULACJA – dane ze scenariusza, nie z pojazdu ***','',`Data: ${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`,`Scenariusz: ${s.n}`,`Tryb prowadzenia: ${mode==='auto'?'AUTO':'KROK PO KROKU'}`,stopped?'STATUS: SESJA PRZERWANA PRZEZ OPERATORA – brak wniosku':'STATUS: zakończona','');
+ L.push('1. POJAZD I STEROWNIK',`   VIN: ${s.ident.vin}`,`   Pojazd: ${s.ident.car}`,`   Silnik: ${s.ident.eng}`,`   Sterownik: ${s.ident.ecu}`,`   Pewność identyfikacji: ${s.noEcu?'niepełna':'wysoka'}`,'');
+ L.push('2. KODY USTEREK');if(s.dtc.length)s.dtc.forEach(x=>L.push(`   ${x.c}  ${x.d}  [${x.s}]`));else L.push('   brak (lista pusta potwierdzona)');L.push('');
+ L.push('3. ŚCIEŻKA',`   ${F.path==='LIVE'?`Live Data (${F.pidMode}, ${F.dur?F.dur+' s':'ręczne zakończenie'})`:F.path==='CONS'?'Analiza i konsultacja (bez pomiaru)':'nie wybrano'}`);if(F.sel.length)L.push(`   PID: ${F.sel.map(id=>pidOf(s,id).n).join(', ')}`);if(F.live)L.push(`   Próbki: ${F.live.n}, czas: ${f1(F.live.t,1)} s`);L.push('');
+ if(F.ev){L.push('4. WYNIKI POMIARU');F.ev.L.forEach(x=>L.push('   - '+x));L.push('')}
+ if(F.hyp){L.push('5. HIPOTEZY (wagi względne, robocze)');[...F.hyp].sort((a,b)=>b.w-a.w).forEach(h=>L.push(`   ${h.id}  ${String(Math.round(h.w*100)).padStart(3)} %  ${h.n}`));L.push('')}
+ if(s.test&&F.testOpt!=null){L.push('6. TEST ROZSTRZYGAJĄCY',`   ${s.test.n}`,`   Wynik (operator): ${s.test.opts[F.testOpt].t}`,'')}
+ if(F.final){L.push('7. WNIOSEK',`   ${F.final.res}`,'')}
+ if(F.cleared)L.push('8. KASOWANIE KODÓW: zatwierdzone przez operatora (symulator)','');
+ L.push('ZASTRZEŻENIA','   Asystent nie zleca wymiany części. Wniosek wymaga potwierdzenia przez mechanika.','   Wartości i progi w tej symulacji są demonstracyjne, nie są danymi producenta.','',`DZIENNIK AUDYTU (${F.audit.length} wpisów)`);F.audit.forEach(a=>L.push(`   ${a.t}  [${TAG[a.who]}]  ${a.txt}`));
+ F.report=L.join('\n');$('rep').textContent=F.report;$('rSub').textContent=stopped?'Raport z przerwanej sesji – bez wniosku.':'Raport gotowy. Możesz go pobrać lub skopiować.';$('bDl').disabled=false;$('bCp').disabled=false;$('bClr').disabled=stopped||!s.dtc.length||s.noEcu||F.cleared}
+$('bDl').onclick=()=>{const b=new Blob([F.report],{type:'text/plain;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`raport_ekotronik_ai_${F.sc.id}.txt`;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)};
+$('bCp').onclick=()=>{const done=()=>{$('bCp').textContent='SKOPIOWANO ✓';setTimeout(()=>$('bCp').textContent='KOPIUJ',1500)};try{navigator.clipboard.writeText(F.report).then(done,()=>{})}catch(e){}};
+$('bClr').onclick=async()=>{if(F.run)return;F.pend=[];const ok=await approve('Kasowanie kodów usterek',`Zostaną skasowane kody: ${F.sc.dtc.map(d=>d.c).join(', ')}. Skasowanie usuwa też dane zamrożone (freeze frame) – zapisz raport przed skasowaniem.`);
+ if(ok){F.cleared=true;log('sim','Kody skasowane w symulatorze (nie w pojeździe).');buildReport(false)}};
+lvIdleState();kv();
+})();
+</script>
+</body></html>

@@ -74,6 +74,7 @@ body[data-theme="prad"]::before{background-image:url(img/tlo-prad.svg)}
 body[data-theme="can"]::before{background-image:url(img/tlo-can.svg)}
 body[data-theme="komp"]::before{background-image:url(img/tlo-komp.svg)}
 body[data-theme="roz"]::before{background-image:url(img/tlo-roz.svg)}
+body[data-theme="ai"]::before{background-image:url(img/tlo-ai.svg)}
 body[data-theme]{background:transparent}
 body[data-theme] .panel,body[data-theme] .tile,body[data-theme] .card4,body[data-theme] .prof{background:rgba(11,24,39,.80);backdrop-filter:blur(2px)}
 body[data-theme] .hdr{background:rgba(5,6,8,.85)}

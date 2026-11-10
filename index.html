@@ -1646,10 +1646,11 @@ html.boot-seen #bootScreen{display:none!important}
     <div class="section-title">
       <h2>LAB / Analizatory EKOTRONIK</h2>
     </div>
-    <p class="section-sub">Cztery analizatory z asystenta EKOTRONIK. Każdy ma własne okno z interaktywną symulacją, opisem i celem projektu. To symulacje: sprzęt i pojazd nie były jeszcze sprawdzane.</p>
+    <p class="section-sub">Asystent diagnostyczny EKOTRONIK AI i cztery jego analizatory. Każdy projekt ma własne okno z interaktywną symulacją, opisem i celem. To symulacje: sprzęt i pojazd nie były jeszcze sprawdzane.</p>
 
     <div class="gal-filters" aria-label="Filtry sekcji LAB">
       <button class="gal-filter-btn active" data-filter="all">Wszystko</button>
+      <button class="gal-filter-btn" data-filter="AI">AI Asystent</button>
       <button class="gal-filter-btn" data-filter="PRAD">Prąd</button>
       <button class="gal-filter-btn" data-filter="CAN">CAN</button>
       <button class="gal-filter-btn" data-filter="KOMP">Kompresja</button>
@@ -1657,6 +1658,19 @@ html.boot-seen #bootScreen{display:none!important}
     </div>
 
     <div class="lab-grid gal-grid">
+      <article class="lab-card gal-card" data-cat="AI">
+        <div class="lab-thumb gal-thumb">
+          <span class="lab-badge gal-badge">SYMULACJA</span>
+          <img src="assets_v8/projects/lab_asystent.svg" alt="EKOTRONIK AI ASYSTENT – podgląd aplikacji" loading="lazy">
+        </div>
+        <div class="lab-body gal-body">
+          <h3 class="lab-title gal-title">EKOTRONIK AI ASYSTENT</h3>
+          <p class="lab-desc gal-desc">Pełna symulacja aplikacji na tablet: diagnoza prowadzona krok po kroku, odczyt kodów, Live Data z wykresami, hipotezy, test rozstrzygający i raport. Sześć scenariuszy usterek.</p>
+          <p class="lab-goal">Cel: poprowadzić mechanika od kodu usterki do potwierdzonej przyczyny, bez zgadywania i bez zbędnej wymiany części.</p>
+          <a class="lab-open lab-btn" href="lab/asystent-ai.html">Otwórz okno symulacji →</a>
+        </div>
+      </article>
+
       <article class="lab-card gal-card" data-cat="PRAD">
         <div class="lab-thumb gal-thumb">
           <span class="lab-badge gal-badge">SYMULACJA</span>
