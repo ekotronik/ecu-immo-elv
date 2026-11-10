@@ -438,13 +438,14 @@ function homeRender(){
   pvRender('dtc');
   $('hAns').textContent=SESS.answer?SESS.answer.replace(/<[^>]+>/g,''):'Brak odpowiedzi. START prowadzi sesję z EKO-SCAN; ZAPYTAJ ASYSTENTA odpowiada na pytanie.';
   $('pvT').querySelectorAll('button').forEach(function(b){b.onclick=function(){$('pvT').querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x===b)});pvRender(b.dataset.t)}});
-  $('hSet').onclick=openSet;$('hMic').onclick=function(){TOAST('Mikrofon: dyktowanie pytania działa na tablecie.')};
+  $('hSet').onclick=function(){_offFn()};$('hMic').onclick=function(){TOAST('Mikrofon: dyktowanie pytania działa na tablecie.')};
   $('hDet').onclick=function(){TOAST('Szczegóły: model załadowany, źródło danych: '+SESS.src+', sieć: '+(SESS.net?'tak':'nie')+'.')};
   $('hPdf').onclick=function(){TOAST(v?'Załączono raport EKO-SCAN (PDF): raport_'+v.id+'.pdf (symulacja)':'Najpierw wykonaj START, żeby powstał raport EKO-SCAN.')};
   $('hStart').onclick=function(){pickVehicle('START / DIAGNOSTYKA: wybór scenariusza',diagStart)};
   $('hStop').onclick=function(){TOAST('STOP: sesja zatrzymana; nowy START otwiera nową sesję.')};
   $('hAsk').onclick=function(){var q=$('hQ').value.trim();SESS.answer=v?(q?'Pytanie: „'+q+'”. ':'')+answerFor(v):'Brak sesji pojazdu. Naciśnij START w Diagnostyce i wybierz scenariusz, a asystent odpowie na podstawie pomiaru.';$('hAns').textContent=SESS.answer.replace(/<[^>]+>/g,'')};
-  $('fAn').onclick=function(){hub('ANALIZATORY','wybierz analizator',[
+  var _offFn=function(){TOAST('To okno symulacji nie obejmuje tej funkcji: tu działają START / Diagnostyka, Live Data / Wykresy i Funkcje prowadzone.')};
+  $('fAn').onclick=_offFn;var _unusedAn=function(){hub('ANALIZATORY','wybierz analizator',[
     {t:'Analizator prądu spoczynkowego',d:'pobór prądu przez samochód w uśpieniu, cęgi CC-65 (osobne okno LAB)',go:function(){location.href='prad-spoczynkowy.html'}},
     {t:'Analizator CAN (EKO-CAN)',d:'sygnał i dane magistrali (osobne okno LAB)',go:function(){location.href='analizator-can.html'}},
     {t:'Tester kompresji względnej',d:'porównanie cylindrów z prądu rozrusznika (osobne okno LAB)',go:function(){location.href='kompresja-wzgledna.html'}},
@@ -455,12 +456,12 @@ function homeRender(){
     {t:'Live Data: parametry na żywo',d:'Parametry z otwartego ekranu Live Data',go:function(){pickVehicle('Live Data: parametry na żywo',function(x){setSession(x);lvOpen('live',x)},function(){$('fLive').onclick()})}},
     {t:'Pomiar AUTO / MANUAL i wykres sesji',d:'Pomiar AUTO lub MANUAL z wykresem sesji',go:function(){pickVehicle('Pomiar AUTO / MANUAL',function(x){setSession(x);lvOpen('pomiar',x)},function(){$('fLive').onclick()})}},
     {t:'Wykresy na żywo (szybkie próbkowanie)',d:'Szybkie próbkowanie kilku parametrów naraz',go:function(){pickVehicle('Wykresy na żywo',function(x){setSession(x);lvOpen('wykresy',x)},function(){$('fLive').onclick()})}}])};
-  $('fRap').onclick=function(){hub('ANALIZA I RAPORTY','wybierz funkcję',[
+  $('fRap').onclick=_offFn;var _unusedRap=function(){hub('ANALIZA I RAPORTY','wybierz funkcję',[
     {t:'Analiza, hipotezy i raport',d:'Wniosek, hipotezy i kontrole na przebiegach dla wybranego przypadku',go:function(){if(SESS.v)openAnaliza('analiza',SESS.v);else pickVehicle('Analiza i raport: wybór pojazdu',function(x){setSession(x);openAnaliza('analiza',x)},function(){$('fRap').onclick()})}},
     {t:'Raporty i historia',d:'Raporty sesji, historia odpowiedzi',go:function(){openAnaliza('rap',SESS.v)}},
     {t:'Konsultacja z modelem',d:'Komentarz modelu do raportu (w symulacji: odpowiedź z wyniku analizy)',go:function(){if(SESS.v)openAnaliza('model',SESS.v);else pickVehicle('Konsultacja: wybór pojazdu',function(x){setSession(x);openAnaliza('model',x)},function(){$('fRap').onclick()})}}])};
   $('fFun').onclick=function(){C.show('menu')};
-  $('fCal').onclick=openKal;$('fSet').onclick=openSet;
+  $('fCal').onclick=_offFn;$('fSet').onclick=_offFn;
   $('fExit').onclick=function(){TOAST('To symulacja: aplikacji nie zamykasz. Wróć do LAB przyciskiem u góry strony.')};
 }
 function pvRender(t){
