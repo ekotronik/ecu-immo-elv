@@ -406,18 +406,37 @@ C.register('set',SE);
 
 /* ================= PANEL GŁÓWNY (jak na zdjęciu tabletu) ================= */
 var HM=$('s-home');
+function wp(kind,ic,extra){return '<div class="tw wp"><img class="ic" src="img/'+ic+'" alt="">'+(extra||'')+'<canvas class="wv" data-w="'+kind+'"></canvas><small class="vl">'+({can:'4.0V<br>2.5V<br>1.0V',pwm:'15V<br>0V<br>-15V',inj:'200V<br>100V<br>0V'})[kind]+'</small></div>'}
 function topBar(sec){
-  var logo='img/logo-emblem.png',id=function(x){return sec?'':' id="'+x+'"'};
-  var on=SESS.v;
-  return '<div class="tb"><div class="lg"><img src="'+logo+'" alt=""><div><b>EKOTRONIK <i>AI</i></b><small>ASYSTENT</small></div></div>'+
-  '<div class="tw w1" title="Magistrala CAN"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3v4M8 7h8M12 7v6M7 13h10M12 13v4M9 21h6M12 17v4" stroke="#ffd24a" fill="none" stroke-width="1.8"/></svg><small class="cn">CAN-H<br>CAN-L</small><svg viewBox="0 0 70 34" class="wv"><path d="M2 6h6v-3h6v3h6v-3h6v3h6v-3h6v3h6v-3h6" stroke="#18e6c8" fill="none" stroke-width="3"/><path d="M2 28h6v3h6v-3h6v3h6v-3h6v3h6v-3h6v3h6" stroke="#31d46b" fill="none" stroke-width="3"/></svg><small class="vl">4.0V<br>2.5V<br>1.0V</small></div>'+
-  '<div class="tw w2" title="Prąd"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2" stroke="#ffd24a" fill="none" stroke-width="1.8"/><path d="M8 7V4h3v3M13 7V4h3v3M12 10l-3 4h4l-2 4" stroke="#ffd24a" fill="none" stroke-width="1.6"/></svg><svg viewBox="0 0 70 34" class="wv"><path d="M3 30V6h5v24M12 30V6h5v24M21 30V6h5v24M30 30V6h5v24M39 30V6h5v24M48 30V6h5v24M57 30V6h5v24" stroke="#ff9f2e" fill="#ff9f2e66" stroke-width="2"/></svg><small class="vl">15V<br>0V<br>-15V</small></div>'+
-  '<div class="tw w3" title="Wtryskiwacz"><svg class="ic" viewBox="0 0 24 24"><path d="M4 20l6-6M8 12l4 4M10 10l5-5 5 5-5 5zM15 5l5 5" stroke="#ffd24a" fill="none" stroke-width="1.8"/></svg><svg viewBox="0 0 70 34" class="wv"><path d="M2 28h14V8h5l3 18h6l4 2h34" stroke="#ffe27a" fill="none" stroke-width="2.4"/></svg><small class="vl">200V<br>100V<br>0V</small></div>'+
-  '<div class="tw st"><b><u class="dot'+(on||SESS.src!=='EKO-SCAN'?' g':'')+'"></u>'+(SESS.src==='EKO-SCAN'?'EKO-SCAN: '+(on?'odczyt ekranu':'niepołączony'):'EMULATOR (SYMULACJA)')+' ▾</b><b>Model: załadowany</b><b>Pojazd: '+(on?'potwierdzono':'nie potwierdzono')+'</b></div>'+
-  '<button class="ib"'+id('hMic')+' title="Mikrofon">'+MICSVG+'</button><button class="ib"'+id('hSet')+' title="Ustawienia">'+GEARSVG+'</button></div>';
+  var id=function(x){return sec?'':' id="'+x+'"'},on=SESS.v;
+  return '<div class="tb"><div class="lg"><img src="img/logo_eko.png" alt=""><div><b>EKOTRONIK AI</b><small>A S Y S T E N T</small></div></div><div class="wvs">'+
+  wp('can','ikona_can.png','<small class="cn"><i style="color:#4DE3F5">CAN-H</i><i style="color:#6BE36B">CAN-L</i></small>')+wp('pwm','ikona_pwm.png')+wp('inj','ikona_wtrysk.png')+'</div>'+
+  '<div class="tw st"><b><u class="dot'+(on||SESS.src!=='EKO-SCAN'?' g':'')+'"></u>'+(SESS.src==='EKO-SCAN'?'EKO-SCAN: '+(on?'odczyt ekranu':'niepołączony'):'EMULATOR (SYMULACJA)')+'  ▾</b><span>Model: załadowany</span><span>Pojazd: '+(on?'potwierdzono':'nie potwierdzono')+'</span></div>'+
+  '<button class="ib"'+id('hMic')+' title="Mikrofon">'+MICSVG+'</button><button class="ib"'+id('hSet')+' title="Ustawienia">⚙</button></div>';
 }
+/* przebiegi banera: kształty i skale z Brand.kt (CAN-H/L, PWM ±15 V, wtryskiwacz do 200 V) */
+var CANB='000000000110100110100100000000000000011010110101101010000000';
+function wPwm(u){var b=(u*3)%1;if(b>.62)return -10;return ((b/.62)*5%1)<.5?15:-10}
+function wInj(u){var base=8;if(u<.12)return base;if(u<.135)return base+(200-base)*(u-.12)/.015;if(u<.55){var d=(u-.135)/.415;return 100+100*Math.exp(-d*18)+7*Math.exp(-d*9)*Math.sin(d*120)}if(u<.565)return 100-(100-base)*(u-.55)/.015;var e=(u-.565)/.435;return base+9*Math.exp(-e*14)*Math.sin(e*150)}
+function canD(u){return CANB.charAt(Math.max(0,Math.min(CANB.length-1,Math.floor(u*CANB.length))))==='1'}
+var WV={can:[.5,4.5],pwm:[-20,20],inj:[-15,225]};
+function drawWaves(ts){
+  var ph=((ts||0)%6000)/6000;
+  document.querySelectorAll('canvas.wv').forEach(function(c){
+    var r=c.getBoundingClientRect();if(r.width<4)return;var d=Math.min(2,window.devicePixelRatio||1),w=Math.round(r.width*d),h=Math.round(r.height*d);
+    if(c.width!==w||c.height!==h){c.width=w;c.height=h}
+    var x=c.getContext('2d');x.clearRect(0,0,w,h);x.strokeStyle='rgba(142,107,44,.22)';x.lineWidth=1;
+    for(var i=1;i<8;i++){x.beginPath();x.moveTo(w*i/8,0);x.lineTo(w*i/8,h);x.stroke()}for(i=1;i<3;i++){x.beginPath();x.moveTo(0,h*i/3);x.lineTo(w,h*i/3);x.stroke()}
+    var k=c.dataset.w,mn=WV[k][0],mx=WV[k][1];
+    function tr(col,f){x.beginPath();var n=Math.max(60,Math.min(300,Math.round(w/2)));for(var i=0;i<=n;i++){var u=((i/n)+ph)%1,y=h-(f(u)-mn)/(mx-mn)*h;i?x.lineTo(w*i/n,y):x.moveTo(0,y)}x.strokeStyle=col;x.globalAlpha=.25;x.lineWidth=5*d/1.5;x.stroke();x.globalAlpha=1;x.lineWidth=1.8*d/1.2;x.stroke()}
+    if(k==='can'){tr('#4DE3F5',function(u){return canD(u)?3.5:2.6});tr('#6BE36B',function(u){return canD(u)?1.5:2.4})}
+    else if(k==='pwm')tr('#D6A852',wPwm);else tr('#F4D89A',wInj);
+  });
+  requestAnimationFrame(drawWaves);
+}
+requestAnimationFrame(drawWaves);
 var MICSVG='<svg viewBox="0 0 24 24" width="26" height="26"><rect x="9" y="3" width="6" height="12" rx="3" fill="#4aa8ff"/><path d="M5 11a7 7 0 0014 0M12 18v3" stroke="#4aa8ff" fill="none" stroke-width="2"/></svg>';
-var GEARSVG='<svg viewBox="0 0 24 24" width="26" height="26"><circle cx="12" cy="12" r="3.2" fill="none" stroke="#5db7ff" stroke-width="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2" stroke="#5db7ff" stroke-width="2.4"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#5db7ff" stroke-width="2"/></svg>';
+var GEARSVG_UNUSED='<svg viewBox="0 0 24 24" width="26" height="26"><circle cx="12" cy="12" r="3.2" fill="none" stroke="#5db7ff" stroke-width="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2" stroke="#5db7ff" stroke-width="2.4"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#5db7ff" stroke-width="2"/></svg>';
 var _cs=C.show;C.show=function(){fillTb();return _cs.apply(this,arguments)};
 function fillTb(){document.querySelectorAll('.tbh').forEach(function(e){e.innerHTML=topBar(true)})}
 function homeRender(){
