@@ -46,3 +46,22 @@
   LAB.f1=function(x,n){return (n===undefined?x.toFixed(1):x.toFixed(n)).replace('.',',')};
   LAB.sg=function(x,n){return (x>=0?'+':'−')+LAB.f1(Math.abs(x),n)};
 })();
+/* Suwaki na żywo dla scenariusza „Własny”. Przycisk SUWAKI jest nad ekranem pomiaru, więc działa też w trybie pełnoekranowym. */
+(function(){
+  LAB.live=function(cfg){
+    const vals={};cfg.defs.forEach(d=>vals[d.id]=d.val);
+    const fab=document.createElement('button');fab.className='lv-fab hidden';fab.type='button';fab.textContent='⚙ SUWAKI';
+    const sh=document.createElement('div');sh.className='lv-sheet hidden';sh.setAttribute('role','dialog');sh.setAttribute('aria-label','Suwaki symulacji');
+    let h='<div class="lv-h"><b>'+(cfg.title||'Scenariusz własny')+'</b><button type="button" class="lv-x" aria-label="Zamknij">✕</button></div><div class="lv-sub">'+(cfg.sub||'Przesuń suwak – symulacja reaguje od razu.')+'</div><div class="lv-b">';
+    cfg.defs.forEach(d=>{h+='<div class="lv-r"><div class="lv-t"><span>'+d.label+'</span><b id="lvv_'+d.id+'"></b></div><input type="range" id="lvi_'+d.id+'" min="'+d.min+'" max="'+d.max+'" step="'+d.step+'" value="'+d.val+'" aria-label="'+d.label+'"><div class="lv-hint" id="lvh_'+d.id+'"></div></div>'});
+    h+='</div>'+(cfg.presets?'<div class="lv-p">'+cfg.presets.map((p,i)=>'<button type="button" class="btn" data-pi="'+i+'">'+p.n+'</button>').join('')+'</div>':'');
+    sh.innerHTML=h;document.body.appendChild(fab);document.body.appendChild(sh);
+    const fmt=(d,v)=>LAB.f1(v,d.dec===undefined?(d.step<1?1:0):d.dec)+(d.unit?' '+d.unit:'');
+    function paint(d){const v=vals[d.id],e=document.getElementById('lvv_'+d.id);e.textContent=fmt(d,v);const hh=document.getElementById('lvh_'+d.id);hh.textContent=d.hint?d.hint(v):''}
+    function set(id,v,fin){vals[id]=+v;document.getElementById('lvi_'+id).value=v;cfg.onChange(vals,!!fin,id);cfg.defs.forEach(paint)}
+    cfg.defs.forEach(d=>{paint(d);const r=document.getElementById('lvi_'+d.id);r.addEventListener('input',()=>set(d.id,r.value,false));r.addEventListener('change',()=>set(d.id,r.value,true))});
+    fab.onclick=()=>{cfg.defs.forEach(paint);sh.classList.toggle('hidden')};sh.querySelector('.lv-x').onclick=()=>sh.classList.add('hidden');
+    if(cfg.presets)sh.querySelector('.lv-p').addEventListener('click',e=>{const b=e.target.closest('[data-pi]');if(!b)return;const p=cfg.presets[+b.dataset.pi];Object.keys(p.v).forEach(k=>set(k,p.v[k],false));cfg.onChange(vals,true,null);cfg.defs.forEach(paint)});
+    return{vals,show:function(on){fab.classList.toggle('hidden',!on);if(!on)sh.classList.add('hidden')},open:function(){cfg.defs.forEach(paint);sh.classList.remove('hidden')}};
+  };
+})();

@@ -97,7 +97,19 @@ const SC=[
  {id:'xcvr',n:'Uszkodzony transceiver (wzorzec)',d:'niska amplituda dominująca, wolne krawędzie',p:mk({a:.5,tau:.24,j:4}),dat:{act:'on',err:'low'}}
 ];
 let sc=SC[0],R_known=null,frozen=false,mode=0,tabG='A',curA=.3,curB=.65,autoCur=true,clock=0,saveN=0;
-const sel=document.getElementById('scn');sel.innerHTML=SC.map((s,i)=>'<option value="'+i+'">'+(i+1)+'. '+s.n+'</option>').join('');
+const CUS={id:'wlasny',n:'★ Własny – suwaki na żywo',d:'Ustawiasz sam: amplitudę, szum, dzwonienie, jitter i opór terminacji. Wskaźnik pokazuje, jak daleko jesteś od progu UWAGA. Suwaki pod przyciskiem SUWAKI, także na ekranie pomiaru.',p:mk({}),dat:{act:'on',err:0}};
+const SCU=SC.concat([CUS]);
+const FF=()=>{try{return F}catch(e){return null}};
+const LV=LAB.live({title:'CAN – scenariusz własny',sub:'Zmiany od razu widać na oscylogramie, oku i w werdykcie. Opór wpływa na wynik po naciśnięciu MIERZ OPÓR.',
+ defs:[
+  {id:'a',label:'Amplituda sygnału',min:.3,max:1.2,step:.05,val:1,unit:'×',dec:2,hint:v=>'dominant '+(FF()?LAB.f1(FF().dom,2):'—')+' V · norma 1,5–3,0 V'},
+  {id:'noise',label:'Szum na magistrali',min:5,max:120,step:1,val:12,unit:'mV',dec:0,hint:v=>v>50?'powyżej progu UWAGA (50 mV)':'zapas do progu UWAGA 50 mV: '+Math.round(50-v)+' mV'},
+  {id:'ring',label:'Dzwonienie zboczy',min:0,max:1,step:.05,val:0,dec:2,hint:v=>'dzwonienie '+(FF()?Math.round(FF().ring):'—')+' mV · próg UWAGA 150 mV'},
+  {id:'j',label:'Jitter krawędzi',min:.5,max:8,step:.1,val:.8,unit:'%',hint:v=>v>=5?'powyżej normy (5 %)':'norma poniżej 5 %, zapas '+LAB.f1(5-v)+' %'},
+  {id:'R',label:'Opór H–L (test oporu)',min:5,max:130,step:1,val:60,unit:'Ω',dec:0,hint:v=>v<20?'zwarcie H–L':v<=70?'2 terminatory (norma 60 Ω)':v<=105?'brak jednego terminatora (≈ 120 Ω)':'brak obu / przerwa'}],
+ presets:[{n:'Sprawna',v:{a:1,noise:12,ring:0,j:.8,R:60}},{n:'Tuż przy progu szumu',v:{noise:48}},{n:'Tuż przy dzwonieniu',v:{ring:.35}},{n:'Brak terminatora',v:{R:120,ring:.7}}],
+ onChange:(v,fin)=>{if(sc!==CUS)return;Object.assign(CUS.p,{a:v.a,noise:v.noise/1000,ring:v.ring,R:v.R,j:v.j});regen(1);edge();if(R_known!==null){R_known=CUS.p.R;LAB.set('oR',Math.round(R_known)+' Ω')}if(fin)buildEye();updateVerdict();redraw()}});
+const sel=document.getElementById('scn');sel.innerHTML=SCU.map((s,i)=>'<option value="'+i+'">'+(i+1)+'. '+s.n+'</option>').join('');
 /* ---------- generator sygnału ---------- */
 const SPB=64,NB=24;
 function trace(p,seed,nb,idle){
@@ -377,7 +389,7 @@ function showTab(t){tab=t;document.querySelectorAll('[data-p]').forEach(p=>p.cla
  [cOsc,cEdge,cEye,cNoise].forEach(o=>o.fit());if(t==='pat'&&!patDone){buildPat();patDone=true}if(t==='bits')bitMap();redraw()}
 function showGroup(g){tabG=g;document.querySelectorAll('.grpbtn').forEach(b=>b.classList.toggle('on',b.dataset.g===g));document.getElementById('tabsA').classList.toggle('hidden',g!=='A');document.getElementById('tabsB').classList.toggle('hidden',g!=='B');showTab(g==='A'?(TA.some(x=>x[0]===tab)?tab:'osc'):(TB.some(x=>x[0]===tab)?tab:'fr'))}
 function redraw(){if(tab==='osc')drawOsc();if(tab==='edge')drawEdge();if(tab==='eye')drawEye();if(tab==='noise')drawNoise();if(tab==='pat')updatePat();if(tab==='fr')tableFrames();if(tab==='sig')signals();if(tab==='nodes')nodes();if(tab==='evt')events()}
-function setScn(i){sc=SC[i];sel.value=i;LAB.set('scd',sc.d);R_known=null;LAB.set('oR','—');LAB.set('oC','—');LAB.set('oT','Naciśnij MIERZ OPÓR. W symulacji pomiar wykonuje model głowicy.');regen(1);edge();buildEye();resetData();document.getElementById('bmIds').innerHTML=IDS.filter(x=>x.hz).map(x=>'<button class="btn '+(x.id===selId?'sel':'')+'" data-id="'+x.id+'" style="flex:1 1 90px">0x'+x.id.toString(16).toUpperCase()+'</button>').join('');updateVerdict();redraw()}
+function setScn(i){sc=SCU[i];LV.show(sc===CUS);if(sc===CUS)LV.open();sel.value=i;LAB.set('scd',sc.d);R_known=null;LAB.set('oR','—');LAB.set('oC','—');LAB.set('oT','Naciśnij MIERZ OPÓR. W symulacji pomiar wykonuje model głowicy.');regen(1);edge();buildEye();resetData();document.getElementById('bmIds').innerHTML=IDS.filter(x=>x.hz).map(x=>'<button class="btn '+(x.id===selId?'sel':'')+'" data-id="'+x.id+'" style="flex:1 1 90px">0x'+x.id.toString(16).toUpperCase()+'</button>').join('');updateVerdict();redraw()}
 sel.onchange=()=>setScn(+sel.value);
 document.getElementById('grp').addEventListener('click',e=>{const b=e.target.closest('[data-g]');if(b)showGroup(b.dataset.g)});
 document.querySelector('.wrap').addEventListener('click',e=>{const b=e.target.closest('#tabsA [data-t],#tabsB [data-t]');if(b)showTab(b.dataset.t);const id=e.target.closest('[data-id]');if(id){selId=+id.dataset.id;document.querySelectorAll('#bmIds .btn').forEach(x=>x.classList.toggle('sel',x===id));bitMap()}});

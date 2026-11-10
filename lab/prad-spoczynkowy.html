@@ -324,8 +324,17 @@ function report(){
  const e=evaluate(),b=hist.length?Math.round(base()):null;
  return 'RAPORT – ANALIZATOR PRĄDU SPOCZYNKOWEGO (SYMULACJA)\nScenariusz: '+sc.n+' – '+sc.d+'\nCzas pomiaru od zamknięcia: '+LAB.mmss(Math.max(0,tau-T0))+'\nPrąd bazowy: '+(b===null?'—':b+' mA'+(flips.length?' (z poprawką dryfu, odwróceń: '+flips.length+')':' (bez korekty dryfu)'))+'\nNorma: '+NORM+' mA (ogólna)\nWerdykt: '+(e?e.t:'—')+'\n'+(e?e.d:'')+'\n\nZdarzenia:\n'+evs.map(x=>LAB.mmss(x.t)+'  '+x.txt).join('\n')+'\n\nUwaga: wynik z SYMULACJI nie potwierdza usterki pojazdu. Sprzęt i pojazd niesprawdzone.';
 }
-function setSc(i){sc=SC[i];document.querySelectorAll('#scBtns .btn').forEach((b,k)=>b.classList.toggle('sel',k===i));LAB.set('scDesc',(i+1)+'. '+sc.n+' – '+sc.d);reset()}
-document.getElementById('scBtns').innerHTML=SC.map((s,i)=>'<button class="btn" data-i="'+i+'">'+(i+1)+'  '+s.n+'</button>').join('');
+const CUS={id:'wlasny',n:'★ Własny – suwaki na żywo',d:'Ustawiasz sam: prąd po uśpieniu (także tuż przy normie 50 mA i progiem 100 mA), dryf cęgów i częstość wybudzeń. Suwaki pod przyciskiem SUWAKI, także na ekranie pomiaru.',dur:90,lvl:45,I:t=>t<21?prof(t):CUS.lvl,wake:{start:32,per:12,dur:3.6/60,amp:210},can:t=>t<21,flips:[62,85],drift:120};
+const SCU=SC.concat([CUS]);
+const LV=LAB.live({title:'Prąd spoczynkowy – scenariusz własny',sub:'Norma: do 50 mA. Powyżej 100 mA: błąd. Przyspieszenie czasu ustawisz w zakładce Przygotowanie.',
+ defs:[
+  {id:'lvl',label:'Prąd po uśpieniu auta',min:10,max:300,step:1,val:45,unit:'mA',dec:0,hint:v=>v<=NORM?'w normie, zapas '+Math.round(NORM-v)+' mA':v<=100?'podwyższony: '+Math.round(v-NORM)+' mA ponad normę':'za duży pobór: '+Math.round(v-100)+' mA ponad próg błędu'},
+  {id:'drift',label:'Dryf zera cęgów',min:0,max:400,step:5,val:120,unit:'mA/h',dec:0,hint:v=>v>250?'duży dryf: wymagane odwracanie cęgów':v>0?'korygowany pomiarem dwukierunkowym':'idealne cęgi'},
+  {id:'per',label:'Wybudzenia co',min:2,max:30,step:1,val:12,unit:'min',dec:0,hint:v=>v<=5?'za częste: zgłosi ostrzeżenie':'normalne'}],
+ presets:[{n:'W normie',v:{lvl:45}},{n:'Tuż nad normą',v:{lvl:55}},{n:'Tuż pod progiem błędu',v:{lvl:95}},{n:'Nad progiem',v:{lvl:110}}],
+ onChange:v=>{CUS.lvl=v.lvl;CUS.drift=v.drift;CUS.wake.per=v.per}});
+function setSc(i){sc=SCU[i];document.querySelectorAll('#scBtns .btn').forEach((b,k)=>b.classList.toggle('sel',k===i));LAB.set('scDesc',(i+1)+'. '+sc.n+' – '+sc.d);LV.show(sc===CUS);if(sc===CUS)LV.open();reset()}
+document.getElementById('scBtns').innerHTML=SCU.map((s,i)=>'<button class="btn" data-i="'+i+'">'+(i+1)+'  '+s.n+'</button>').join('');
 document.getElementById('scBtns').addEventListener('click',e=>{const b=e.target.closest('[data-i]');if(b){setSc(+b.dataset.i)}});
 document.querySelectorAll('[data-sp]').forEach(b=>b.onclick=()=>{speed=+b.dataset.sp;document.querySelectorAll('[data-sp]').forEach(x=>x.classList.toggle('sel',x===b))});
 document.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{range=b.dataset.r;document.querySelectorAll('[data-r]').forEach(x=>x.classList.toggle('sel',x.dataset.r===range));draw()});
