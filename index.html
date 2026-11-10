@@ -1667,6 +1667,11 @@ html.boot-seen #bootScreen{display:none!important}
  #aiAsystent .lab-body{padding:16px 18px 20px}
 }
 @media (max-width:520px){#aiAsystent .ai-ft{max-width:38%}#aiAsystent .ai-ft svg{width:56px}#aiAsystent .ai-frame{height:430px}}
+/* animacja na całym polu karty: wyśrodkowana, symetryczna, krawędzie wtopione w tło o kolorze filmu */
+#aiAsystent .ai-frame{background:radial-gradient(ellipse at 50% 46%,rgba(40,150,160,.20),transparent 60%),linear-gradient(180deg,#020d0c 0%,#031316 50%,#020c09 100%);padding:0}
+#aiAsystent .ai-fb{padding:0;justify-content:center;align-items:center}
+#aiAsystent .ai-ft{display:none}
+#aiAsystent .ai-vid{order:0;height:100%;max-height:100%;max-width:100%;border:0;border-radius:0;box-shadow:none;background:transparent;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 12%,#000 88%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 12%,#000 88%,transparent 100%)}
 </style>
 <script>
 document.addEventListener('DOMContentLoaded',function(){var v=document.getElementById('aiVideo');if(!v)return;
