@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EKOTRONIK AI ASYSTENT – projekt | EKOTRONIK SYSTEM</title>
+<meta name="description" content="EKOTRONIK AI ASYSTENT: aplikacja na Androida prowadząca diagnostę krok po kroku, współpracująca z głowicą pomiarową ESP32. Cztery analizatory w interaktywnej symulacji.">
+<link rel="canonical" href="https://ekotronik.github.io/ecu-immo-elv/lab/asystent.html">
+<meta name="robots" content="index,follow">
+<link rel="icon" type="image/png" sizes="64x64" href="../assets_v8/favicon.png">
+<link rel="apple-touch-icon" href="../assets_v8/apple-touch-icon.png">
+<meta property="og:type" content="website"><meta property="og:locale" content="pl_PL"><meta property="og:site_name" content="EKOTRONIK SYSTEM">
+<meta property="og:url" content="https://ekotronik.github.io/ecu-immo-elv/lab/asystent.html"><meta property="og:title" content="EKOTRONIK AI ASYSTENT – projekt | EKOTRONIK SYSTEM"><meta property="og:description" content="EKOTRONIK AI ASYSTENT: aplikacja prowadząca diagnostę krok po kroku i cztery analizatory w symulacji.">
+<meta property="og:image" content="https://ekotronik.github.io/ecu-immo-elv/assets_v8/og_ekotronik_system.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Logo EKOTRONIK SYSTEM">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="EKOTRONIK AI ASYSTENT – projekt | EKOTRONIK SYSTEM"><meta name="twitter:description" content="EKOTRONIK AI ASYSTENT: aplikacja prowadząca diagnostę krok po kroku i cztery analizatory w symulacji."><meta name="twitter:image" content="https://ekotronik.github.io/ecu-immo-elv/assets_v8/og_ekotronik_system.png">
+<link rel="stylesheet" href="lab.css"><style>
+.ai{display:grid;grid-template-columns:minmax(0,320px) 1fr;gap:22px;align-items:start;margin:12px 0}
+.ai video{display:block;width:100%;height:auto;align-self:start;aspect-ratio:9/16;object-fit:cover;border-radius:16px;border:1px solid var(--border);background:#040a11}
+.ai h1{margin:6px 0 8px;color:var(--gold);font-size:clamp(1.6rem,4vw,2.4rem);letter-spacing:.04em}
+.ai p{font-size:1.1rem;line-height:1.6;margin:8px 0}
+.ai ul{margin:8px 0 14px;padding-left:22px;font-size:1.05rem;line-height:1.7}
+.an{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-top:10px}
+.an a{display:block;text-decoration:none;border:1px solid var(--border);border-radius:14px;background:var(--panel);padding:12px 16px;min-height:64px}
+.an a b{display:block;color:var(--gold-l);font-size:1.1rem}.an a span{color:var(--muted);font-size:.92rem}
+@media(max-width:760px){.ai{grid-template-columns:1fr}.ai video{max-width:320px;margin:0 auto}}
+</style></head><body><div class="wrap">
+<div class="hdr" id="hdr"></div><div class="crumb" id="crumb"></div>
+<div class="panel ai">
+ <video id="v" muted loop playsinline preload="none" poster="../assets_v8/asystent/tapeta_plakat.webp" data-src="../assets_v8/asystent/tapeta.mp4" aria-label="Animowana tapeta projektu EKOTRONIK AI ASYSTENT" width="540" height="960"></video>
+ <div>
+  <h1>EKOTRONIK AI ASYSTENT</h1>
+  <p>Aplikacja na Androida, która prowadzi diagnostę krok po kroku. Sama dobiera parametry, porównuje wartości zadane ze zmierzonymi, a wynik ocenia w trzech poziomach. Asystent tylko prowadzi i ocenia, silnikiem steruje diagnosta.</p>
+  <ul><li>Współpracuje z głowicą pomiarową EKOTRONIK na ESP32 (CAN, prąd, wejście sondy).</li><li>Cztery analizatory: prąd spoczynkowy, CAN, kompresja względna i rozrząd.</li><li>Cel: pokazać, że prosty sprzęt i dobrze poprowadzony pomiar dają wiarygodną diagnozę.</li></ul>
+  <p class="note">To symulacje. Aplikacja, głowica i pojazd nie były jeszcze sprawdzane na sprzęcie.</p>
+  <div class="pt" style="margin-top:14px"><i>●</i>Analizatory z asystenta (interaktywna symulacja)</div>
+  <div class="an">
+   <a href="prad-spoczynkowy.html"><b>Prąd spoczynkowy</b><span>pobór prądu po uśpieniu auta</span></a>
+   <a href="analizator-can.html"><b>Analizator CAN</b><span>sygnał i dane magistrali</span></a>
+   <a href="kompresja-wzgledna.html"><b>Kompresja względna</b><span>porównanie cylindrów z rozruchu</span></a>
+   <a href="kontrola-rozrzadu.html"><b>Rozrząd</b><span>kąt CMP względem luki CKP</span></a>
+  </div>
+ </div>
+</div>
+<script src="lab.js"></script>
+<script>
+LAB.header({icon:'ai',sym:'AI ASYSTENT',symd:'projekt · aplikacja Android',title:'EKOTRONIK AI ASYSTENT'});
+(function(){var v=document.getElementById('v'),r=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;v.src=v.dataset.src;if(!r){var p=v.play();if(p&&p.catch)p.catch(function(){})}})();
+</script></div></body></html>
