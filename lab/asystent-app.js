@@ -218,7 +218,7 @@ function lvOpen(mode,v){
 }
 function buildLvCtl(){
   var v=L.M.v,h='<h4>STEROWANIE POMIAREM (symulowane)</h4>';
-  h+='<div class="small">Sterownik</div><select id="lvEcu" class="inp" style="min-height:36px">'+v.ecus.map(function(e,i){return '<option value="'+i+'">'+e.a+' '+e.n+'</option>'}).join('')+'</select>';
+  h+='<input class="inp" id="lvQ" placeholder="🔍  Szukaj parametru…" style="min-height:36px;margin-bottom:6px" value="'+(L.q||'')+'"><div class="small">Sterownik</div><select id="lvEcu" class="inp" style="min-height:36px">'+v.ecus.map(function(e,i){return '<option value="'+i+'">'+e.a+' '+e.n+'</option>'}).join('')+'</select>';
   h+='<div class="seg" style="margin-top:6px"><button id="lvAuto" class="'+(L.auto?'on':'')+'">JAZDA AUTO</button><button id="lvMan" class="'+(L.auto?'':'on')+'">GAZ RĘCZNIE</button></div>';
   h+='<div class="sl"><div class="lb"><span>Gaz</span><em id="lvGV" class="gd">0 %</em></div><input type="range" id="lvGas" min="0" max="100" value="0"></div>';
   if(L.mode==='pomiar')h+='<div class="seg"><button id="pmA" class="'+(L.manual?'':'on')+'">POMIAR AUTO</button><button id="pmM" class="'+(L.manual?'on':'')+'">MANUAL</button></div><div class="small" id="pmH"></div>';
@@ -227,6 +227,7 @@ function buildLvCtl(){
   if(L.mode==='jazda')h+='<div class="small">Asystent dobrał parametry: '+L.sel.join(', ')+'.</div>';
   h+='<div class="seg" id="lvTempo" style="margin-top:6px"><button data-t="1">×1</button><button data-t="2" class="on">×2</button><button data-t="4">×4</button><button data-t="8">×8</button></div>';
   $('lvCtl').innerHTML=h;
+  $('lvQ').oninput=function(){L.q=this.value.trim().toLowerCase();buildPl()};
   $('lvEcu').onchange=function(){L.M.setEcu(+$('lvEcu').value);var ps=L.M.list.map(function(p){return p.n});L.sel=L.sel.filter(function(n){return ps.indexOf(n)>=0});if(!L.sel.length)L.sel=ps.slice(0,4);buildPl()};
   $('lvAuto').onclick=function(){L.auto=true;DR.ov=null;$('lvAuto').classList.add('on');$('lvMan').classList.remove('on')};
   $('lvMan').onclick=function(){L.auto=false;DR.ov=$('lvGas').value/100;$('lvMan').classList.add('on');$('lvAuto').classList.remove('on')};
@@ -241,7 +242,7 @@ function buildLvCtl(){
 function pmHint(){if($('pmH'))$('pmH').textContent=L.manual?'MANUAL: wybierasz parametry do pomiaru.':'AUTO: asystent dobiera parametry do przypadku (jak w START).'}
 function buildPl(){
   var el=$('lvPl');if(!el)return;
-  el.innerHTML=L.M.list.map(function(p){return '<label><input type="checkbox" data-n="'+p.n.replace(/"/g,'&quot;')+'"'+(L.sel.indexOf(p.n)>=0?' checked':'')+'>'+p.n+'</label>'}).join('');
+  el.innerHTML=L.M.list.filter(function(p){return !L.q||p.n.toLowerCase().indexOf(L.q)>=0}).map(function(p){return '<label><input type="checkbox" data-n="'+p.n.replace(/"/g,'&quot;')+'"'+(L.sel.indexOf(p.n)>=0?' checked':'')+'>'+p.n+'</label>'}).join('');
   el.querySelectorAll('input').forEach(function(c){c.onchange=function(){var n=c.dataset.n;if(c.checked){if(L.sel.length>=6){c.checked=false;TOAST('Najwyżej 6 parametrów naraz.');return}L.sel.push(n)}else L.sel=L.sel.filter(function(x){return x!==n})}});
 }
 function buildLvBtn(){
@@ -275,7 +276,7 @@ function lvFrame(ts){
   var cv=$('lvCv');
   if(L.mode==='live'){
     var rows='<table><tr><th>PARAMETR</th><th>WARTOŚĆ</th><th>JEDNOSTKA</th><th>WYKRES (TREND)</th></tr>';
-    M.list.forEach(function(p,i){var v=M.last[p.n];rows+='<tr><td>'+p.n+'</td><td class="v">'+(v==null?'---':fm(v,p.d))+'</td><td>'+p.u+'</td><td><canvas width="90" height="20" data-i="'+i+'"></canvas></td></tr>'});rows+='</table>';
+    M.list.forEach(function(p,i){if(L.q&&p.n.toLowerCase().indexOf(L.q)<0)return;var v=M.last[p.n];rows+='<tr><td>'+p.n+'</td><td class="v">'+(v==null?'---':fm(v,p.d))+'</td><td>'+p.u+'</td><td><canvas width="90" height="20" data-i="'+i+'"></canvas></td></tr>'});rows+='</table>';
     var sy=$('lvTbl').scrollTop;$('lvTbl').innerHTML=rows;$('lvTbl').scrollTop=sy;
     $('lvTbl').querySelectorAll('canvas').forEach(function(c){var p=M.list[+c.dataset.i],h=M.hist[p.n]||[];sparkline(c,h.slice(-60).map(function(q){return q.v}),'#5adce8')});
     $('lvRd').innerHTML='';
