@@ -3,7 +3,7 @@
 (function(){
   var el=document.getElementById('eko-licznik'); if(!el||!window.fetch) return;
   var dbg=/[?&]licznik=test/.test(location.search);
-  function pokaz(t){el.textContent=t;el.hidden=false;}
+  function pokaz(t){var s=el.style;s.display='block';s.fontSize='clamp(18px,2.4vw,24px)';s.fontWeight='700';s.lineHeight='1.4';s.margin='12px 0 4px';s.opacity='1';el.textContent=t;el.hidden=false;}
   fetch('https://ekotronik.goatcounter.com/counter/TOTAL.json',{cache:'no-store'})
     .then(function(r){ if(!r.ok){ var e=new Error('HTTP '+r.status); e.http=r.status; throw e; } return r.json(); })
     .then(function(d){
