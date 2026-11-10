@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EKOTRONIK AI ASYSTENT – interaktywna symulacja | EKOTRONIK SYSTEM</title>
+<meta name="description" content="Interaktywna symulacja aplikacji EKOTRONIK AI ASYSTENT: 8 funkcji prowadzonych (paliwo, ciśnienie, wtryskiwacze, doładowanie, fazy, EGR, DPF, SCR) w scenariuszach: sprawny, usterki, graniczny z suwakiem, warunki niewystarczające i własny.">
+<meta name="robots" content="index,follow">
+<link rel="icon" type="image/png" sizes="64x64" href="../assets_v8/favicon.png">
+<link rel="stylesheet" href="lab.css">
+<style>
+:root{--g:#d4af37;--gl:#f0d575;--cy:#4cc9e0;--or:#ff8a3d;--card:#1d1c19;--ln:#3b3418}
+html,body{height:100%}
+body{background:#060606;overflow:hidden}
+#app{height:100dvh;display:flex;flex-direction:column;gap:8px;padding:8px;max-width:1500px;margin:0 auto}
+.si-box{background:#141414;border:1px solid #2f2a16;border-radius:14px;padding:8px 14px}
+.si-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.si-top h1{margin:0;font-size:clamp(1.05rem,2.6vw,1.5rem);color:var(--g);letter-spacing:.03em}
+.si-top span{color:var(--or);font-size:.95rem}
+.si-sim{border:2px solid var(--or);color:var(--or);text-align:center;font-weight:800;border-radius:12px;padding:6px;font-size:.95rem;background:#141414}
+.si-tabs{display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
+.si-tabs button,.si-btn{font:inherit;font-weight:800;color:var(--gl);background:var(--card);border:1.5px solid var(--g);border-radius:12px;min-height:48px;cursor:pointer;padding:4px 6px;font-size:.95rem}
+.si-tabs button.on,.si-btn.pri{background:var(--g);color:#111}
+.si-btn.red{color:#ef5350;border-color:#ef5350}
+.si-btn:disabled{opacity:.4;cursor:default}
+.si-h2{color:var(--cy);font-weight:800;font-size:clamp(1.05rem,2.4vw,1.4rem);margin:2px 0}
+#scGrid{flex:1;min-height:0;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);gap:8px}
+@media(max-aspect-ratio:1/1){#scGrid{grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(3,1fr)}.si-tabs button{font-size:.78rem;padding:2px}}
+.sc{background:var(--card);border:1.5px solid var(--ln);border-radius:14px;padding:10px 14px;display:flex;flex-direction:column;gap:6px;cursor:pointer;text-align:left;font:inherit;color:var(--text);min-height:0;overflow:hidden}
+.sc.on{border:3px solid var(--g)}
+.sc b{color:var(--gl);font-size:clamp(1rem,2.2vw,1.35rem);display:flex;align-items:center;gap:10px}
+.sc i{width:20px;height:20px;border-radius:50%;flex:none}
+.sc p{margin:0;font-size:clamp(.9rem,1.9vw,1.1rem);line-height:1.35}
+.sc small{margin-top:auto;font-weight:800;font-size:.85rem}
+.sc .sl{margin-top:4px}.sc input[type=range]{width:100%;height:34px;accent-color:#f5a623}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.si-run{font-size:1.4rem;min-height:56px}
+/* jazda */
+#run{flex:1;min-height:0;display:flex;flex-direction:column;gap:8px}
+.si-step{border:2px solid var(--g);background:#1d1c19;border-radius:14px;padding:8px 14px}
+.si-step .k{color:var(--g);font-weight:800;font-size:.8rem;letter-spacing:.06em}
+.si-step .t{font-size:clamp(1.1rem,2.8vw,1.7rem);font-weight:800;color:#fff;line-height:1.2}
+.si-step .c{color:#aaa;font-size:.95rem}.si-step.okc{border-color:var(--ok)}
+.si-bar{height:6px;background:#2a2a2a;border-radius:3px;margin-top:4px;overflow:hidden}.si-bar i{display:block;height:100%;background:var(--g);width:0}
+.si-main{flex:1;min-height:0;display:grid;grid-template-columns:1.9fr 1fr;gap:8px}
+@media(max-aspect-ratio:1/1){.si-main{grid-template-columns:1fr;grid-template-rows:.8fr 1fr}}
+.si-ch{position:relative;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:12px;min-height:0;overflow:hidden}
+.si-ch canvas{position:absolute;inset:0;width:100%;height:100%}
+.si-side{background:#141414;border:1px solid #2a2a2a;border-radius:12px;padding:8px 14px;overflow:auto;min-height:0}
+.si-side h3{margin:6px 0 2px;font-size:.8rem;letter-spacing:.06em;color:var(--cy)}.si-side h3.f{color:#ef5350}
+.sr{display:flex;justify-content:space-between;font-weight:700;font-size:1rem}.sr b{font-family:"Roboto Mono",monospace}
+.si-side input[type=range]{width:100%;height:40px;accent-color:#d4af37}
+.si-side .hint{font-size:.88rem;color:#a3b0c2;min-height:1.2em}
+.si-btns{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+@media(max-aspect-ratio:1/1){.si-btns{grid-template-columns:repeat(2,1fr)}}
+.si-ft{font-size:.78rem;color:#7f8da1;text-align:center}
+#res{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.82);display:flex;align-items:center;justify-content:center;padding:14px}
+#res>div{width:min(780px,100%);max-height:100%;overflow:auto;background:#141414;border:3px solid var(--g);border-radius:18px;padding:16px 20px}
+#res h2{margin:0 0 6px;font-size:clamp(1.3rem,3.4vw,2rem)}
+#res .big{font-size:clamp(1.4rem,4vw,2.3rem);font-weight:900;margin:6px 0}
+#res table{width:100%;border-collapse:collapse;margin:8px 0}#res td{padding:5px 6px;border-bottom:1px solid #2f2a16;font-size:1rem}
+.hidden{display:none!important}
+</style></head><body>
+<div id="app">
+ <div id="s1" style="display:flex;flex-direction:column;gap:8px;flex:1;min-height:0">
+  <div class="si-box si-top"><h1>SYMULACJA INTERAKTYWNA</h1><span>krok 1 z 2: scenariusz</span></div>
+  <div class="si-sim">SYMULACJA · dane z emulatora, nie z pojazdu</div>
+  <div class="si-tabs" id="tabs"></div>
+  <div class="si-h2" id="h2"></div>
+  <div id="scGrid"></div>
+  <div class="si-box row"><b style="color:var(--cy)">TEMPO</b><button class="si-btn on" data-tp="1">×1 (jak w aucie)</button><button class="si-btn" data-tp="2">×2</button><button class="si-btn" data-tp="4">×4</button></div>
+  <button class="si-btn pri si-run" id="go">URUCHOM SYMULACJĘ ›</button>
+  <a class="si-btn" href="../index.html#galeria" style="text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center">← POWRÓT DO LAB</a>
+ </div>
+ <div id="run" class="hidden">
+  <div class="si-box si-top"><h1 id="rt"></h1><span>krok 2 z 2: jazda</span></div>
+  <div class="si-sim">SYMULACJA · dane z emulatora, nie z pojazdu</div>
+  <div class="si-step" id="stp"><div class="k" id="stk"></div><div class="t" id="stt"></div><div class="c" id="stc"></div><div class="si-bar"><i id="stb"></i></div></div>
+  <div class="si-main">
+   <div class="si-ch" id="chw"><canvas id="cv"></canvas></div>
+   <div class="si-side">
+    <h3>STEROWANIE SILNIKIEM (symulowane)</h3>
+    <div class="sr"><span>Gaz</span><b id="vg" style="color:var(--g)"></b></div><input type="range" id="sg" min="0" max="100" step="1" value="0" aria-label="Gaz">
+    <div class="sr"><span>Obroty</span><b id="vr" style="color:var(--ok)"></b></div><input type="range" id="sr" min="600" max="4000" step="10" value="850" aria-label="Obroty">
+    <div class="sr"><span>Temperatura silnika</span><b id="vt"></b></div>
+    <h3 class="f" id="fh">USTERKA NA ŻYWO</h3>
+    <div class="sr"><span id="fl">Nasilenie usterki</span><b id="vf" style="color:#ef5350"></b></div><input type="range" id="sf" min="0" max="100" step="1" value="0" aria-label="Usterka">
+    <div class="hint" id="fhint"></div>
+    <div class="row" id="ftype" style="margin:4px 0"></div>
+    <h3>ODCHYŁKA ZMIERZONEJ OD ZADANEJ</h3>
+    <div class="sr"><span>teraz</span><b id="vd"></b></div><div class="sr"><span>średnia z kroków</span><b id="va"></b></div><div class="hint" id="vz"></div>
+   </div>
+  </div>
+  <div class="si-btns"><button class="si-btn pri" id="bOk">POTWIERDZAM</button><button class="si-btn" id="bPa">PAUZA</button><button class="si-btn red" id="bFt">USTERKA ON/OFF</button><button class="si-btn" id="bEv">OCEŃ TERAZ</button></div>
+  <button class="si-btn" id="bBk">← POWRÓT DO WYBORU SCENARIUSZA</button>
+  <div class="si-ft">Asystent tylko prowadzi i ocenia. Silnikiem steruje diagnosta. Wszystko to symulacja: aplikacja, sprzęt i pojazd nie były w tym teście używane.</div>
+ </div>
+</div>
+<div id="res" class="hidden"></div>
+<script src="lab.js"></script>
+<script>
+(function(){
+const $=id=>document.getElementById(id),f1=LAB.f1,clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const THR=.08; // próg odchyłki: 8 % zakresu
+/* funkcje prowadzone: zakres sygnału, model wartości zadanej (lo+span*clamp(a*u+b*g+c)), znak odchyłki */
+const FN=[
+ {k:'Paliwo',n:'Regulacja mieszanki i katalizator',q:'Lambda (λ)',lo:.8,hi:1.2,dec:2,u:'',a:0,b:-.2,c:.5,
+  A:{n:'Sonda lambda wolna (starzenie)',d:'Sonda reaguje za wolno na zmiany obciążenia',type:'lag',f:.8,exp:'oczekiwany: NIEZGODNE',res:'Sonda lambda nie nadąża za wartością zadaną. Zmierzone λ spóźnia się za zadanym. Podejrzewaj starzenie sondy lub jej ogrzewanie; sprawdź też podsysanie powietrza.'},
+  B:{n:'Mieszanka uboga',d:'Stała odchyłka λ w górę: podsysanie powietrza',type:'offset',sgn:1,f:.22,exp:'oczekiwany: NIEZGODNE',res:'Zmierzone λ stale powyżej zadanego. Mieszanka uboga: najpierw sprawdź podsysanie powietrza i przepływomierz, potem ciśnienie paliwa.'}},
+ {k:'Ciśn.',n:'Ciśnienie paliwa',q:'Ciśnienie w szynie [bar]',lo:200,hi:1800,dec:0,u:'bar',a:.5,b:.42,c:.03,
+  A:{n:'Zawór regulacyjny zacięty',d:'Ciśnienie nie podąża za zadanym',type:'stuck',f:.9,exp:'oczekiwany: NIEZGODNE',res:'Ciśnienie w szynie prawie nie reaguje na zmianę zadanego. Podejrzewaj zawór regulacyjny ciśnienia. Najpierw wyklucz zasilanie niskociśnieniowe (filtr, pompa podająca).'},
+  B:{n:'Pompa wysokiego ciśnienia osłabiona',d:'Ciśnienie nie dobija pod obciążeniem',type:'clip',f:.7,exp:'oczekiwany: NIEZGODNE',res:'Ciśnienie rośnie do pewnego poziomu i dalej nie. Pod obciążeniem brakuje wydajności. Wyklucz filtr i zasilanie niskociśnieniowe, potem pompę.'}},
+ {k:'Wtrysk',n:'Testy wtryskiwaczy',q:'Korekta wydatku cyl. 3 [mg/suw]',lo:-4,hi:4,dec:1,u:'mg',a:0,b:0,c:.5,
+  A:{n:'Cylinder 3: korekta w górę',d:'Sterownik dodaje paliwo na cylindrze 3',type:'offset',sgn:1,f:.3,exp:'oczekiwany: NIEZGODNE',res:'Korekta cylindra 3 odbiega od zerowej. To dopiero wskazanie do dalszej weryfikacji: najpierw trzeba wykluczyć ciśnienie w szynie, zasilanie, powietrze i elektrykę. Asystent nie zaleca wymiany wtryskiwacza.'},
+  B:{n:'Cylinder 3: korekta w dół',d:'Sterownik odbiera paliwo na cylindrze 3',type:'offset',sgn:-1,f:.25,exp:'oczekiwany: NIEZGODNE',res:'Korekta cylindra 3 ujemna, poza zakresem. Wskazanie do weryfikacji po wykluczeniu ciśnienia, zasilania, powietrza i elektryki. Asystent nie zaleca wymiany wtryskiwacza.'}},
+ {k:'Doład.',n:'Doładowanie',q:'Ciśnienie doładowania [kPa abs]',lo:100,hi:250,dec:0,u:'kPa',a:.5,b:.45,c:0,
+  A:{n:'Wyciek za sprężarką',d:'Brak ciśnienia pod obciążeniem',type:'offset',sgn:-1,f:.3,exp:'oczekiwany: NIEZGODNE',res:'Doładowanie stale poniżej zadanego. Zacznij od próby szczelności układu dolotowego (węże, intercooler), potem zawór upustowy.'},
+  B:{n:'Zacięta geometria turbiny',d:'Doładowanie nie podąża za zadanym',type:'stuck',f:.8,exp:'oczekiwany: NIEZGODNE',res:'Doładowanie prawie nie zmienia się z obciążeniem. Podejrzewaj siłownik geometrii turbiny lub jego zasilanie podciśnieniem.'}},
+ {k:'Fazy',n:'Fazy rozrządu (nastawnik)',q:'Kąt nastawnika [°KW]',lo:-10,hi:40,dec:1,u:'°',a:.6,b:.2,c:.05,
+  A:{n:'Nastawnik zacięty',d:'Kąt nie podąża za zadanym',type:'stuck',f:.9,exp:'oczekiwany: NIEZGODNE',res:'Nastawnik fazy nie zmienia kąta zgodnie z poleceniem. Sprawdź olej i zawór sterujący nastawnika.'},
+  B:{n:'Nastawnik spóźniony (olej)',d:'Reakcja z opóźnieniem',type:'lag',f:.8,exp:'oczekiwany: NIEZGODNE',res:'Nastawnik reaguje z wyraźnym opóźnieniem. Sprawdź poziom i lepkość oleju, filtr zaworu sterującego.'}},
+ {k:'EGR',n:'EGR: ocena sprawności',q:'Pozycja zaworu EGR [%]',lo:0,hi:100,dec:0,u:'%',a:.4,b:.3,c:.05,
+  A:{n:'Usterka: zawór zacięty',d:'Pozycja nie podąża za zadaną',type:'stuck',f:.85,exp:'oczekiwany: PRZESŁANKA / NIEZGODNE',res:'Pozycja zaworu EGR nie podąża za poleceniem ECU. Podejrzewaj zawór lub jego siłownik. Zacznij od inspekcji i czyszczenia, bez kasowania adaptacji.'},
+  B:{n:'Usterka: zatkany kanał',d:'Zawór chodzi, przepływ za mały',type:'clip',f:.85,exp:'oczekiwany: PRZESŁANKA',res:'Zawór chodzi, ale zmierzony przepływ nie osiąga zadanego. Podejrzewaj zanieczyszczony kanał lub chłodnicę EGR.'}},
+ {k:'DPF',n:'DPF: różnica ciśnień',q:'Różnica ciśnień DPF [kPa]',lo:0,hi:30,dec:1,u:'kPa',a:.55,b:.3,c:.03,
+  A:{n:'Filtr zapchany',d:'Różnica ciśnień za duża',type:'offset',sgn:1,f:.3,exp:'oczekiwany: NIEZGODNE',res:'Różnica ciśnień wyraźnie powyżej wzorca dla tego przepływu spalin. Filtr zapchany: sprawdź stopień zapełnienia sadzą i warunki regeneracji. Asystent nie uruchamia regeneracji.'},
+  B:{n:'Filtr uszkodzony (za mała różnica)',d:'Różnica ciśnień zbyt mała',type:'offset',sgn:-1,f:.3,exp:'oczekiwany: NIEZGODNE',res:'Różnica ciśnień poniżej wzorca: możliwe uszkodzenie lub wycięcie wkładu. Potwierdź czujnikiem różnicy ciśnień i inspekcją.'}},
+ {k:'SCR',n:'SCR / AdBlue / NOx',q:'Konwersja NOx [%]',lo:0,hi:100,dec:0,u:'%',a:.1,b:0,c:.85,
+  A:{n:'Katalizator SCR zużyty',d:'Konwersja NOx za niska',type:'offset',sgn:-1,f:.3,exp:'oczekiwany: NIEZGODNE',res:'Konwersja NOx poniżej wzorca. Sprawdź jakość AdBlue, dozownik i czujniki NOx przed oceną katalizatora.'},
+  B:{n:'Dozownik opóźniony',d:'Konwersja reaguje z opóźnieniem',type:'lag',f:.7,exp:'oczekiwany: NIEZGODNE',res:'Konwersja NOx spóźnia się za wartością zadaną. Sprawdź dozownik i ciśnienie w układzie AdBlue.'}}
+];
+const STEPS=[
+ {t:'Rozgrzej silnik do 80 °C',c:'warunek: temperatura ≥ 80 °C (rośnie samoczynnie po uruchomieniu)',temp:true},
+ {t:'Bieg jałowy: 750–950 obr/min przez 8 s',c:'warunek: obroty 750–950 przez 8 s',r:[750,950],h:8},
+ {t:'Przygazuj do 2500 obr/min i trzymaj 10 s',c:'warunek: obroty 2400–2600 przez 10 s',r:[2400,2600],h:10},
+ {t:'Obciążenie: gaz powyżej 70 % przez 6 s',c:'warunek: gaz ≥ 70 % przez 6 s',g:70,h:6},
+ {t:'Wróć na bieg jałowy i trzymaj 5 s',c:'warunek: obroty 750–950 przez 5 s',r:[750,950],h:5}
+];
+const SCN=[ /* kolejność kart */
+ {id:'ok',n:'SPRAWNY',col:'#4cc96b',d:'Funkcja działa zgodnie z poleceniem ECU',exp:'oczekiwany wynik: ZGODNE',ec:'#4cc96b'},
+ {id:'A',col:'#ef5350',ec:'#ef5350'},{id:'B',col:'#ef5350',ec:'#ef5350'},
+ {id:'gr',n:'GRANICZNY',col:'#f5a623',d:'Wynik tuż przy progu: sprawdź, co wskaże ocena. Przesuwasz odległość od progu suwakiem.',exp:'suwak „blisko progu” ±',ec:'#f5a623'},
+ {id:'nd',n:'WARUNKI NIEWYSTARCZAJĄCE',col:'#a8a79c',d:'Funkcja zablokowana przez ECU, zimny silnik: temperatura nie dojdzie do 80 °C',exp:'oczekiwany: ZA MAŁO DANYCH',ec:'#a8a79c'},
+ {id:'wl',n:'WŁASNY',col:'#d4af37',d:'Ustawiasz usterkę suwakiem w trakcie jazdy i wybierasz jej rodzaj',exp:'pełna swoboda',ec:'#d4af37'}
+];
+let fi=5,sid='ok',tempo=1,gr=0; // gr: odległość od progu w % (−50..+50)
+const sTabs=$('tabs');sTabs.innerHTML=FN.map((x,i)=>'<button data-i="'+i+'">'+(i+1)+' '+x.k+'</button>').join('');
+function drawCards(){
+ const F=FN[fi];$('h2').textContent=F.n+' · wybierz scenariusz';
+ sTabs.querySelectorAll('button').forEach((b,i)=>b.classList.toggle('on',i===fi));
+ $('scGrid').innerHTML=SCN.map(s=>{const o=s.id==='A'||s.id==='B'?F[s.id]:null,n=o?(/^Usterka/.test(o.n)?o.n.toUpperCase().replace(/^USTERKA:/,'USTERKA:'):'USTERKA: '+o.n):s.n,d=o?o.d:s.d,e=o?o.exp:s.exp;
+  return '<div class="sc'+(s.id===sid?' on':'')+'" data-id="'+s.id+'" role="button" tabindex="0"><b><i style="background:'+s.col+'"></i>'+n+'</b><p>'+d+'</p>'+(s.id==='gr'?'<div class="sl"><div class="sr"><span>Odległość od progu</span><b id="grv"></b></div><input type="range" id="grs" min="-50" max="50" step="1" value="'+gr+'" aria-label="Odległość od progu"><div class="hint" id="grh"></div></div>':'')+'<small style="color:'+s.ec+'">'+e+'</small></div>'}).join('');
+ grLab();
+ $('scGrid').querySelectorAll('.sc').forEach(el=>el.onclick=e=>{if(e.target.tagName==='INPUT')return;sid=el.dataset.id;drawCards()});
+ const g=$('grs');if(g){g.oninput=()=>{gr=+g.value;sid='gr';grLab();$('scGrid').querySelectorAll('.sc').forEach(el=>el.classList.toggle('on',el.dataset.id==='gr'))}}
+}
+function zoneOf(d){const m=d/THR;return m<.8?['ok','ZGODNE']:m<=1.2?['warn','GRANICZNE (UWAGA)']:['fail','NIEZGODNE']}
+function grLab(){const v=$('grv');if(!v)return;const dev=THR*(1+gr/100);v.textContent=(gr>0?'+':gr<0?'−':'')+Math.abs(gr)+' %';$('grh').textContent='odchyłka ≈ '+f1(dev*100)+' % zakresu przy progu '+f1(THR*100,0)+' % → '+zoneOf(dev)[1]}
+sTabs.onclick=e=>{const b=e.target.closest('button');if(b){fi=+b.dataset.i;drawCards()}};
+document.querySelectorAll('[data-tp]').forEach(b=>b.onclick=()=>{tempo=+b.dataset.tp;document.querySelectorAll('[data-tp]').forEach(x=>x.classList.toggle('on',x===b))});
+/* ===== silnik symulacji ===== */
+let S=null,raf=0,last=0;
+const cv=$('cv'),ctx=cv.getContext('2d');
+function spec(){const F=FN[fi];let o;
+ if(sid==='A'||sid==='B')o=F[sid];
+ else if(sid==='gr')o={type:'offset',sgn:F.A.sgn||1,f:THR*(1+gr/100)};
+ else if(sid==='wl')o={...F.A,f:F.A.f};
+ else o={type:'offset',sgn:1,f:0};
+ return o}
+function newRun(){
+ const F=FN[fi],o=spec();
+ S={F,o,sid,t:0,temp:sid==='nd'?30:38,gaz:0,rpm:850,si:0,hold:0,ready:false,paused:false,faultOn:true,
+    f:sid==='wl'?0.5:o.f,wtype:'A',y:null,hist:[],devs:[],valid:0,done:false,rnd:LAB.rng(7+fi*13),acc:0};
+ $('sg').value=0;$('sr').value=850;$('sf').value=Math.round(S.f*100);
+ $('rt').textContent=F.n;
+ const own=sid==='wl',gr_=sid==='gr';
+ $('sf').disabled=!own;$('fh').textContent=own?'USTERKA NA ŻYWO':'USTERKA (zadana scenariuszem)';
+ $('ftype').innerHTML=own?['A','B'].map(k=>'<button class="si-btn'+(k==='A'?' pri':'')+'" style="min-height:40px;font-size:.85rem" data-w="'+k+'">'+F[k].n+'</button>').join(''):'';
+ $('fl').textContent=own?'Nasilenie usterki':'Nasilenie (stałe)';
+ $('bPa').textContent='PAUZA';
+ stepUI();upd();
+}
+function tgt(F,rpm,gz){const u=clamp((rpm-800)/2800,0,1),g=gz/100;return F.lo+(F.hi-F.lo)*clamp(F.a*u+F.b*g+F.c,0,1)}
+function condOk(st){
+ if(st.temp)return S.temp>=80;
+ if(st.r)return S.rpm>=st.r[0]&&S.rpm<=st.r[1];
+ if(st.g)return S.gaz>=st.g;
+ return false}
+function meas(dt){
+ const F=S.F,o=S.wtype&&S.sid==='wl'?F[S.wtype]:S.o,span=F.hi-F.lo,tg=tgt(F,S.rpm,S.gaz);
+ const f=S.faultOn?S.f:0,ty=o.type;let m=tg;
+ if(S.y===null)S.y=tg;
+ if(ty==='offset'){m=tg+(o.sgn||1)*f*span}
+ else if(ty==='lag'){const tau=.2+f*10;S.y+=(tg-S.y)*Math.min(1,dt/tau);m=S.y-f*.5*(S.y-F.lo)}
+ else if(ty==='stuck'){m=tg+(F.lo+span*.25-tg)*f}
+ else if(ty==='clip'){m=Math.min(tg,F.lo+span*(1-f*1.0)*.9+(tg-F.lo)*0)}
+ if(ty!=='lag')S.y=m;
+ m=clamp(m,F.lo-span*.1,F.hi+span*.1);
+ return{tg,m,mn:m+LAB.gauss(S.rnd)*.0015*span}
+}
+function stepSim(dt){
+ const st=STEPS[S.si];
+ S.t+=dt;
+ const maxT=S.sid==='nd'?55:95;
+ if(S.rpm>600)S.temp=Math.min(maxT,S.temp+1.6*dt);
+ const r=meas(dt);
+ const ok=condOk(st);
+ if(ok){S.hold+=dt;if(!st.temp&&S.hold>=st.h)S.ready=true;if(st.temp)S.ready=true}else{S.hold=0}
+ if(S.si>0&&ok){S.valid+=dt;S.devs.push(Math.abs(r.m-r.tg)/(S.F.hi-S.F.lo))}
+ S.hist.push({t:S.t,tg:r.tg,m:r.mn,ok:S.si>0&&ok});
+ if(S.hist.length>600)S.hist.shift();
+ S.cur=r;
+}
+function stepUI(){
+ const st=STEPS[S.si];$('stk').textContent='ETAP '+(S.si+1)+' z '+STEPS.length+' · POLECENIE ASYSTENTA';$('stt').textContent=st.t;
+ S.ready=false;S.hold=0;
+}
+function upd(){
+ if(!S)return;
+ const st=STEPS[S.si];
+ $('vg').textContent=Math.round(S.gaz)+' %';$('vr').textContent=Math.round(S.rpm)+' obr/min';$('vt').textContent=Math.round(S.temp)+' °C';
+ $('vf').textContent=Math.round(S.f*100)+' %';
+ const need=st.temp?0:st.h;
+ const msg=st.temp?(S.temp>=80?'warunek spełniony':(S.sid==='nd'?'temperatura '+Math.round(S.temp)+' °C: ECU blokuje funkcję, silnik się nie rozgrzeje do 80 °C. Użyj OCEŃ TERAZ.':'temperatura '+Math.round(S.temp)+' °C, rośnie…')):(S.ready?'warunek spełniony: naciśnij POTWIERDZAM':'jest '+f1(S.hold,0)+' z '+need+' s'+(condOk(st)?'':' · poza zakresem'));
+ $('stc').textContent=st.c+' · '+msg;
+ $('stp').className='si-step'+(S.ready?' okc':'');
+ $('stb').style.width=(st.temp?clamp((S.temp-30)/50,0,1):clamp(S.hold/need,0,1))*100+'%';
+ $('bOk').disabled=!S.ready||S.done;
+ const r=S.cur;
+ if(r){const d=Math.abs(r.m-r.tg)/(S.F.hi-S.F.lo);$('vd').textContent=f1(d*100)+' %'}
+ const avg=S.devs.length?S.devs.reduce((a,b)=>a+b)/S.devs.length:null;
+ $('va').textContent=avg===null?'—':f1(avg*100)+' %';
+ const z=avg===null?null:zoneOf(avg);$('va').style.color=z?'var(--'+z[0]+')':'';
+ $('vz').textContent=avg===null?'brak próbek w warunkach kroku':z[1]+' · próg '+f1(THR*100,0)+' % zakresu';
+ const o=S.sid==='wl'?S.F[S.wtype]:S.o;
+ $('fhint').textContent=S.sid==='wl'?'Rodzaj: '+o.n:S.sid==='gr'?'Scenariusz graniczny: '+(gr>0?'+':'')+gr+' % od progu':S.sid==='ok'?'Scenariusz sprawny: bez usterki. USTERKA ON/OFF działa też tutaj tylko w trybie własnym.':S.sid==='nd'?'Warunki niewystarczające':o.n;
+ draw();
+}
+function draw(){
+ const w=cv.parentElement.clientWidth,h=cv.parentElement.clientHeight,d=Math.min(devicePixelRatio||1,2);
+ if(w<=0)return;if(cv.width!==Math.round(w*d)||cv.height!==Math.round(h*d)){cv.width=Math.round(w*d);cv.height=Math.round(h*d)}
+ const c=ctx,F=S.F,W=cv.width,H=cv.height,L=64*d,R=10*d,T=34*d,B=26*d,pw=W-L-R,ph=H-T-B;
+ c.clearRect(0,0,W,H);c.fillStyle='#fff';c.font='bold '+(14*d)+'px Roboto,sans-serif';c.textAlign='left';
+ c.fillText(F.q+': zadana ── / zmierzona - - - (odchyłka na czerwono)',10*d,22*d);
+ const span=F.hi-F.lo,y=v=>T+ph-(v-F.lo)/span*ph;
+ c.font=(12*d)+'px Roboto,sans-serif';c.strokeStyle='rgba(255,255,255,.08)';c.fillStyle='#8f9db0';c.textAlign='right';
+ for(let i=0;i<=4;i++){const v=F.lo+span*i/4,yy=y(v);c.beginPath();c.moveTo(L,yy);c.lineTo(L+pw,yy);c.stroke();c.fillText(v.toFixed(F.dec).replace('.',','),L-6*d,yy+4*d)}
+ const WIN=40,t1=Math.max(S.t,WIN),t0=t1-WIN,X=t=>L+(t-t0)/WIN*pw,hs=S.hist.filter(p=>p.t>=t0);
+ c.textAlign='center';for(let s=0;s<=WIN;s+=10){c.fillText('−'+(WIN-s)+' s',L+s/WIN*pw,H-8*d)}
+ if(hs.length>1){
+  c.fillStyle='rgba(239,83,80,.35)';c.beginPath();hs.forEach((p,i)=>{i?c.lineTo(X(p.t),y(p.tg)):c.moveTo(X(p.t),y(p.tg))});for(let i=hs.length-1;i>=0;i--)c.lineTo(X(hs[i].t),y(hs[i].m));c.closePath();c.fill();
+  c.lineWidth=3*d;c.strokeStyle='#f0d575';c.beginPath();hs.forEach((p,i)=>{i?c.lineTo(X(p.t),y(p.tg)):c.moveTo(X(p.t),y(p.tg))});c.stroke();
+  c.strokeStyle='#ef5350';c.setLineDash([9*d,6*d]);c.lineWidth=2.6*d;c.beginPath();hs.forEach((p,i)=>{i?c.lineTo(X(p.t),y(p.m)):c.moveTo(X(p.t),y(p.m))});c.stroke();c.setLineDash([]);
+  const p=hs[hs.length-1];c.strokeStyle='#d4af37';c.lineWidth=d;c.beginPath();c.moveTo(X(p.t),T);c.lineTo(X(p.t),T+ph);c.stroke();
+ }
+}
+function loop(ts){
+ raf=requestAnimationFrame(loop);
+ if(!S||S.paused||S.done||$('run').classList.contains('hidden')){last=ts;return}
+ let dt=Math.min(.1,(ts-last)/1000)*tempo;last=ts;
+ const n=Math.max(1,Math.round(dt/.05));for(let i=0;i<n;i++)stepSim(dt/n);
+ upd();
+}
+function evaluate(why){
+ S.done=true;
+ const F=S.F,o=S.sid==='wl'?F[S.wtype]:S.o,avg=S.devs.length?S.devs.reduce((a,b)=>a+b)/S.devs.length:null;
+ let cls,title,txt;
+ const minS=14;
+ if(avg===null||S.valid<minS||S.sid==='nd'&&S.temp<80){cls='warn';title='ZA MAŁO DANYCH';
+  txt=S.temp<80?'Silnik nie osiągnął 80 °C, a ECU blokuje tę funkcję w zimnym silniku. Nie wydaję oceny, bo wynik byłby zgadywaniem. Rozgrzej silnik w prawdziwym aucie i powtórz.':'Zebrano tylko '+f1(S.valid,1)+' s poprawnych próbek (potrzeba co najmniej '+minS+' s). Wykonaj kroki w podanych zakresach i powtórz.'}
+ else{const z=zoneOf(avg);cls=z[0];title=z[1];
+  txt=z[0]==='ok'?'Zmierzona wartość zgodna z zadaną w granicach progu. Brak podstaw do wskazywania usterki tej funkcji.':z[0]==='warn'?'Odchyłka tuż przy progu. Wynik nie jest jednoznaczny: powtórz pomiar, sprawdź powtarzalność i dodatkowe dane zanim cokolwiek wskażesz.':(S.sid==='wl'||S.sid==='A'||S.sid==='B'?o.res:o.res||'Odchyłka powyżej progu. Sprawdź tor pomiarowy i powtórz.')}
+ const col={ok:'var(--ok)',warn:'var(--warn)',fail:'var(--fail)'}[cls];
+ $('res').innerHTML='<div style="border-color:'+col+'"><h2 style="color:var(--gold)">'+F.n+' · wynik oceny</h2><div class="big" style="color:'+col+'">'+title+'</div><p style="font-size:1.1rem;margin:4px 0">'+txt+'</p><table><tr><td>Średnia odchyłka z kroków</td><td><b>'+(avg===null?'—':f1(avg*100)+' % zakresu')+'</b></td></tr><tr><td>Próg oceny</td><td>ZGODNE &lt; '+f1(THR*80,1)+' % · GRANICZNE '+f1(THR*80,1)+'–'+f1(THR*120,1)+' % · NIEZGODNE &gt; '+f1(THR*120,1)+' %</td></tr><tr><td>Zebrane próbki w warunkach</td><td>'+f1(S.valid,1)+' s</td></tr><tr><td>Scenariusz</td><td>'+({ok:'sprawny',A:'usterka A',B:'usterka B',gr:'graniczny ('+(gr>0?'+':'')+gr+' % od progu)',nd:'warunki niewystarczające',wl:'własny'}[S.sid])+'</td></tr></table><p class="si-ft" style="text-align:left">Ocena z symulacji. Asystent nie steruje silnikiem, nie kasuje adaptacji i nie zaleca wymiany części.</p><div class="row"><button class="si-btn pri" id="rAg" style="flex:1">POWTÓRZ</button><button class="si-btn" id="rBk" style="flex:1">ZMIEŃ SCENARIUSZ</button></div></div>';
+ $('res').classList.remove('hidden');
+ $('rAg').onclick=()=>{$('res').classList.add('hidden');newRun()};
+ $('rBk').onclick=()=>{$('res').classList.add('hidden');back()};
+}
+function back(){$('run').classList.add('hidden');$('s1').style.display='flex';drawCards()}
+$('go').onclick=()=>{$('s1').style.display='none';$('run').classList.remove('hidden');newRun();last=performance.now()};
+$('bBk').onclick=back;
+$('sg').oninput=()=>{S.gaz=+$('sg').value;upd()};$('sr').oninput=()=>{S.rpm=+$('sr').value;upd()};
+$('sf').oninput=()=>{S.f=+$('sf').value/100;upd()};
+$('bOk').onclick=()=>{if(!S.ready)return;if(S.si>=STEPS.length-1){evaluate();return}S.si++;stepUI();upd()};
+$('bPa').onclick=()=>{S.paused=!S.paused;$('bPa').textContent=S.paused?'WZNÓW':'PAUZA'};
+$('bFt').onclick=()=>{S.faultOn=!S.faultOn;$('bFt').textContent='USTERKA '+(S.faultOn?'ON/OFF · jest ON':'ON/OFF · jest OFF');upd()};
+$('bEv').onclick=()=>evaluate();
+$('ftype').onclick=e=>{const b=e.target.closest('[data-w]');if(!b)return;S.wtype=b.dataset.w;S.y=null;$('ftype').querySelectorAll('button').forEach(x=>x.classList.toggle('pri',x===b));upd()};
+addEventListener('resize',()=>{if(S&&!$('run').classList.contains('hidden'))draw()});
+drawCards();raf=requestAnimationFrame(loop);
+window.__si={FN,get S(){return S},setup(i,id,g){fi=i;sid=id;if(g!==undefined)gr=g;$('s1').style.display='none';$('run').classList.remove('hidden');newRun()},step:stepSim,evaluate,upd,set(k,v){S[k]=v},THR,zoneOf};
+})();
+</script></body></html>
