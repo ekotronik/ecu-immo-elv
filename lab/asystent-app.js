@@ -127,16 +127,16 @@ var SIM='<div class="sim">SYMULACJA · TRYB TESTOWY: dane testowe, nie z pojazdu
 var ICON={an:'<svg viewBox="0 0 40 40"><rect x="6" y="12" width="28" height="18" rx="3"/><path d="M14 12V8h12v4M20 16l-4 6h6l-4 6"/></svg>',live:'<svg viewBox="0 0 40 40"><path d="M5 31l8-9 6 5 8-13 8 6"/><path d="M5 35h30"/></svg>',rap:'<svg viewBox="0 0 40 40"><path d="M10 5h14l8 8v22H10z"/><path d="M24 5v8h8M15 20h12M15 26h12M15 32h8"/></svg>',fun:'<svg viewBox="0 0 40 40"><path d="M10 10h4M10 20h4M10 30h4M18 10h14M18 20h14M18 30h14"/></svg>',cal:'<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="9"/><circle cx="20" cy="20" r="2"/><path d="M20 4v8M20 28v8M4 20h8M28 20h8"/></svg>',set:'<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="6"/><path d="M20 4v6M20 30v6M4 20h6M30 20h6M9 9l4 4M27 27l4 4M31 9l-4 4M13 27l-4 4"/></svg>'};
 
 /* ---------- ekran HUB (lista opcji jak w aplikacji) ---------- */
-var HUB=mk('hub','<div class="bar"><b id="hubT"></b><span id="hubS"></span></div><div class="rows" id="hubR"></div>'+SIM+'<button class="bigbtn gold" id="hubB">←  POWRÓT DO PANELU</button>');
+var HUB=mk('hub','<div class="tbh"></div><div class="bar"><b id="hubT"></b><span id="hubS"></span></div><div class="rows" id="hubR"></div><button class="bigbtn hubback" id="hubB">←  POWRÓT DO PANELU</button>');
 function hub(title,sub,rows,back){
   $('hubT').textContent=title;$('hubS').textContent=sub;
   var h='';rows.forEach(function(r,i){h+='<button class="rw" data-i="'+i+'"><div><b>'+r.t+'</b><span>'+r.d+'</span></div><i>›</i></button>'});
   $('hubR').innerHTML=h;
   HUB.querySelectorAll('.rw').forEach(function(b){b.onclick=function(){rows[+b.dataset.i].go()}});
   $('hubB').onclick=back||function(){C.show('home')};
-  C.show('hub');
+  fillTb();C.show('hub');
 }
-C.register('hub',HUB);
+C.register('hub',HUB);C.register('menu',document.getElementById('s-menu'),{on:fillTb});
 
 /* ---------- wybór scenariusza pojazdu ---------- */
 var VS=mk('veh','<div class="bar"><b id="vehT"></b><span>wybór scenariusza symulacji</span></div><div class="tabs2" id="vehM"></div><div class="scs" id="vehL"></div><div class="sdesc" id="vehD"></div><div class="row2"><button class="bigbtn" id="vehBack">←  POWRÓT</button><button class="bigbtn gold" id="vehGo">START SYMULACJI  ▶</button></div>');
@@ -362,7 +362,7 @@ function anRender(){
 C.register('an',AN);
 
 /* ================= EKRAN: KALIBRACJA EKO-SCAN ================= */
-var KB=mk('kal','<div class="bar"><b>KALIBRACJA EKO-SCAN</b><span>test, zapis ekranów · SYMULACJA</span></div><div class="scs" id="kalS" style="flex:0 0 auto;grid-auto-rows:auto"></div><div class="card2" id="kalC" style="flex:1"></div><div class="btns" id="kalBtn"></div>');
+var KB=mk('kal','<div class="bar"><b>KALIBRACJA<br>EKO-SCAN</b><span>test, zapis ekranów · SYMULACJA</span></div><div class="scs" id="kalS" style="flex:0 0 auto;grid-auto-rows:auto"></div><div class="card2" id="kalC" style="flex:1"></div><div class="btns" id="kalBtn"></div>');
 var KSC=[{t:'EKO-SCAN reaguje poprawnie',d:'Wszystkie ekrany rozpoznane, dotyk bez opóźnień.',k:'SPRAWNY',lag:0,miss:0},{t:'Opóźniona reakcja dotyku',d:'Ekran odpowiada po ok. 1,5 s: asystent czeka dłużej na każdy ekran.',k:'GRANICZNY',lag:1.6,miss:0},{t:'Nierozpoznany ekran',d:'Jeden ekran (Strumień danych) nie jest rozpoznany: zapis ekranów pomaga to poprawić.',k:'USTERKA',lag:.4,miss:1}];
 var KS=0,KRUN=null,KTIMER=0,KSCREENS=['Menu główne EKO-SCAN','Wybór pojazdu','Wybór sterownika','Informacje o sterowniku','Kody usterek','Strumień danych'];
 function openKal(){KS=0;KRUN=null;kalRender();C.show('kal')}
@@ -406,28 +406,32 @@ C.register('set',SE);
 
 /* ================= PANEL GŁÓWNY (jak na zdjęciu tabletu) ================= */
 var HM=$('s-home');
-function topBar(){
-  var logo=document.querySelector('#hdr img')?'img/logo-emblem.png':'img/logo-emblem.png';
-  return '<div class="tb"><div class="lg"><img src="'+logo+'" alt=""><div><b>EKOTRONIK AI</b><small>ASYSTENT</small></div></div>'+
-  '<div class="tw" title="Magistrala CAN"><svg viewBox="0 0 60 30"><path d="M2 8h8v-4h8v4h8v-4h8v4h8v-4h8" stroke="#4de3f5" fill="none" stroke-width="2"/><path d="M2 24h8v4h8v-4h8v4h8v-4h8v4h8" stroke="#6be36b" fill="none" stroke-width="2"/></svg><small>CAN-H<br>CAN-L</small></div>'+
-  '<div class="tw" title="Prąd"><svg viewBox="0 0 60 30"><path d="M3 28V10h6v18M13 28V6h6v22M23 28V12h6v16M33 28V8h6v20M43 28V11h6v17" stroke="#ffa94d" fill="#ffa94d55" stroke-width="2"/></svg><small>15V<br>0V</small></div>'+
-  '<div class="tw" title="Wtryskiwacz"><svg viewBox="0 0 60 30"><path d="M2 24h14v-18h6v18h8l4-3h26" stroke="#ffd24a" fill="none" stroke-width="2"/></svg><small>200V<br>0V</small></div>'+
-  '<div class="tw st"><b>'+(SESS.src==='EKO-SCAN'?'EKO-SCAN: '+(SESS.v?'połączony':'niepołączony'):'EMULATOR (SYMULACJA)')+'</b><b>Model: załadowany</b><b>Pojazd: '+(SESS.v?'potwierdzono':'nie potwierdzono')+'</b></div>'+
-  '<button class="ib" id="hMic" title="Mikrofon">🎤</button><button class="ib" id="hSet" title="Ustawienia">⚙</button></div>';
+function topBar(sec){
+  var logo='img/logo-emblem.png',id=function(x){return sec?'':' id="'+x+'"'};
+  var on=SESS.v;
+  return '<div class="tb"><div class="lg"><img src="'+logo+'" alt=""><div><b>EKOTRONIK <i>AI</i></b><small>ASYSTENT</small></div></div>'+
+  '<div class="tw w1" title="Magistrala CAN"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3v4M8 7h8M12 7v6M7 13h10M12 13v4M9 21h6M12 17v4" stroke="#ffd24a" fill="none" stroke-width="1.8"/></svg><small class="cn">CAN-H<br>CAN-L</small><svg viewBox="0 0 70 34" class="wv"><path d="M2 6h6v-3h6v3h6v-3h6v3h6v-3h6v3h6v-3h6" stroke="#18e6c8" fill="none" stroke-width="3"/><path d="M2 28h6v3h6v-3h6v3h6v-3h6v3h6v-3h6v3h6" stroke="#31d46b" fill="none" stroke-width="3"/></svg><small class="vl">4.0V<br>2.5V<br>1.0V</small></div>'+
+  '<div class="tw w2" title="Prąd"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2" stroke="#ffd24a" fill="none" stroke-width="1.8"/><path d="M8 7V4h3v3M13 7V4h3v3M12 10l-3 4h4l-2 4" stroke="#ffd24a" fill="none" stroke-width="1.6"/></svg><svg viewBox="0 0 70 34" class="wv"><path d="M3 30V6h5v24M12 30V6h5v24M21 30V6h5v24M30 30V6h5v24M39 30V6h5v24M48 30V6h5v24M57 30V6h5v24" stroke="#ff9f2e" fill="#ff9f2e66" stroke-width="2"/></svg><small class="vl">15V<br>0V<br>-15V</small></div>'+
+  '<div class="tw w3" title="Wtryskiwacz"><svg class="ic" viewBox="0 0 24 24"><path d="M4 20l6-6M8 12l4 4M10 10l5-5 5 5-5 5zM15 5l5 5" stroke="#ffd24a" fill="none" stroke-width="1.8"/></svg><svg viewBox="0 0 70 34" class="wv"><path d="M2 28h14V8h5l3 18h6l4 2h34" stroke="#ffe27a" fill="none" stroke-width="2.4"/></svg><small class="vl">200V<br>100V<br>0V</small></div>'+
+  '<div class="tw st"><b><u class="dot'+(on||SESS.src!=='EKO-SCAN'?' g':'')+'"></u>'+(SESS.src==='EKO-SCAN'?'EKO-SCAN: '+(on?'połączony':'niepołączony'):'EMULATOR (SYMULACJA)')+' ▾</b><b>Model: załadowany</b><b>Pojazd: '+(on?'potwierdzono':'nie potwierdzono')+'</b></div>'+
+  '<button class="ib"'+id('hMic')+' title="Mikrofon">'+MICSVG+'</button><button class="ib"'+id('hSet')+' title="Ustawienia">'+GEARSVG+'</button></div>';
 }
+var MICSVG='<svg viewBox="0 0 24 24" width="26" height="26"><rect x="9" y="3" width="6" height="12" rx="3" fill="#4aa8ff"/><path d="M5 11a7 7 0 0014 0M12 18v3" stroke="#4aa8ff" fill="none" stroke-width="2"/></svg>';
+var GEARSVG='<svg viewBox="0 0 24 24" width="26" height="26"><circle cx="12" cy="12" r="3.2" fill="none" stroke="#5db7ff" stroke-width="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2" stroke="#5db7ff" stroke-width="2.4"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#5db7ff" stroke-width="2"/></svg>';
+function fillTb(){document.querySelectorAll('.tbh').forEach(function(e){e.innerHTML=topBar(true)})}
 function homeRender(){
   var v=SESS.v,e=v?engineEcu(v):null;
   var h=topBar()+'<div class="mp"><div class="col">'+
-   '<div class="pn" style="flex:0 0 auto"><h5>01 / STAN ASYSTENTA <button class="sm" id="hDet">SZCZEGÓŁY ›</button></h5><div class="kv"><span>Model</span><span>załadowany (qwen2.5-…)</span><span>EKO-SCAN</span><span>'+(v?'sesja aktywna':'czeka na EKO-SCAN')+'</span><span>Pojazd</span><span>'+(v?v.make+' '+v.model:'nie potwierdzono')+'</span><span>Ekran</span><span>'+(v?'obserwacja (symulacja)':'brak obserwacji')+'</span><span>DTC · Live</span><span>'+(v?e.dtc.length+' DTC · '+SESS.npids+' parametrów':'brak · brak pomiarów')+'</span></div><div class="small" style="font-size:.7rem">STOP aktywny: sesja zatrzymana; nowy START otwiera nową sesję</div></div>'+
-   '<div class="pn" style="flex:1"><h5>PODGLĄD BIEŻĄCEJ SESJI</h5><div class="tabs2" id="pvT"><button data-t="dtc" class="on">DTC</button><button data-t="par">Parametry</button><button data-t="prz">Przebieg</button></div><div class="pv" id="pvB"></div></div></div>'+
+   '<div class="pn" style="flex:0 0 auto"><h5>01 / STAN ASYSTENTA <button class="sm" id="hDet">SZCZEGÓŁY ›</button></h5><div class="chips"><div><b>Model</b><span>załadowany (qwen2.5-…)</span></div><div><b>EKO-SCAN</b><span>'+(v?'sesja aktywna':'czeka na EKO-SCAN')+'</span></div></div><div class="kv"><span>Pojazd</span><span>'+(v?v.make+' '+v.model:'nie potwierdzono')+'</span><span>Ekran</span><span>'+(v?'obserwacja (symulacja)':'brak obserwacji')+'</span><span>DTC · Live</span><span>'+(v?e.dtc.length+' DTC · '+SESS.npids+' parametrów':'brak · brak pomiarów')+'</span></div><div class="small" style="font-size:.7rem">STOP aktywny: sesja zatrzymana; nowy START otwiera nową sesję</div></div>'+
+   '<div class="pn" style="flex:1"><h5>PODGLĄD BIEŻĄCEJ SESJI</h5><div class="tabs2" id="pvT"><button data-t="dtc" class="on">DTC</button><button data-t="par">Parametry</button><button data-t="prz">Przebieg</button></div><div class="strip">EKO-SCAN · obserwacja ekranu · odtworzone z dziennika</div><div class="pv" id="pvB"></div></div></div>'+
   '<div class="col"><div class="pn" style="flex:0 0 auto"><h5>02 / ZADANIE '+(SESS.net?'<em>DOSTĘP DO SIECI</em>':'<em style="background:#b71c1c;color:#fff">BEZ SIECI</em>')+'</h5>'+(SESS.mistral?'<div><span class="chip">AI: MISTRAL WŁ.</span></div>':'<div><span class="chip cy">AI: WYŁ.</span></div>')+'<input class="inp" id="hQ" placeholder="Wpisz pytanie lub opisz objaw..."><button class="mb" id="hPdf">ZAŁĄCZ RAPORT EKO-SCAN (PDF)</button><button class="mb go" id="hStart">▶  START / DIAGNOSTYKA</button><div class="two"><button class="mb" id="hStop">STOP / WSTRZYMAJ</button><button class="mb" id="hAsk">ZAPYTAJ ASYSTENTA</button></div></div>'+
    '<div class="pn" style="flex:1"><h5>04 / ODPOWIEDŹ ASYSTENTA</h5><div class="ans" id="hAns"></div></div></div>'+
   '<div class="col"><div class="pn" style="flex:1"><h5>FUNKCJE</h5><div class="ft2">'+
-   '<button class="fb cy" id="fAn">'+ICON.an+'<b>ANALIZATORY</b><small>prąd · CAN · kompresja · rozrząd</small></button>'+
+   '<button class="fb cy" id="fAn">'+ICON.an+'<b>ANALIZATORY</b><small>prąd · CAN/LIN · silnik</small></button>'+
    '<button class="fb" id="fLive">'+ICON.live+'<b>LIVE DATA / WYKRESY ▶</b><small>pomiar, jazda, wykresy</small></button>'+
    '<button class="fb" id="fRap">'+ICON.rap+'<b>ANALIZA I RAPORTY ▶</b><small>PDF, hipotezy, historia</small></button>'+
    '<button class="fb cy" id="fFun">'+ICON.fun+'<b>FUNKCJE PROWADZONE ▶</b><small>paliwo · EGR · DPF · SCR</small></button>'+
-   '<button class="fb" id="fCal">'+ICON.cal+'<b>KALIBRACJA EKO-SCAN</b><small>test, zapis ekranów</small></button>'+
+   '<button class="fb yl" id="fCal">'+ICON.cal+'<b>KALIBRACJA<br>EKO-SCAN</b><small>test, zapis ekranów</small></button>'+
    '<button class="fb" id="fSet">'+ICON.set+'<b>USTAWIENIA</b><small>motyw, zgody, system</small></button></div><button class="sm" id="fExit" style="align-self:flex-end;border-color:#ef5350;color:#ff8a86">ZAMKNIJ APLIKACJĘ</button></div></div></div>';
   HM.innerHTML=h;
   pvRender('dtc');

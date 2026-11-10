@@ -133,7 +133,7 @@ input[type=range][disabled]{opacity:.5}
 .ft .bt .y{color:#f0b400}
 .tb{display:flex;align-items:center;gap:8px;border:1.5px solid var(--ap);border-radius:12px;padding:6px 10px;background:rgba(8,16,40,.95)}
 .tb .lg{display:flex;align-items:center;gap:8px;margin-right:auto}.tb .lg img{height:40px;width:auto}
-.tb .lg b{font-size:1.15rem;letter-spacing:.02em;color:#fff;line-height:1}.tb .lg small{display:block;letter-spacing:.35em;font-size:.65rem;color:#c7d2ea;margin-top:3px}
+.tb .lg b{font-size:1.15rem;letter-spacing:.02em;color:#fff;line-height:1}.tb .lg small{text-transform:uppercase;display:block;letter-spacing:.35em;font-size:.65rem;color:#c7d2ea;margin-top:3px}
 .tw{border:1.5px solid var(--ap);border-radius:10px;padding:3px 8px;background:#06102a;display:flex;align-items:center;gap:6px;min-width:0;height:42px}
 .tw svg{height:30px;width:auto}.tw small{font-size:.62rem;color:#c7d2ea;line-height:1.2;white-space:nowrap}
 .tw.st{flex-direction:column;align-items:flex-start;justify-content:center;gap:0}.tw.st b{font-size:.66rem;color:#fff}
@@ -189,6 +189,36 @@ input[type=range][disabled]{opacity:.5}
 .sw{width:54px;height:30px;border-radius:16px;border:1.5px solid var(--ap);background:#0a1a44;position:relative;cursor:pointer;flex:none}.sw::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#8fa3d2;transition:.15s}.sw.on{background:#27501f}.sw.on::after{left:27px;background:#8cf080}
 .thm{display:flex;gap:8px;flex-wrap:wrap}.thm button{width:44px;height:44px;border-radius:10px;border:2px solid #444;cursor:pointer}.thm button.on{border-color:#fff}
 @media (orientation:portrait),(max-width:820px){.mp{grid-template-columns:1fr;overflow:auto}.tb .tw:not(.st){display:none}.diag{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr) minmax(0,.6fr)}.col{min-height:auto}.ft2{grid-auto-rows:minmax(72px,auto)}}
+
+/* ===== dopasowanie do zdjęć (0.7.89) ===== */
+.app{background:#081530}
+.app .tb,.app .bar,.app .pn,.app .ft,.app .rw,.app .card2,.app .sess,.app .sc,.app .sdesc,.app .ctl,.app .chartp,.app .step{background:#0d2250}
+.app .pn h5,.app .bar b{font-weight:900;letter-spacing:.02em}
+.tb{padding:4px 8px;gap:6px}
+.tb .lg img{height:50px}
+.tb .lg b{font-size:1.75rem;font-weight:900;letter-spacing:-.01em;background:linear-gradient(180deg,#fff 30%,#7fd6ff);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 0 14px #2aa4ff55;-webkit-text-stroke:.6px #7fd0ff}
+.tb .lg b i{font-style:normal;color:#ffd24a;-webkit-text-fill-color:#ffd24a}
+.tb .lg small{font-size:.7rem;font-weight:900;letter-spacing:.5em;color:#fff;margin-top:2px}
+.tw{height:46px;gap:4px;padding:3px 6px;border-radius:8px;background:#071433}
+.tw .ic{height:24px;width:24px;flex:none}.tw .wv{height:34px;width:70px;flex:none}
+.tw small.cn{font-size:.5rem;font-weight:900;color:#fff}.tw small.vl{font-size:.5rem;font-weight:900;color:#dbe4f7;text-align:right;line-height:1.25}
+.tw.st{padding:3px 8px;border-radius:8px}.tw.st b{font-size:.62rem;display:flex;align-items:center;gap:4px}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#f0b400}.dot.g{background:#36d36b}
+.ib{background:#071433;border-color:#d98a2b;display:flex;align-items:center;justify-content:center}
+.chips{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.chips div{border:1.5px solid var(--ap);border-radius:8px;padding:3px 7px;background:#0a1a44;min-width:0}
+.chips b{display:block;font-size:.72rem;color:#fff}.chips span{display:block;font-size:.72rem;color:#ffe2a8;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.strip{background:#1fa3e0;color:#04162b;font-weight:900;font-size:.68rem;border-radius:5px;padding:3px 8px}
+.fb{background:#0c2358;font-weight:800}.fb b{font-size:.74rem;font-weight:900}.fb small{font-weight:700;color:#cfd9f2}
+.fb.yl{border-color:#f5c518}.fb.yl svg{stroke:#ffcc33}
+#s-menu .tiles{flex:1;grid-template-rows:repeat(2,minmax(0,1fr))}
+#s-menu .ft{font-weight:800}#s-menu .ft .d{font-weight:700;font-size:.78rem;color:#dbe4f7}#s-menu .ft .t{font-size:.98rem}
+.app .sim{border:2px solid #e53060;color:#6fe3ff;background:#0a1634}
+.app .bigbtn.gold{color:#0a2a6a}
+#s-menu,#s-hub,.scr[data-n=hub]{justify-content:flex-start}
+.rows{flex:0 0 auto;overflow:visible;gap:7px}.rw{flex:0 0 auto;min-height:0;padding:9px 16px}
+.rw b{font-size:1.05rem}
+.hubback{border-color:#4aa8ff!important}
 </style></head><body><div class="wrap">
 <div class="hdr" id="hdr"></div><div class="crumb" id="crumb"></div>
 
@@ -201,7 +231,7 @@ input[type=range][disabled]{opacity:.5}
 
  <!-- MENU FUNKCJI PROWADZONYCH -->
  <section class="scr" id="s-menu" aria-label="Funkcje prowadzone">
-  <div class="bar"><b>FUNKCJE PROWADZONE</b><span>wybierz funkcję</span></div>
+  <div class="tbh"></div><div class="bar"><b>FUNKCJE PROWADZONE</b><span>wybierz funkcję</span></div>
   <div id="sessBar"></div>
   <div class="tiles" id="tiles"></div>
   <div class="sim">SYMULACJA · TRYB TESTOWY: dane testowe, nie z pojazdu</div>
