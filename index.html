@@ -86,6 +86,15 @@
     /* HERO */
 
     .brand{display:flex;align-items:center;gap:12px;margin:4px 0 10px}
+    .brand-kula{position:relative;width:230px;height:215px;flex:0 0 auto}
+    .brand-kula video{position:absolute;left:50%;top:50%;width:232px;height:232px;transform:translate(-50%,-50%);clip-path:circle(48.2%);pointer-events:none}
+    @media (max-width: 720px){.brand-kula{width:190px;height:177px}.brand-kula video{width:192px;height:192px}}
+    @media (prefers-reduced-motion: reduce){.brand-kula video{display:none}.brand-kula{background:url("assets_v8/hero/logo_kula_plakat.webp") center/232px no-repeat}}
+    /* tlo hero: jednolity granat jak w logo; bez ozdobnikow obok logo */
+    .hero-card{background:#07182c !important}
+    .hero-bg{background:#07182c !important;filter:none !important;transform:none !important}
+    .hero-bg::after{display:none !important}
+    .hero-card .scan,.hero-left .eko-logo-wrap,.hero-left .brand-text{display:none !important}
     .brand-logo{width:230px;height:auto;display:block;border-radius:18px;filter: drop-shadow(0 16px 26px rgba(0,0,0,.55))}
     .brand-text{display:flex;flex-direction:column;gap:2px}
     .brand-name{font-weight:900;letter-spacing:.08em;font-size:12px;color:rgba(255,255,255,.86)}
@@ -1420,7 +1429,9 @@ html.boot-seen #bootScreen{display:none!important}
       <div class="hero-inner">
         <div class="hero-left">
           <div class="brand">
-            <img class="brand-logo" src="assets_v8/logo/logo_ekotronik_system.webp" width="640" height="598" alt="Logo EKOTRONIK SYSTEM" />
+            <div class="brand-kula" role="img" aria-label="Logo EKOTRONIK SYSTEM">
+              <video src="assets_v8/hero/logo_kula.mp4" poster="assets_v8/hero/logo_kula_plakat.webp" autoplay muted loop playsinline preload="auto" width="232" height="232" aria-hidden="true"></video>
+            </div>
             
 <!-- EKOTRONIK Premium SVG Logo (animated + scroll reactive) -->
 <div class="eko-logo-wrap" aria-label="EKOTRONIK — animowane logo">
