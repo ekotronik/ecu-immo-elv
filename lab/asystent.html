@@ -231,6 +231,27 @@ input[type=range][disabled]{opacity:.5}
 .tabs2 button{font-size:.98rem;padding:9px 4px}.pv,.ans{font-size:.95rem}.strip{font-size:.78rem}.pn .small{font-size:.8rem!important}
 .fb b{font-size:.95rem}.fb small{font-size:.72rem}.fb svg{width:56px;height:56px;filter:drop-shadow(0 0 4px rgba(240,176,48,.5))}.fb.cy svg{filter:drop-shadow(0 0 4px rgba(24,200,255,.5))}
 .sm{font-size:.82rem}.chip{font-size:.72rem}.pn h5 em{font-size:.72rem}
+
+.ride2{display:grid;gap:8px;flex:1;min-height:0;position:relative;grid-template-columns:minmax(0,.8fr) minmax(0,1.4fr)}
+.lcol{display:flex;flex-direction:column;gap:8px;min-height:0;min-width:0}
+.lcol .step{grid-column:auto}
+.dvw{flex:1;min-height:0;overflow:auto;background:#000;border:1px solid #6b5a33;border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:7px}
+.dvw .hd{background:#d6a852;color:#000;font-weight:900;font-size:.8rem;border-radius:6px;padding:3px 8px}
+.dvw .dr .t{display:flex;justify-content:space-between;gap:8px;align-items:baseline}.dvw .dr .t b{font-size:.9rem;color:#fff}.dvw .dr .t em{font-style:normal;font-weight:900;font-size:1.05rem}
+.dvw .dr .s{font-size:.74rem;color:#c9d3e6}
+.dvw .bar2{position:relative;height:12px;background:#151a22;border-radius:6px;margin:3px 0;overflow:hidden}
+.dvw .bar2 i{position:absolute;top:0;bottom:0;width:2px;background:#fff;left:50%}
+.dvw .bar2 u{position:absolute;top:0;bottom:0;border-radius:6px}
+.dvw .bar2 s{position:absolute;top:0;bottom:0;width:1px;background:#ffb300}
+.dvw .bar2 s.z{background:#ff5252}
+.dvw .w{font-size:.62rem;font-weight:900;letter-spacing:.04em}
+.ok2{color:#66bb6a}.uw2{color:#ffb300}.zl2{color:#ff5252}.nd2{color:#8fa3d2}
+.ride2 .chartp canvas{flex:1.5}
+.ride2 .rd{grid-template-columns:repeat(4,1fr);max-height:42%;overflow:auto;align-content:start}
+.ride2 .rd div .v.zl2{color:#ff6b66}.ride2 .rd div .v.uw2{color:#ffb300}
+#s-ride .ctl{display:none;position:absolute;left:0;right:0;bottom:0;z-index:6;box-shadow:0 -8px 30px #000;border:2px solid var(--ap);grid-template-columns:1fr 1fr;gap:0 18px}
+#s-ride .ctl.open{display:grid}
+@media (orientation:portrait),(max-width:820px){.ride2{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1.4fr) minmax(0,.9fr)}.ride2 .lcol{display:contents}.ride2 .lcol .step{order:1}.ride2 .chartp{order:2}.ride2 .dvw{order:3;max-height:none}#s-ride .ctl.open{display:grid}.ride2 .rd{grid-template-columns:repeat(3,1fr)}}
 </style></head><body><div class="wrap">
 <div class="hdr" id="hdr"></div><div class="crumb" id="crumb"></div>
 
@@ -265,8 +286,9 @@ input[type=range][disabled]{opacity:.5}
  <!-- JAZDA -->
  <section class="scr" id="s-ride" aria-label="Przebieg funkcji prowadzonej">
   <div class="bar"><b id="rT">Funkcja</b><span id="rS">krok</span></div>
-  <div class="ride">
-   <div class="step"><div class="k" id="stK"></div><div class="c" id="stC"></div><div class="w" id="stW"></div><div class="pg" id="stP"></div></div>
+  <div class="ride2">
+   <div class="lcol"><div class="step"><div class="k" id="stK"></div><div class="c" id="stC"></div><div class="w" id="stW"></div><div class="pg" id="stP"></div></div>
+   <div class="dvw" id="dvw"></div></div>
    <div class="chartp"><canvas id="cv"></canvas><div class="rd" id="rd"></div></div>
    <div class="ctl" id="ctl">
     <div><h4>STEROWANIE SILNIKIEM (symulowane)</h4>
@@ -285,6 +307,7 @@ input[type=range][disabled]{opacity:.5}
   <div class="btns">
    <button class="bigbtn gold" id="bOk">POTWIERDZAM</button>
    <button class="bigbtn" id="bPause">PAUZA</button>
+   <button class="bigbtn" id="bCtl">STEROWANIE SYMULACJĄ</button>
    <button class="bigbtn" id="bECT" style="display:none">ECT AUTO</button>
    <button class="bigbtn red" id="bFault">USTERKA ON/OFF</button>
    <button class="bigbtn red" id="bStop">STOP</button>
@@ -453,6 +476,94 @@ function stages(fn){
  return s;
 }
 
+/* ===== zestawy parametrów funkcji (role jak w aplikacji: Funkcje.kt, Pasma.kt) ===== */
+function osc(c,f,a){return Math.sin(c.t*f)*a}
+function kor(n){return function(c){var k=c.cyl===n?c.me:(c.shift?c.f*.9:0);return k+.12*Math.sin(c.t*(.5+n*.12)+n)}}
+var PRM={
+paliwo:[
+ {id:'stft',l:'Korekta krótka STFT (bank 1)',u:'%',d:1,key:1,v:function(c){return c.me*.4+1.4*Math.sin(c.t*0.52)}},
+ {id:'ltft',l:'Korekta długa LTFT (bank 1)',u:'%',d:1,key:1,v:function(c){return c.me*.6+.15*Math.sin(c.t*.2)}},
+ {id:'s1',l:'Sonda przed katalizatorem S1',u:'V',d:2,key:1,v:function(c){return .45+.4*Math.sin(c.t*0.92)}},
+ {id:'s2',l:'Sonda za katalizatorem S2',u:'V',d:2,v:function(c){return c.fid==='KATALIZATOR_S2'&&c.f>=.5?.45+.4*Math.sin(c.t*0.92+.3):.68+.03*Math.sin(c.t*.7)}},
+ {id:'maf',l:'Przepływ powietrza MAF',u:'kg/h',d:1,key:1,v:function(c){return (8+105*c.x)*(c.fid==='MAF_ZANIZONY'?1-c.f*.12:1)+.4*Math.sin(c.t*1.20)}},
+ {id:'lambda',l:'Lambda / AFR',u:'',d:3,v:function(c){return 1-c.me/100*.8+.01*Math.sin(c.t*0.92)}},
+ {id:'map',l:'Ciśnienie w kolektorze MAP',u:'kPa',d:0,v:function(c){return 31+58*c.x+.5*Math.sin(c.t*0.80)}},
+ {id:'iat',l:'Temp. powietrza dolotowego',u:'°C',d:0,v:function(c){return 27+5*c.x}},
+ {id:'p_pal',l:'Ciśnienie paliwa',u:'kPa',d:0,v:function(c){return 382+4*Math.sin(c.t*.9)}},
+ {id:'czas',l:'Czas wtrysku',u:'ms',d:2,v:function(c){return (2.3+4.6*c.x)*(1+c.me/100)}},
+ {id:'obc',l:'Obciążenie silnika',u:'%',d:0,v:function(c){return 15+52*c.x}},
+ {id:'tkat',l:'Temp. katalizatora (obl.)',u:'°C',d:0,v:function(c){return 360+150*c.x}}],
+cisnienie:[
+ {id:'regulator',l:'Sterowanie zaworu dozującego',u:'%',d:1,key:1,v:function(c){return 18+34*c.x+(c.fid==='SLABA_POMPA'?c.f*16*c.x:0)+.6*Math.sin(c.t*0.64)}},
+ {id:'kor1',l:'Korekta wtryskiwacza cyl. 1',u:'mg',d:2,v:kor(1)},{id:'kor2',l:'Korekta wtryskiwacza cyl. 2',u:'mg',d:2,v:kor(2)},{id:'kor3',l:'Korekta wtryskiwacza cyl. 3',u:'mg',d:2,v:kor(3)},{id:'kor4',l:'Korekta wtryskiwacza cyl. 4',u:'mg',d:2,v:kor(4)},
+ {id:'ilosc',l:'Ilość wtrysku',u:'mg',d:1,v:function(c){return 6+30*c.x}},
+ {id:'czas',l:'Czas wtrysku',u:'ms',d:2,v:function(c){return .42+.38*c.x}},
+ {id:'kat_wtr',l:'Początek wtrysku (kąt)',u:'°',d:1,v:function(c){return 1+11*c.x}},
+ {id:'tpal',l:'Temperatura paliwa',u:'°C',d:0,v:function(c){return 38+4*c.x}},
+ {id:'p_niskie',l:'Ciśnienie zasilania niskie',u:'bar',d:1,v:function(c){return 4.8+.05*Math.sin(c.t*0.44)}}],
+wtryskiwacze:[
+ {id:'kor1',l:'Korekta wtryskiwacza cyl. 1',u:'mg',d:2,key:1,v:kor(1)},{id:'kor2',l:'Korekta wtryskiwacza cyl. 2',u:'mg',d:2,key:1,v:kor(2)},{id:'kor3',l:'Korekta wtryskiwacza cyl. 3',u:'mg',d:2,key:1,v:kor(3)},{id:'kor4',l:'Korekta wtryskiwacza cyl. 4',u:'mg',d:2,key:1,v:kor(4)},
+ {id:'p_mierz',l:'Ciśnienie szyny',u:'bar',d:0,v:function(c){return 300+850*c.x-(c.fid==='WTR_POMPA_ROZRZUT'?c.f*110*(.3+.7*c.x):0)+3*Math.sin(c.t*0.80)}},
+ {id:'p_niskie',l:'Ciśnienie zasilania niskie',u:'bar',d:1,v:function(c){return 4.8+(c.fid==='WTR_ZASILANIE'?-c.f*1.1*Math.sin(c.t*0.68)-c.f*.6:.04*Math.sin(c.t))}},
+ {id:'ilosc',l:'Ilość wtrysku',u:'mg',d:1,v:function(c){return 6+30*c.x}},
+ {id:'czas',l:'Czas wtrysku',u:'ms',d:2,v:function(c){return .42+.38*c.x}},
+ {id:'zap',l:'Nierównomierność pracy (cyl. z odchyłką)',u:'',d:2,v:function(c){return c.cyl?Math.abs(c.me)*.35+.05:.05}}],
+doladowanie:[
+ {id:'pedal',l:'Pedał gazu',u:'%',d:0,v:function(c){return Math.max(0,Math.min(100,(c.rpm-800)/24+(c.x>0?4:0)))}},
+ {id:'maf',l:'Przepływ powietrza MAF',u:'kg/h',d:0,v:function(c){return 12+110*c.x-(c.fid==='WYCIEK_DOLADOWANIA'?c.f*18*c.x:0)}},
+ {id:'maf_zad',l:'MAF zadany',u:'kg/h',d:0,v:function(c){return 12+110*c.x}},
+ {id:'baro',l:'Ciśnienie atmosferyczne',u:'kPa',d:1,v:function(){return 100.8}},
+ {id:'obc',l:'Obciążenie silnika',u:'%',d:0,v:function(c){return 14+62*c.x}},
+ {id:'iat',l:'Temp. powietrza za chłodnicą',u:'°C',d:0,v:function(c){return 30+14*c.x}},
+ {id:'turbo_rpm',l:'Prędkość turbiny',u:'obr/min',d:0,v:function(c){return 28000+96000*c.x*(c.fid==='SILOWNIK_TURBINY'?1-.15*c.f:1)}}],
+fazy:[
+ {id:'ster_in',l:'Sterowanie zaworu VVT ssącego',u:'%',d:0,v:function(c){return 8+55*c.x}},
+ {id:'ster_ex',l:'Sterowanie zaworu VVT wydechowego',u:'%',d:0,v:function(c){return 6+48*c.x}},
+ {id:'adapt',l:'Adaptacja faz wałków',u:'°',d:1,v:function(){return .3}},
+ {id:'odchylka',l:'Odchyłka fazy (ECU)',u:'°',d:1,v:function(c){return c.me-c.tg}},
+ {id:'p_oleju',l:'Ciśnienie oleju',u:'bar',d:1,v:function(c){return 1.6+2.4*c.x-(c.fid==='VVT_SLABY_OLEJ'?c.f*1.1:0)}},
+ {id:'t_oleju',l:'Temperatura oleju',u:'°C',d:0,v:function(c){return 82+5*c.x}},
+ {id:'napiecie',l:'Napięcie zasilania',u:'V',d:1,v:function(c){return 14.1+.05*Math.sin(c.t)}}],
+egr:[
+ {id:'map',l:'Ciśnienie w kolektorze MAP',u:'kPa',d:0,v:function(c){return 38+90*c.x}},
+ {id:'t_egr',l:'Temperatura gazów EGR',u:'°C',d:0,v:function(c){return 70+150*c.x*(c.me/55+.2)}},
+ {id:'bypass',l:'Bypass chłodnicy EGR',u:'%',d:0,v:function(c){return c.x>.6?60:0}},
+ {id:'lambda',l:'Lambda / O2 (skutek EGR)',u:'',d:2,v:function(c){return 3.4-1.8*c.x-c.me/100}}],
+dpf:[
+ {id:'t_przed',l:'Temperatura przed DPF',u:'°C',d:0,key:1,v:function(c){return 250+170*c.x}},
+ {id:'t_za',l:'Temperatura za DPF',u:'°C',d:0,v:function(c){return 232+168*c.x}},
+ {id:'t_doc',l:'Temp. przed DOC',u:'°C',d:0,v:function(c){return 214+160*c.x}},
+ {id:'sadza',l:'Sadza obliczona',u:'g',d:1,v:function(c){return 14.2+(c.fid==='DPF_ZAPCHANY'?c.f*18:0)}},
+ {id:'popiol',l:'Popiół obliczony',u:'g',d:1,v:function(){return 31.4}},
+ {id:'km_regen',l:'Przebieg od regeneracji',u:'km',d:0,v:function(){return 212}},
+ {id:'przeplyw',l:'Przepływ spalin (obl.)',u:'kg/h',d:0,v:function(c){return 20+150*c.x}},
+ {id:'baro',l:'Ciśnienie atmosferyczne',u:'kPa',d:1,v:function(){return 100.8}}],
+scr:[
+ {id:'nox_up',l:'NOx przed SCR',u:'ppm',d:0,key:1,v:function(c){return 120+420*c.x+8*Math.sin(c.t*0.84)}},
+ {id:'nox_down',l:'NOx za SCR',u:'ppm',d:0,key:1,v:function(c){var up=120+420*c.x;return Math.max(0,up*(1-c.me/100))+4*Math.sin(c.t*0.68)}},
+ {id:'p_ab',l:'Ciśnienie reagenta AdBlue',u:'bar',d:2,key:1,v:function(c){return 5.0+.03*Math.sin(c.t*1.20)-(c.fid==='SCR_NISKIE_CISNIENIE'?c.f*1.7:0)}},
+ {id:'t_scr',l:'Temperatura spalin SCR',u:'°C',d:0,v:function(c){return 240+120*c.x}},
+ {id:'doz',l:'Dozowanie',u:'ml/h',d:0,v:function(c){return c.fid==='SCR_BRAK_DOZOWANIA'&&c.f>=.5?0:150+700*c.x}},
+ {id:'zbiornik',l:'Poziom AdBlue',u:'%',d:0,v:function(){return 62}},
+ {id:'t_zb',l:'Temperatura zbiornika',u:'°C',d:0,v:function(c){return 28+3*c.x}}]
+};
+/* drugie pary zadane-zmierzone (Pasma.pary) */
+var PAIRS2={
+ doladowanie:{lab:'Sterowanie turbiny (VNT)',u:'%',dec:0,min:0,max:100,tol:10,tgt:function(x){return 20+60*x},mes:function(x,c){return 20+60*x-(c.fid==='SILOWNIK_TURBINY'?c.f*15:0)}},
+ egr:{lab:'Przepływ powietrza MAF',u:'kg/h',dec:0,min:0,max:140,tol:10,rel:1,tgt:function(x,c){return 12+95*x-.12*c.tg},mes:function(x,c){return 12+95*x-.12*c.me}},
+ fazy:{lab:'Kąt fazy wałka wydechowego',u:'°',dec:1,min:-25,max:5,tol:3,tgt:function(x){return -20*Math.sin(Math.PI*Math.min(x/.95,1))},mes:function(x,c){return -20*Math.sin(Math.PI*Math.min(x/.95,1))*(c.fid==='VVT_WYDECH_ZACIETY'?1-c.f:1)}}
+};
+var CYL={WYSTK:0};
+function cylOf(fid){return {WTRYSKIWACZ_CYL3:3,WTR_MECH_CYL3:3,WTR_ZAMIANA_POTWIERDZA:3,WTR_PRZY_CYLINDRZE:3,WTR_ELEKTRYKA_CYL2:2,WTR_B_ZAPLONY_CYL2:2}[fid]||0}
+function simCtx(){
+ var f=S.f||0,fid=S.fault.id;
+ return {t:S.t,x:S.x||0,rpm:S.rpm,f:f,fid:fid,ect:S.ect,tg:S.tg,me:S.me,cyl:cylOf(fid),shift:fid==='WTR_POMPA_ROZRZUT'||fid==='WTR_ZASILANIE'||fid==='WTR_B_POWIETRZE'};
+}
+function snapVals(){
+ var c=simCtx(),v={};(PRM[fnCur.id]||[]).forEach(function(q){v[q.id]=q.v(c)});
+ var p2=PAIRS2[fnCur.id];if(p2){v.p2z=p2.tgt(c.x,c);v.p2m=p2.mes(c.x,c)+gauss()*.02*p2.tol}
+ return v;
+}
 /* ================= SYMULATOR ================= */
 var S=null,fnCur=null,scList=[],scSel=0,results={},raf=0,lastT=0,tempo=2;
 function pairOf(){var f=S.fault;return f.pair||fnCur.pair}
@@ -506,7 +617,7 @@ function tick(dt){
  else if(!S.lim&&st.t!=='confirm'&&S.stT>st.lim+S.limAdd){S.lim=true;S.paused=true;showLimit()}
  /* historia wykresu */
  S.hAcc+=dt;
- if(S.hAcc>=.2){S.hAcc=0;S.hist.push({t:S.t,tg:S.tg,me:S.me});while(S.hist.length&&S.hist[0].t<S.t-60)S.hist.shift()}
+ if(S.hAcc>=.2){S.hAcc=0;S.hist.push({t:S.t,tg:S.tg,me:S.me,v:snapVals()});while(S.hist.length&&S.hist[0].t<S.t-60)S.hist.shift()}
 }
 function nextStage(){
  S.i++;S.stT=0;S.hold=0;S.limAdd=0;S.lim=false;
@@ -619,6 +730,7 @@ $('bOk').onclick=function(){var st=S.st[S.i];if(st&&st.t==='confirm'&&!S.done)ne
 $('bPause').onclick=function(){if(S.done)return;S.paused=!S.paused;this.textContent=S.paused?'WZNÓW':'PAUZA'};
 $('bStop').onclick=function(){if(!S.done)finish(true)};
 $('bBack').onclick=function(){hideOv();show('scen')};
+$('bCtl').onclick=function(){$('ctl').classList.toggle('open')};
 function hideOv(){$('ovLim').classList.remove('on');$('ovRes').classList.remove('on');$('bPause').textContent='PAUZA'}
 function showLimit(){var st=S.st[S.i];$('limT').innerHTML='Etap „'+st.title+'” trwa dłużej niż limit, a warunek nie jest spełniony ('+st.cond+'). Możesz czekać dalej, przerwać albo kontynuować mimo to: wtedy wynik będzie oznaczony jako <b>WARUNKI NIEWYSTARCZAJĄCE</b>.';$('ovLim').classList.add('on')}
 $('lWait').onclick=function(){S.limAdd+=30;S.lim=false;S.paused=false;$('ovLim').classList.remove('on')};
@@ -645,45 +757,87 @@ function showResult(){
 var cv=$('cv'),cx=cv.getContext('2d'),W=0,Hh=0,dpr=1;
 function resize(){var r=cv.getBoundingClientRect();dpr=Math.min(2,window.devicePixelRatio||1);W=Math.max(10,r.width);Hh=Math.max(10,r.height);cv.width=Math.round(W*dpr);cv.height=Math.round(Hh*dpr)}
 window.addEventListener('resize',function(){if(raf)resize()});
-function draw(){
- if(!S)return;var p=pairOf();cx.setTransform(dpr,0,0,dpr,0,0);cx.clearRect(0,0,W,Hh);
- var L=54,R=10,T=26,B=18,w=W-L-R,h=Hh-T-B;
- cx.fillStyle='#0a0c0f';cx.fillRect(0,0,W,Hh);
- cx.font='13px Roboto,Arial';cx.fillStyle='#e8e8e8';cx.fillText(p.lab+' ['+p.u+']: zadana ── / zmierzona ---  (odchyłka na czerwono)',8,16);
- var lo=p.min,hi=p.max;
+function chartSpecs(){
+ var p=pairOf(),fn=fnCur,sp=[],used={};
+ sp.push({main:1,lab:p.lab,u:p.u,dec:p.dec,min:p.min,max:p.max,tol:p.tol,get:function(q){return q.me},set:function(q){return q.tg}});
+ var p2=PAIRS2[fn.id];
+ if(p2)sp.push({lab:p2.lab,u:p2.u,dec:p2.dec,min:p2.min,max:p2.max,tol:p2.tol,get:function(q){return q.v&&q.v.p2m},set:function(q){return q.v&&q.v.p2z}});
+ (PRM[fn.id]||[]).forEach(function(q){if(q.key&&sp.length<6)sp.push({lab:q.l,u:q.u,dec:q.d,get:function(h){return h.v&&h.v[q.id]}})});
+ return sp;
+}
+function drawChart(sp,x0,y0,w0,h0,H2,t0,t1){
+ var L=44,R=8,T=18,B=4,w=w0-L-R,h=h0-T-B;if(w<20||h<10)return;
+ cx.save();cx.translate(x0,y0);
+ cx.fillStyle='#07090c';cx.fillRect(0,0,w0,h0);cx.strokeStyle='#2a2f38';cx.lineWidth=1;cx.strokeRect(.5,.5,w0-1,h0-1);
+ var lo=sp.min,hi=sp.max;
+ if(sp.min==null){var a=1e18,b=-1e18;H2.forEach(function(q){var v=sp.get(q);if(v!=null&&isFinite(v)){a=Math.min(a,v);b=Math.max(b,v)}});if(a>b){a=0;b=1}var pd=Math.max((b-a)*.15,Math.abs((a+b)/2)*.03,.2);lo=a-pd;hi=b+pd}
  function Y(v){return T+h-(cl(v,lo,hi)-lo)/(hi-lo)*h}
- cx.strokeStyle='#1c2128';cx.fillStyle='#6f7a89';cx.lineWidth=1;cx.font='11px Roboto,Arial';
- for(var i=0;i<=4;i++){var v=lo+(hi-lo)*i/4,y=Y(v);cx.beginPath();cx.moveTo(L,y);cx.lineTo(W-R,y);cx.stroke();cx.fillText(fm(v,hi-lo<10?1:0),6,y+4)}
- var t1=S.t,t0=t1-60;function X(t){return L+(t-t0)/60*w}
- var H2=S.hist.slice();H2.push({t:S.t,tg:S.tg,me:S.me});
+ function X(t){return L+(t-t0)/(t1-t0)*w}
+ cx.font='11px Roboto,Arial';cx.fillStyle='#e8e8e8';
+ var last=H2[H2.length-1],lv=last&&sp.get(last);
+ cx.fillText(sp.lab+' ['+sp.u+']'+(lv!=null?'  '+fm(lv,sp.dec):''),6,12);
+ cx.strokeStyle='#1c2128';cx.fillStyle='#6f7a89';
+ for(var i=0;i<=2;i++){var v=lo+(hi-lo)*i/2,y=Y(v);cx.beginPath();cx.moveTo(L,y);cx.lineTo(w0-R,y);cx.stroke();cx.fillText(fm(v,(hi-lo)<10?1:0),4,y+3)}
  if(H2.length>1){
-  /* pasmo tolerancji */
-  cx.fillStyle='rgba(214,168,82,.10)';cx.beginPath();H2.forEach(function(q,i){var x=X(q.t),y=Y(q.tg+p.tol);i?cx.lineTo(x,y):cx.moveTo(x,y)});
-  for(var j=H2.length-1;j>=0;j--)cx.lineTo(X(H2[j].t),Y(H2[j].tg-p.tol));cx.closePath();cx.fill();
-  /* odchyłka */
-  cx.fillStyle='rgba(239,83,80,.38)';
-  for(var k=1;k<H2.length;k++){var a=H2[k-1],b=H2[k];if(Math.abs(a.me-a.tg)>p.tol||Math.abs(b.me-b.tg)>p.tol){cx.beginPath();cx.moveTo(X(a.t),Y(a.tg));cx.lineTo(X(b.t),Y(b.tg));cx.lineTo(X(b.t),Y(b.me));cx.lineTo(X(a.t),Y(a.me));cx.closePath();cx.fill()}}
-  cx.lineWidth=2.5;cx.strokeStyle='#f0d078';cx.setLineDash([]);cx.beginPath();H2.forEach(function(q,i){var x=X(q.t),y=Y(q.tg);i?cx.lineTo(x,y):cx.moveTo(x,y)});cx.stroke();
-  cx.strokeStyle='#ef5350';cx.setLineDash([8,6]);cx.beginPath();H2.forEach(function(q,i){var x=X(q.t),y=Y(q.me);i?cx.lineTo(x,y):cx.moveTo(x,y)});cx.stroke();cx.setLineDash([]);
+  if(sp.set){
+   cx.fillStyle='rgba(214,168,82,.10)';cx.beginPath();var ok=false;
+   H2.forEach(function(q,i){var s=sp.set(q);if(s==null)return;var x=X(q.t),y=Y(s+sp.tol);ok?cx.lineTo(x,y):cx.moveTo(x,y);ok=true});
+   for(var j=H2.length-1;j>=0;j--){var s2=sp.set(H2[j]);if(s2!=null)cx.lineTo(X(H2[j].t),Y(s2-sp.tol))}cx.closePath();cx.fill();
+   cx.fillStyle='rgba(239,83,80,.38)';
+   for(var k=1;k<H2.length;k++){var a=H2[k-1],b=H2[k],sa=sp.set(a),sb=sp.set(b),ma=sp.get(a),mb=sp.get(b);if(sa==null||ma==null||sb==null||mb==null)continue;if(Math.abs(ma-sa)>sp.tol||Math.abs(mb-sb)>sp.tol){cx.beginPath();cx.moveTo(X(a.t),Y(sa));cx.lineTo(X(b.t),Y(sb));cx.lineTo(X(b.t),Y(mb));cx.lineTo(X(a.t),Y(ma));cx.closePath();cx.fill()}}
+   cx.lineWidth=2;cx.strokeStyle='#f0d078';cx.setLineDash([]);cx.beginPath();ok=false;H2.forEach(function(q){var s=sp.set(q);if(s==null)return;ok?cx.lineTo(X(q.t),Y(s)):cx.moveTo(X(q.t),Y(s));ok=true});cx.stroke();
+  }
+  cx.lineWidth=2;cx.strokeStyle=sp.set?'#ef5350':'#6cebf5';if(sp.set)cx.setLineDash([7,5]);cx.beginPath();var o2=false;
+  H2.forEach(function(q){var m=sp.get(q);if(m==null)return;o2?cx.lineTo(X(q.t),Y(m)):cx.moveTo(X(q.t),Y(m));o2=true});cx.stroke();cx.setLineDash([]);
  }
- cx.strokeStyle='#d6a852';cx.lineWidth=1;cx.beginPath();cx.moveTo(W-R,T);cx.lineTo(W-R,T+h);cx.stroke();
- cx.fillStyle='#6f7a89';cx.fillText('−60 s',L,Hh-4);cx.fillText('teraz',W-R-34,Hh-4);
- if(S.paused&&!S.done){cx.fillStyle='#f0d078';cx.font='bold 16px Roboto,Arial';cx.fillText('PAUZA',L+10,T+22)}
+ cx.restore();
+}
+function draw(){
+ if(!S)return;cx.setTransform(dpr,0,0,dpr,0,0);cx.clearRect(0,0,W,Hh);
+ cx.fillStyle='#05070a';cx.fillRect(0,0,W,Hh);
+ var sp=chartSpecs(),n=sp.length,cols=n<=2?1:2,rows=Math.ceil(n/cols),gap=4;
+ var cw=(W-gap*(cols-1))/cols,ch=(Hh-gap*(rows-1))/rows;
+ var H2=S.hist.slice();H2.push({t:S.t,tg:S.tg,me:S.me,v:snapVals()});
+ var t1=S.t,t0=t1-60;
+ sp.forEach(function(s,i){var cc=i%cols,rr=Math.floor(i/cols);drawChart(s,cc*(cw+gap),rr*(ch+gap),cw,ch,H2,t0,t1)});
+ if(S.paused&&!S.done){cx.fillStyle='#f0d078';cx.font='bold 16px Roboto,Arial';cx.fillText('PAUZA',60,34)}
+}
+var uiAcc=0;
+function bar2(val,ok,zl,sym){
+ /* pasek odchyłki: środek = 0, linie UWAGA i POZA PROGIEM */
+ var R=zl*1.6,pos=cl(val/R,-1,1)*50,l=sym?(pos<0?50+pos:50):0,w=sym?Math.abs(pos):cl(val/R,0,1)*100;
+ var a=Math.abs(val),col=a>=zl?'#ff5252':a>=ok?'#ffb300':'#66bb6a';
+ return '<div class="bar2"><u style="left:'+(sym?l:0)+'%;width:'+w+'%;background:'+col+'"></u><s style="left:'+(50+ok/R*50)+'%"></s><s style="left:'+(50-ok/R*50)+'%"></s><s class="z" style="left:'+(50+zl/R*50)+'%"></s><s class="z" style="left:'+(50-zl/R*50)+'%"></s><i></i></div>';
+}
+function dvRow(name,val,ok,zl,u,zad,mi,jm,dec,sym){
+ var a=Math.abs(val),k=a>=zl?['zl2','POZA PROGIEM']:a>=ok?['uw2','UWAGA']:['ok2','W NORMIE'];
+ return '<div class="dr"><div class="t"><b>'+name+'</b><em class="'+k[0]+'">'+(val>0&&sym?'+':'')+fm(val,1)+' '+u+'</em></div>'+bar2(val,ok,zl,sym)+'<div class="s"><span class="w '+k[0]+'">'+k[1]+'</span> · zadane '+fm(zad,dec)+' '+jm+' · zmierzone '+fm(mi,dec)+' '+jm+'</div></div>';
+}
+function dvwHtml(){
+ var p=pairOf(),fn=fnCur,h='<div class="hd">WSKAŹNIK ODCHYŁKI · zadane ↔ zmierzone</div>';
+ function one(lab,u,tol,dec,zad,mes,rel){var d=rel?(zad?(mes-zad)/zad*100:0):mes-zad;var tl=rel?tol:tol,j=rel?'%':u;return dvRow(lab,d,tl*.6,tl,j,zad,mes,u,dec,true)}
+ h+=one(p.lab,p.u,p.tol,p.dec,S.tShow!=null?S.tShow:S.tg,S.mShow!=null?S.mShow:S.me,0);
+ var p2=PAIRS2[fn.id];if(p2){var c=simCtx();h+=one(p2.lab,p2.u,p2.tol,p2.dec,p2.tgt(c.x,c),p2.mes(c.x,c),p2.rel)}
+ if(fn.id==='cisnienie'||fn.id==='wtryskiwacze'){var cc=simCtx();(PRM[fn.id]||[]).filter(function(q){return /^kor/.test(q.id)}).forEach(function(q){var v=q.v(cc);h+=dvRow('Korekta cyl. '+q.id.slice(3)+' wzgl. mediany',v,.6,1,'mg',0,v,'mg',1,true)})}
+ h+='<div class="small" style="font-size:.68rem;color:#8fa3d2">Pasma to propozycje z opracowania, nie norma producenta. Wynik po pomiarze wydaje analiza zapisu, nie ten wskaźnik.</div>';
+ return h;
 }
 function ui(){
  if(!S)return;var st=S.st[Math.min(S.i,S.st.length-1)],n=S.st.length;
  $('rS').textContent='krok '+(Math.min(S.i+1,n))+' z '+n+': '+st.title.toLowerCase();
- $('stK').textContent='ETAP '+Math.min(S.i+1,n)+' z '+n+' · POLECENIE ASYSTENTA';
+ $('stK').textContent='ETAP '+Math.min(S.i+1,n)+' z '+n+' · '+st.title;
  $('stC').textContent=st.txt;
  var jest='';if(st.t==='confirm')jest='czeka na POTWIERDZAM';else if(st.s)jest='jest '+fm(S.hold,0)+' z '+st.s+' s'+(S.inband||st.t==='stab'?'':' · poza zakresem');else if(st.t==='ect')jest='ECT '+fm(S.ect,0)+' °C';else jest='obroty '+fm(S.rpm,0)+' obr/min';
  $('stW').textContent='warunek: '+st.cond+' · '+jest;
  $('stP').style.width=(st.s?cl(S.hold/st.s,0,1)*100:(st.t==='ect'?cl((S.ect-20)/50,0,1)*100:0))+'%';
- var p=pairOf(),f=S.f||0;
- var ctx={t:S.t,x:S.x||0,f:f,fid:S.fault.id,pos:S.me};
- var items=[{l:'Obroty',u:'obr/min',v:fm(S.rpmShow||S.rpm,0)},{l:'Temp. cieczy',u:'°C',v:fm(S.ect,0)},{l:'Zadana',u:p.u,v:fm(S.tShow,p.dec)},{l:'Zmierzona',u:p.u,v:fm(S.mShow,p.dec)}];
- fnCur.ex.forEach(function(e){items.push({l:e.l,u:e.u,v:fm(e.v(ctx),e.d)})});
- var dv=Math.abs(S.me-S.tg)>p.tol;
- $('rd').innerHTML=items.map(function(q,i){return '<div><div class="l">'+q.l+'</div><div class="v"'+(i===3&&dv?' style="color:#ff6b66"':'')+'>'+q.v+' <small>'+q.u+'</small></div></div>'}).join('');
+ uiAcc+=1;
+ if(uiAcc%4===1){
+  var c=simCtx(),sp=chartSpecs(),keyIds={};(PRM[fnCur.id]||[]).forEach(function(q){if(q.key)keyIds[q.id]=1});
+  var cells=[{l:'Obroty silnika',u:'obr/min',v:fm(S.rpmShow||S.rpm,0)},{l:'Temperatura cieczy',u:'°C',v:fm(S.ect,0)}];
+  (PRM[fnCur.id]||[]).forEach(function(q){if(!q.key||sp.length>6)cells.push({l:q.l,u:q.u,v:fm(q.v(c),q.d)})});
+  $('rd').innerHTML=cells.map(function(q){return '<div><div class="l">'+q.l+'</div><div class="v">'+q.v+' <small>'+q.u+'</small></div></div>'}).join('');
+  $('dvw').innerHTML=dvwHtml();
+ }
  $('gV').textContent=fm(Math.max(0,(S.rpm-fnCur.idle)/(4000-fnCur.idle)*100),0)+' %';
  $('rV').textContent=fm(S.rpm,0)+' obr/min';$('eV').textContent=fm(S.ect,0)+' °C';
  if(S.mode==='auto'){$('gas').value=Math.round(Math.max(0,(S.rpm-fnCur.idle)/(4000-fnCur.idle)*100));$('rpm').value=Math.round(S.rpm)}
