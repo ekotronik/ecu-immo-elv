@@ -1,0 +1,613 @@
+<!doctype html>
+<html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EKOTRONIK AI ASYSTENT – symulacja aplikacji | EKOTRONIK SYSTEM</title>
+<meta name="description" content="Interaktywna symulacja aplikacji EKOTRONIK AI ASYSTENT: wszystkie funkcje prowadzone i scenariusze (sprawny, usterki, graniczny, zimny silnik, własny) z wykresem zadana kontra zmierzona i oceną w trzech poziomach.">
+<link rel="canonical" href="https://ekotronik.github.io/ecu-immo-elv/lab/asystent.html">
+<meta name="robots" content="index,follow">
+<link rel="icon" type="image/png" sizes="64x64" href="../assets_v8/favicon.png">
+<link rel="apple-touch-icon" href="../assets_v8/apple-touch-icon.png">
+<meta property="og:type" content="website"><meta property="og:locale" content="pl_PL"><meta property="og:site_name" content="EKOTRONIK SYSTEM">
+<meta property="og:url" content="https://ekotronik.github.io/ecu-immo-elv/lab/asystent.html"><meta property="og:title" content="EKOTRONIK AI ASYSTENT – symulacja aplikacji | EKOTRONIK SYSTEM"><meta property="og:description" content="Interaktywna symulacja aplikacji EKOTRONIK AI ASYSTENT: funkcje prowadzone i scenariusze.">
+<meta property="og:image" content="https://ekotronik.github.io/ecu-immo-elv/assets_v8/og_ekotronik_system.png">
+<link rel="stylesheet" href="lab.css"><style>
+.app{position:relative;overflow:hidden;border:1px solid var(--border);border-radius:18px;background:#05080c;margin:10px 0;height:calc(100dvh - 16px);min-height:640px;max-height:1000px;box-shadow:0 0 0 1px #000,0 10px 40px #000a}
+.app .wall{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.5;pointer-events:none}
+.app .veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,8,12,.55),rgba(5,8,12,.78));pointer-events:none}
+.scr{position:absolute;inset:0;display:none;flex-direction:column;gap:8px;padding:10px}
+.scr.on{display:flex}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:10px;background:rgba(8,14,22,.9);border:1px solid var(--border);border-radius:12px;padding:8px 14px;min-height:44px}
+.bar b{color:var(--gold-l);font-size:1.15rem;letter-spacing:.04em}.bar span{color:var(--muted);font-size:.95rem;text-align:right}
+.sim{border:1.5px solid var(--demo);border-radius:10px;color:#ff8a3d;font-weight:800;font-size:.9rem;letter-spacing:.03em;text-align:center;padding:6px 10px;background:rgba(8,14,22,.9)}
+.bigbtn{min-height:54px;border-radius:14px;border:2px solid var(--gold);background:rgba(15,33,53,.92);color:var(--text);font:inherit;font-weight:800;letter-spacing:.03em;cursor:pointer;padding:0 16px}
+.bigbtn:hover{border-color:var(--gold-l)}
+.bigbtn.gold{background:linear-gradient(180deg,#f0d28f,#c9a04d 55%,#9a7634);color:#0e0c08;border-color:var(--gold-l)}
+.bigbtn.red{border-color:var(--fail);color:#ff8a86}
+.bigbtn[disabled]{opacity:.45;cursor:default}
+/* panel główny */
+.home{align-items:stretch;justify-content:center}
+.home .ttl{text-align:center;margin:2px 0 4px}
+.home .ttl img{height:64px;width:auto;vertical-align:middle}
+.home .ttl h2{margin:6px 0 0;color:var(--gold);font-size:clamp(1.4rem,3.2vw,2.1rem);letter-spacing:.12em}
+.home .ttl p{margin:2px 0 0;color:var(--muted)}
+.hm{display:grid;grid-template-columns:1fr 1fr;gap:10px;flex:1;min-height:0;align-content:center}
+.hm .bigbtn{text-align:left;display:flex;flex-direction:column;justify-content:center;gap:2px;font-size:1.1rem}
+.hm .bigbtn small{font-weight:500;color:var(--muted);font-size:.85rem;letter-spacing:0}
+.hm .bigbtn.main{grid-column:1/-1;min-height:84px;font-size:1.35rem}
+.hm .bigbtn.main small{color:#3a2a08}
+/* menu funkcji */
+.sess{display:flex;align-items:center;gap:10px;border:1.5px solid var(--ok);border-radius:12px;padding:8px 14px;background:rgba(8,16,16,.9)}
+.sess i{width:14px;height:14px;border-radius:50%;background:var(--ok);flex:none}
+.sess b{color:var(--ok)}.sess small{display:block;color:var(--text);font-size:.88rem}
+.sess button{margin-left:auto}
+.tiles{flex:1;min-height:0;display:grid;gap:8px;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(2,1fr)}
+.ft{position:relative;display:flex;flex-direction:column;text-align:left;background:rgba(13,29,48,.93);border:1px solid var(--border);border-radius:14px;padding:10px 12px;cursor:pointer;color:var(--text);font:inherit;min-height:0;overflow:hidden}
+.ft:hover,.ft:focus-visible{border-color:var(--gold-l);outline:none}
+.ft .hd{display:flex;gap:10px;align-items:flex-start}
+.ft .n{flex:none;width:32px;height:32px;border-radius:50%;background:var(--gold);color:#101010;font-weight:900;display:flex;align-items:center;justify-content:center}
+.ft .t{color:var(--gold-l);font-weight:800;font-size:1.05rem;line-height:1.2}
+.ft .d{color:var(--muted);font-size:.88rem;margin-top:6px;line-height:1.35}
+.ft .bt{margin-top:auto;display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:.84rem;font-weight:700;color:var(--ok)}
+.ft .bt em{font-style:normal;color:var(--cyan);font-size:.72rem}
+.ft .bd{align-self:flex-start;margin:6px 0 6px;border-radius:8px;padding:3px 9px;font-size:.72rem;font-weight:900;color:#08140a;background:var(--ok)}
+.ft .bd.warn{background:var(--warn)}.ft .bd.fail{background:var(--fail);color:#1a0505}.ft .bd.cy{background:var(--cyan)}
+/* wybór scenariusza */
+.scs{flex:1;min-height:0;display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));grid-auto-rows:minmax(86px,1fr);overflow:auto;align-content:start}
+.sc{background:rgba(13,29,48,.93);border:1.5px solid var(--border);border-radius:12px;padding:9px 12px;text-align:left;cursor:pointer;color:var(--text);font:inherit;display:flex;flex-direction:column;gap:4px;min-height:0}
+.sc.sel{border-color:var(--gold-l);box-shadow:0 0 0 2px var(--gold) inset}
+.sc .k{font-size:.7rem;font-weight:900;letter-spacing:.06em}
+.sc .k.SPRAWNY{color:var(--ok)}.sc .k.USTERKA{color:var(--fail)}.sc .k.GRANICZNY{color:var(--warn)}.sc .k.ZIMNY{color:var(--cyan)}.sc .k.WLASNY{color:var(--gold)}
+.sc b{font-size:1rem;line-height:1.2}.sc span{color:var(--muted);font-size:.82rem;line-height:1.3}
+.sdesc{background:rgba(8,14,22,.92);border:1px solid var(--border);border-radius:12px;padding:8px 12px;font-size:.95rem;line-height:1.4;min-height:48px}
+.custom{display:none;gap:10px;align-items:center;flex-wrap:wrap;background:rgba(8,14,22,.92);border:1px solid var(--gold-d);border-radius:12px;padding:8px 12px}
+.custom.on{display:flex}.custom label{color:var(--muted);font-size:.85rem}
+.custom select{background:var(--raised);color:var(--text);border:1px solid var(--gold);border-radius:8px;padding:8px;font:inherit;max-width:100%}
+.row2{display:flex;gap:8px}.row2 .bigbtn{flex:1}
+/* jazda */
+.ride{display:grid;gap:8px;flex:1;min-height:0;grid-template-columns:minmax(0,1fr) 300px;grid-template-rows:auto minmax(0,1fr)}
+.step{grid-column:1/-1;background:rgba(32,28,18,.94);border:2px solid var(--gold);border-radius:12px;padding:8px 14px;position:relative;overflow:hidden}
+.step .k{font-size:.75rem;font-weight:900;letter-spacing:.07em;color:var(--gold)}
+.step .c{font-size:clamp(1.05rem,2.2vw,1.45rem);font-weight:800;color:#fff;margin:2px 0}
+.step .w{font-size:.85rem;color:#b5bcc8}
+.step .pg{position:absolute;left:0;bottom:0;height:4px;background:var(--gold);width:0;transition:width .15s}
+.chartp{background:rgba(8,12,17,.93);border:1px solid var(--border);border-radius:12px;display:flex;flex-direction:column;min-height:0;min-width:0}
+.chartp canvas{flex:1;width:100%;min-height:0;display:block}
+.rd{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;padding:6px 8px;border-top:1px solid #2a2f38}
+.rd div{background:#0b1320;border-radius:8px;padding:3px 7px;min-width:0}
+.rd .l{font-size:.66rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rd .v{font-size:1.1rem;font-weight:800;font-variant-numeric:tabular-nums}
+.rd .v small{font-size:.65rem;color:var(--muted);font-weight:500}
+.ctl{background:rgba(14,18,24,.94);border:1px solid var(--border);border-radius:12px;padding:10px 14px;overflow:auto;min-height:0}
+.ctl h4{margin:0 0 4px;font-size:.78rem;letter-spacing:.07em;color:var(--cyan)}
+.ctl h4.r{color:var(--fail);margin-top:10px}
+@media (orientation:portrait),(max-width:820px){.ctl{display:grid;grid-template-columns:1fr 1fr;gap:0 18px;align-content:start}.ctl h4.r{margin-top:0}}
+.sl{margin:2px 0 4px}.sl .lb{display:flex;justify-content:space-between;font-weight:700;font-size:.95rem}.sl .lb em{font-style:normal;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;height:30px;background:transparent;-webkit-appearance:none;appearance:none;margin:0}
+input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:#2a2c28}
+input[type=range]::-moz-range-track{height:8px;border-radius:4px;background:#2a2c28}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:#f0d078;border:2px solid #000;margin-top:-9px}
+input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:#f0d078;border:2px solid #000}
+input[type=range][disabled]{opacity:.5}
+.seg{display:flex;gap:6px;margin:2px 0 6px}.seg button{flex:1;min-height:40px;border-radius:10px;border:1.5px solid var(--border);background:var(--raised);color:var(--text);font:inherit;font-weight:800;cursor:pointer}
+.seg button.on{background:var(--gold);color:#101010;border-color:var(--gold-l)}
+.small{font-size:.8rem;color:var(--muted);line-height:1.35}
+.btns{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr 1.4fr;gap:8px}
+.btns .bigbtn{min-height:50px;padding:0 6px;font-size:.92rem}
+.ov{position:absolute;inset:0;background:rgba(2,5,8,.82);display:none;align-items:center;justify-content:center;padding:14px;z-index:5}
+.ov.on{display:flex}
+.card{width:min(760px,100%);max-height:100%;overflow:auto;background:#0b1320;border:2px solid var(--gold);border-radius:16px;padding:16px 18px}
+.card h3{margin:0 0 6px;color:var(--gold)}
+.lvbadge{display:inline-block;border-radius:10px;padding:8px 14px;font-weight:900;font-size:1.15rem;letter-spacing:.03em}
+.lvbadge.ok{background:var(--ok);color:#06140a}.lvbadge.warn{background:var(--warn);color:#1a1300}.lvbadge.fail{background:var(--fail);color:#1a0505}.lvbadge.cy{background:var(--cyan);color:#02171a}.lvbadge.dm{background:#555;color:#fff}
+.lv3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px 0}
+.lv3 div{border:1.5px solid #333;border-radius:10px;padding:6px 8px;font-size:.78rem;color:var(--muted);line-height:1.25}
+.lv3 div b{display:block;color:#888;font-size:.85rem}
+.lv3 div.on{border-color:var(--gold-l);color:var(--text);background:#1c1608}.lv3 div.on b{color:var(--gold-l)}
+.card ul{margin:6px 0 10px;padding-left:20px;line-height:1.5}
+.card .nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:6px;margin:8px 0}
+.card .nums div{background:#0f1c2d;border-radius:8px;padding:5px 9px}.card .nums b{display:block;font-size:1.15rem}.card .nums span{font-size:.72rem;color:var(--muted)}
+.truth{border-left:3px solid var(--cyan);padding:4px 10px;margin:8px 0;color:#b9eaf0;font-size:.9rem}
+.toast{position:absolute;left:50%;bottom:70px;transform:translateX(-50%);background:#161008;border:1.5px solid var(--gold);border-radius:12px;padding:10px 16px;z-index:9;display:none;max-width:90%;text-align:center}
+.toast.on{display:block}
+.aboutp{margin:6px 0 20px;color:var(--muted);font-size:.95rem;line-height:1.55}
+.aboutp a{color:var(--gold-l)}
+@media (orientation:portrait),(max-width:820px){
+ .tiles{grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(4,1fr)}
+ .hm{grid-template-columns:1fr}
+ .ride{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1.5fr) minmax(0,1fr)}
+ .btns{grid-template-columns:1fr 1fr 1fr}
+ .btns .bigbtn:first-child{grid-column:1/-1}
+ .rd{grid-template-columns:repeat(3,1fr)}
+ .app{min-height:760px}
+}
+@media (max-width:520px){.ft .d{display:none}.ft .t{font-size:.95rem}}
+@media (prefers-reduced-motion:reduce){.app .wall{display:none}}
+</style></head><body><div class="wrap">
+<div class="hdr" id="hdr"></div><div class="crumb" id="crumb"></div>
+
+<div class="app" id="app">
+ <video class="wall" id="wall" muted loop playsinline preload="none" poster="../assets_v8/asystent/tapeta_plakat.webp" data-src="../assets_v8/asystent/tapeta.mp4" aria-hidden="true"></video>
+ <div class="veil"></div>
+
+ <!-- PANEL GŁÓWNY -->
+ <section class="scr home on" id="s-home" aria-label="Panel główny aplikacji">
+  <div class="ttl"><img src="img/logo-emblem.png" alt=""><h2>EKOTRONIK AI ASYSTENT</h2><p>Aplikacja na Androida · prowadzi diagnostę krok po kroku · wersja odwzorowana: 0.7.89</p></div>
+  <div class="hm">
+   <button class="bigbtn gold main" data-go="menu">ASYSTENT AI · FUNKCJE PROWADZONE<small>8 funkcji: paliwo, ciśnienie, wtryskiwacze, EGR, DPF, doładowanie, fazy, SCR</small></button>
+   <a class="bigbtn" href="prad-spoczynkowy.html" style="display:flex;text-decoration:none;color:inherit">ANALIZATORY<small>prąd spoczynkowy, CAN, kompresja względna, rozrząd (osobne okna LAB)</small></a>
+   <button class="bigbtn" data-off="Analiza i konsultacja">Analiza i konsultacja<small>raport EKO-SCAN, hipotezy, historia</small></button>
+   <button class="bigbtn" data-off="Live Data">Live Data<small>parametry na żywo, wykresy sesji</small></button>
+   <button class="bigbtn" data-off="DEMO / SYMULACJA DIAGNOSTYCZNA">DEMO / SYMULACJA DIAGNOSTYCZNA<small>pełny przebieg na emulatorze</small></button>
+   <button class="bigbtn" data-off="Ustawienia i system">Ustawienia i system<small>głowica EKO, system, konsultanci</small></button>
+  </div>
+  <div class="sim">SYMULACJA · TRYB TESTOWY: dane z emulatora, nie z pojazdu</div>
+ </section>
+
+ <!-- MENU FUNKCJI PROWADZONYCH -->
+ <section class="scr" id="s-menu" aria-label="Funkcje prowadzone">
+  <div class="bar"><b>FUNKCJE PROWADZONE</b><span>wybierz funkcję</span></div>
+  <div class="sess"><i></i><div><b>Sesja EKO-SCAN: połączona</b><small>emulator pojazdu · dane dobierane do scenariusza · 112 parametrów</small></div></div>
+  <div class="tiles" id="tiles"></div>
+  <div class="sim">SYMULACJA · TRYB TESTOWY: dane testowe, nie z pojazdu</div>
+  <button class="bigbtn gold" data-go="home">←  POWRÓT DO PANELU</button>
+ </section>
+
+ <!-- WYBÓR SCENARIUSZA -->
+ <section class="scr" id="s-scen" aria-label="Wybór scenariusza">
+  <div class="bar"><b id="scT">Funkcja</b><span>wybór scenariusza symulacji</span></div>
+  <div class="scs" id="scs"></div>
+  <div class="sdesc" id="scD"></div>
+  <div class="custom" id="cust">
+   <label>Wariant usterki</label><select id="cVar"></select>
+   <label>Nasilenie</label><input type="range" id="cSev" min="0" max="100" value="70" style="flex:1;min-width:140px"><b id="cSevV" class="gd">70 %</b>
+  </div>
+  <div class="row2"><button class="bigbtn" data-go="menu">←  POWRÓT DO MENU FUNKCJI</button><button class="bigbtn gold" id="start">START SYMULACJI  ▶</button></div>
+ </section>
+
+ <!-- JAZDA -->
+ <section class="scr" id="s-ride" aria-label="Przebieg funkcji prowadzonej">
+  <div class="bar"><b id="rT">Funkcja</b><span id="rS">krok</span></div>
+  <div class="ride">
+   <div class="step"><div class="k" id="stK"></div><div class="c" id="stC"></div><div class="w" id="stW"></div><div class="pg" id="stP"></div></div>
+   <div class="chartp"><canvas id="cv"></canvas><div class="rd" id="rd"></div></div>
+   <div class="ctl" id="ctl">
+    <div><h4>STEROWANIE SILNIKIEM (symulowane)</h4>
+    <div class="seg"><button id="mA" class="on">AUTO</button><button id="mR">RĘCZNE</button></div>
+    <div class="sl"><div class="lb"><span>Gaz</span><em id="gV" class="gd">0 %</em></div><input type="range" id="gas" min="0" max="100" value="0"></div>
+    <div class="sl"><div class="lb"><span>Obroty</span><em id="rV" class="ok">800 obr/min</em></div><input type="range" id="rpm" min="0" max="4000" value="800" step="10"></div>
+    <div class="sl"><div class="lb"><span>Temperatura cieczy</span><em id="eV" class="cy">86 °C</em></div><input type="range" id="ect" min="10" max="100" value="86"></div>
+        </div><div><h4 class="r">USTERKA NA ŻYWO</h4>
+    <div class="small" id="fN" style="margin-bottom:4px"></div>
+    <div class="sl"><div class="lb"><span id="sevL">Nasilenie</span><em id="sevV" class="fail">0 %</em></div><input type="range" id="sev" min="0" max="100" value="0"></div>
+    <div class="small" id="sevH"></div>
+    <div class="seg" style="margin-top:6px"><button id="vP" style="display:none">◀ wariant</button><button id="vN" style="display:none">wariant ▶</button></div>
+    <div class="small" style="margin-top:6px">Tempo symulacji</div><div class="seg" id="tempo" title="Tempo symulacji"><button data-t="1">×1</button><button data-t="2" class="on">×2</button><button data-t="4">×4</button><button data-t="8">×8</button></div></div>
+   </div>
+  </div>
+  <div class="btns">
+   <button class="bigbtn gold" id="bOk">POTWIERDZAM</button>
+   <button class="bigbtn" id="bPause">PAUZA</button>
+   <button class="bigbtn" id="bECT" style="display:none">ECT AUTO</button>
+   <button class="bigbtn red" id="bFault">USTERKA ON/OFF</button>
+   <button class="bigbtn red" id="bStop">STOP</button>
+   <button class="bigbtn" id="bBack">←  WYBÓR SCENARIUSZA</button>
+  </div>
+  <div class="ov" id="ovLim"><div class="card"><h3>Limit czasu etapu</h3><p id="limT"></p><div class="row2"><button class="bigbtn" id="lWait">CZEKAJ DALEJ (+30 s)</button><button class="bigbtn gold" id="lGo">KONTYNUUJ MIMO TO</button><button class="bigbtn red" id="lStop">STOP</button></div></div></div>
+  <div class="ov" id="ovRes"><div class="card" id="resC"></div></div>
+ </section>
+ <div class="toast" id="toast"></div>
+</div>
+
+<p class="aboutp"><b>To jest symulacja aplikacji EKOTRONIK AI ASYSTENT działająca w przeglądarce.</b> Pojazd, głowica pomiarowa i sterownik są emulowane; wartości i progi ocen pochodzą z modelu symulatora aplikacji (propozycje do potwierdzenia na zapisach z pojazdów). Asystent tylko prowadzi diagnostę: nie steruje silnikiem, nie uruchamia regeneracji, nie kasuje adaptacji i nie wskazuje części do wymiany. Analizatory w osobnych oknach LAB: <a href="prad-spoczynkowy.html">prąd spoczynkowy</a>, <a href="analizator-can.html">CAN</a>, <a href="kompresja-wzgledna.html">kompresja względna</a>, <a href="kontrola-rozrzadu.html">rozrząd</a>.</p>
+
+<script src="lab.js"></script>
+<script>
+LAB.header({icon:'ai',sym:'AI ASYSTENT',symd:'symulacja aplikacji · Android',title:'EKOTRONIK AI ASYSTENT'});
+(function(){
+'use strict';
+var $=function(i){return document.getElementById(i)};
+function cl(v,a,b){return Math.max(a,Math.min(b,v))}
+function bump(x){return Math.sin(Math.PI*cl(x,0,1))}
+function sm(x){x=cl(x,0,1);return x*x*(3-2*x)}
+function fm(v,d){return Number(v).toFixed(d==null?0:d).replace('.',',')}
+function gauss(){var u=0,v=0;while(!u)u=Math.random();v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+
+/* ================= WYNIKI (StanOceny) ================= */
+var ST={
+ ZG:{l:'W NORMIE (wg progów propozycji)',c:'ok',lv:0},
+ PR:{l:'PRZESŁANKA USTERKI',c:'warn',lv:2},
+ NI:{l:'ODCHYLENIE POZA PRÓG',c:'fail',lv:3},
+ WN:{l:'WARUNKI NIEWYSTARCZAJĄCE',c:'warn',lv:-1},
+ OB:{l:'OBSERWACJA (bez werdyktu)',c:'cy',lv:1},
+ BD:{l:'BRAK DANYCH',c:'dm',lv:-1},
+ ZP:{l:'ZGODNE Z KRYTERIUM PROFILU',c:'ok',lv:0},
+ NP:{l:'NIEZGODNE Z KRYTERIUM PROFILU',c:'fail',lv:3}
+};
+
+/* ================= FUNKCJE ================= */
+/* pair: zadana (tgt) kontra zmierzona; tol = próg; dev = f*2*tol*sh (f = nasilenie 0..1, D=1 przy f=0,5) */
+var H={id:'ok',healthy:true};
+var FN=[
+{id:'paliwo',name:'Paliwo: regulacja i katalizator',desc:'Korekty STFT/LTFT, sondy S1/S2, MAF. Trzy punkty przepływu rozróżniają nieszczelność dolotu, błąd MAF i katalizator jako przesłankę.',
+ idle:820,pts:[[1500,20],[2500,30]],idleS:25,
+ intro:'Silnik uruchomiony, bieg w luzie, hamulec ręczny, odbiorniki wyłączone.',
+ pair:{lab:'Korekta paliwa łączna (STFT+LTFT)',u:'%',min:-20,max:30,tol:8,dec:1,tgt:function(){return 0}},
+ ex:[{l:'Sonda S1',u:'V',d:2,v:function(c){return .45+.4*Math.sin(c.t*2.3)}},{l:'Sonda S2',u:'V',d:2,v:function(c){return c.fid==='KATALIZATOR_S2'&&c.f>=.5?.45+.4*Math.sin(c.t*2.3+.3):.68+.03*Math.sin(c.t*.7)}}],
+ faults:[
+  {id:'SPRAWNY_B',healthy:true,title:'Silnik sprawny',opis:'Benzyna sprawna: korekty paliwa w paśmie, sonda S2 stabilna.'},
+  {id:'FALSZYWE_POWIETRZE',title:'Nieszczelność dolotu',opis:'Nieszczelność dolotu (fałszywe powietrze): korekta dodatnia, największa na biegu jałowym i maleje z obrotami.',sg:1,sh:function(x){return 1-.75*x},why:'Korekta paliwa jest dodatnia i największa na jałowym, a maleje z obrotami: to typowy ślad nieszczelności dolotu. Przesłanka, nie dowód: sprawdź dolot, przewody podciśnienia, uszczelki, odmę.'},
+  {id:'MAF_ZANIZONY',title:'Zaniżony odczyt MAF',opis:'Zaniżony odczyt przepływomierza: korekta dodatnia rośnie z obrotami.',sg:1,sh:function(x){return .3+.7*x},why:'Korekta rośnie wraz z przepływem powietrza: ślad zaniżonego odczytu MAF. Przesłanka; wyklucz zanieczyszczenie, dolot i zasilanie, zanim cokolwiek wskażesz.'},
+  {id:'KATALIZATOR_S2',title:'Sonda S2 powtarza S1',opis:'Sonda za katalizatorem powtarza S1. Analiza nie ocenia katalizatora z amplitudy, odsyła do monitora ECU.',sg:0,sh:function(){return 0},note:'Sonda S2 powtarza przebieg S1. Asystent nie ocenia sprawności katalizatora z samej amplitudy sondy: sprawdź status monitora katalizatora w ECU.'}
+ ]},
+{id:'cisnienie',name:'Ciśnienie paliwa i wtryskiwacze',desc:'Ciśnienie w szynie zadane i zmierzone, korekty wtryskiwaczy, ciśnienie zasilania. Rozróżnia pompę, wtryskiwacz i zasilanie.',
+ idle:800,pts:[[1500,20],[2500,25]],idleS:20,intro:'Silnik rozgrzany, bieg w luzie, hamulec ręczny.',
+ pair:{lab:'Ciśnienie w szynie',u:'bar',min:100,max:1500,tol:70,dec:0,tgt:function(x){return 300+850*x}},
+ ex:[{l:'Zasilanie niskie',u:'bar',d:1,v:function(c){return 4.8+.05*Math.sin(c.t*1.1)}},{l:'Korekta cyl. 3',u:'mg',d:1,v:function(c){return c.fid==='WTRYSKIWACZ_CYL3'?c.f*2.4*1:.1*Math.sin(c.t)}}],
+ faults:[
+  {id:'SPRAWNY_D',healthy:true,title:'Silnik sprawny',opis:'Diesel sprawny: ciśnienie w szynie nadąża za zadanym, korekty w paśmie.'},
+  {id:'SLABA_POMPA',title:'Słaba pompa wysokiego ciśnienia',opis:'Pompa wysokiego ciśnienia nie nadąża przy wyższych obrotach.',sg:-1,sh:function(x){return .25+.75*x},why:'Ciśnienie w szynie nie dochodzi do zadanego, zwłaszcza przy wyższych obrotach. Przesłanka pompy lub zasilania: najpierw wyklucz filtr paliwa, zasilanie niskie, zawór dozujący, elektrykę.'},
+  {id:'WTRYSKIWACZ_CYL3',title:'Odstający wtryskiwacz cyl. 3',opis:'Korekta wtryskiwacza cyl. 3 wyraźnie poza pasmem.',pair:{lab:'Korekta wtryskiwacza cyl. 3',u:'mg',min:-5,max:5,tol:1.2,dec:1,tgt:function(){return 0}},sg:1,sh:function(){return 1},why:'Korekta cylindra 3 odstaje od pozostałych. To przesłanka dotycząca cylindra/wtryskiwacza, nie decyzja o wymianie: wyklucz ciśnienie, zasilanie, elektrykę i mechanikę cylindra.'}
+ ]},
+{id:'wtryskiwacze',name:'Testy wtryskiwaczy',desc:'Korekty i nierównomierność, kody obwodów, ciśnienie, zasilanie, zamiana wtryskiwaczy. Wtryskiwacz nie jest wskazany, dopóki nie wykluczono reszty.',
+ idle:800,pts:[[1500,20],[2200,25]],idleS:25,intro:'Silnik rozgrzany, bieg w luzie, hamulec ręczny.',
+ pair:{lab:'Korekta wtryskiwacza cyl. 3',u:'mg',min:-5,max:5,tol:1,dec:1,tgt:function(){return 0}},
+ ex:[{l:'Ciśnienie szyny',u:'bar',d:0,v:function(c){return 300+850*c.x-(c.fid==='WTR_POMPA_ROZRZUT'?c.f*110*(.3+.7*c.x):0)}},{l:'Zasilanie niskie',u:'bar',d:1,v:function(c){return 4.8+(c.fid==='WTR_ZASILANIE'?-c.f*1.1*Math.sin(c.t*1.7)-c.f*.6:.04*Math.sin(c.t))}}],
+ faults:[
+  {id:'SPRAWNY_D',healthy:true,title:'Silnik sprawny',opis:'Diesel CR sprawny: korekty i nierównomierność w paśmie.',tag:'SPRAWNY DIESEL'},
+  {id:'WTR_MECH_CYL3',title:'Cyl. 3: korekta i nierównomierność',opis:'Diesel CR: korekta i nierównomierność cyl. 3 poza pasmem, ciśnienie i zasilanie w normie.',sg:1,sh:function(){return 1},fixed:{st:'PR',note:'Poziom 2: przesłanka dotycząca cylindra 3 przy normalnym ciśnieniu i zasilaniu. To jeszcze nie wymiana: wykonaj test zamiany wtryskiwaczy i sprawdź mechanikę cylindra.'}},
+  {id:'WTR_ELEKTRYKA_CYL2',title:'Cyl. 2: kod obwodu wtryskiwacza',opis:'Odchyłka cyl. 2 przy zgłoszonym kodzie obwodu wtryskiwacza (elektryka pierwsza).',pair:{lab:'Korekta wtryskiwacza cyl. 2',u:'mg',min:-5,max:5,tol:1,dec:1,tgt:function(){return 0}},sg:1,sh:function(){return 1},fixed:{st:'OB',note:'Poziom 1: sterownik zgłasza kod obwodu wtryskiwacza cyl. 2. Elektryka pierwsza: okablowanie, złącze, masa, sterownik. Pomiar tylko opisuje odchyłkę, bez werdyktu o części.'}},
+  {id:'WTR_POMPA_ROZRZUT',title:'Pompa: rozrzut korekt',opis:'Ciśnienie w szynie nie nadąża, korekty wszystkich cylindrów przesunięte.',pair:{lab:'Ciśnienie w szynie',u:'bar',min:100,max:1500,tol:70,dec:0,tgt:function(x){return 300+850*x}},sg:-1,sh:function(x){return .3+.7*x},fixed:{st:'PR',note:'Przyczyna ogólna: ciśnienie w szynie nie nadąża, a korekty wszystkich cylindrów są przesunięte. Żaden wtryskiwacz nie jest wskazany; sprawdź pompę, zawór dozujący i zasilanie.'}},
+  {id:'WTR_ZASILANIE',title:'Zasilanie niskie niestabilne',opis:'Niestabilne ciśnienie zasilania niskiego i rozrzut korekt (zasilanie przed wtryskiwaczem).',pair:{lab:'Ciśnienie zasilania niskie',u:'bar',min:2,max:7,tol:.5,dec:1,tgt:function(){return 4.8}},sg:-1,sh:function(x,t){return .75+.25*Math.sin(t*1.7)},fixed:{st:'PR',note:'Poziom 1–2: ciśnienie zasilania niskiego jest niestabilne. Zasilanie leży przed wtryskiwaczem: sprawdź filtr, pompę zasilającą, nieszczelności po stronie ssącej.'}},
+  {id:'WTR_ZAMIANA_POTWIERDZA',title:'Zamiana: odchyłka za wtryskiwaczem',opis:'Odchyłka cyl. 3 poszła za wtryskiwaczem po zamianie.',sg:1,sh:function(){return 1},fixed:{st:'NI',note:'Poziom 3: pomiar plus test diagnosty (zamiana). Odchyłka poszła za wtryskiwaczem, więc przyczyna jest w nim. Decyzję o dalszych krokach podejmuje diagnosta; asystent nie zaleca wymiany.'}},
+  {id:'WTR_PRZY_CYLINDRZE',title:'Zamiana: odchyłka przy cylindrze',opis:'Po zamianie odchyłka została przy cylindrze 3.',sg:1,sh:function(){return 1},fixed:{st:'OB',note:'Po zamianie odchyłka została przy cylindrze 3: wtryskiwacz nie jest przyczyną. Szukaj w cylindrze (sprężanie, zawory, uszczelka).'}},
+  {id:'WTR_B_ZAPLONY_CYL2',sil:'B',title:'Benzyna: zapłony cyl. 2',opis:'Benzyna MPI: nieudane zapłony cyl. 2 przy sprawnym zapłonie i korektach w normie.',pair:{lab:'Nieudane zapłony cyl. 2',u:'/min',min:0,max:30,tol:4,dec:0,tgt:function(){return 0}},sg:1,sh:function(x){return .8+.2*x},fixed:{st:'PR',note:'Poziom 2: nieudane zapłony cyl. 2 przy potwierdzonym sprawnym zapłonie i korektach w normie. Sprawdź mieszankę cylindra i wtryskiwacz jako jedną z przyczyn, nie jako wniosek.'}},
+  {id:'WTR_B_POWIETRZE',sil:'B',title:'Benzyna: nieszczelny dolot',opis:'Benzyna MPI: korekty paliwa +13 % (nieszczelność dolotu), nieudane zapłony wtórnie.',pair:{lab:'Korekta paliwa łączna',u:'%',min:-20,max:30,tol:6,dec:1,tgt:function(){return 0}},sg:1,sh:function(x){return 1-.6*x},fixed:{st:'PR',note:'Przyczyna ogólna: korekty paliwa +13 % wskazują na nieszczelność dolotu, a zapłony są wtórne. Żaden wtryskiwacz nie jest wskazany.'}}
+ ]},
+{id:'egr',name:'EGR: ocena sprawności',desc:'Pozycja zaworu zadana i zmierzona oraz skutek w przepływie powietrza. Odróżnia zacięty zawór, zatkany kanał i blokadę przez ECU.',
+ idle:800,pts:[[1800,20],[2500,25]],idleS:20,intro:'Silnik rozgrzany, bieg w luzie, hamulec ręczny.',
+ pair:{lab:'Pozycja zaworu EGR',u:'%',min:0,max:100,tol:8,dec:0,tgt:function(x){return 15+55*Math.sin(Math.PI*Math.min(x/.9,1))}},
+ ex:[{l:'MAF',u:'kg/h',d:0,v:function(c){return 12+95*c.x+(c.fid==='EGR_KANAL'?c.f*0:-c.pos*.12)}},{l:'MAP',u:'kPa',d:0,v:function(c){return 38+90*c.x}}],
+ faults:[
+  {id:'SPRAWNY_D',healthy:true,title:'Silnik sprawny',opis:'Diesel sprawny: zawór EGR nadąża za zadaną pozycją.'},
+  {id:'EGR_ZACIETY',title:'Zawór EGR zacięty',opis:'Zawór EGR zacięty: zmierzona pozycja prawie się nie zmienia.',sg:-1,sh:function(x){return .4+.6*bump(x/.9)},why:'Zmierzona pozycja zaworu nie podąża za zadaną. Przesłanka zacięcia zaworu lub siłownika; sprawdź zasilanie i sygnał sterujący zaworu, zanim wskażesz część.'},
+  {id:'EGR_KANAL',title:'Zatkany kanał EGR',opis:'Zawór porusza się poprawnie, ale spadek przepływu powietrza jest za mały.',pair:{lab:'Skutek EGR: spadek przepływu powietrza',u:'%',min:0,max:60,tol:6,dec:0,tgt:function(x){return 30*Math.sin(Math.PI*Math.min(x/.9,1))}},sg:-1,sh:function(x){return .35+.65*bump(x/.9)},why:'Zawór się porusza, ale oczekiwany spadek przepływu powietrza nie występuje: przesłanka ograniczonego przepływu w kanale. Sprawdź kanał i chłodnicę EGR.'},
+  {id:'EGR_BLOKOWANY',title:'EGR zablokowany przez ECU',opis:'ECU zablokował EGR (np. temperatura, tryb awaryjny): zadana pozycja 0.',sg:0,sh:function(){return 0},tgtZero:true,fixed:{st:'WN',note:'Sterownik zablokował EGR (zadana pozycja = 0), więc nie ma czego porównywać. Wyjaśnij powód blokady (kody, temperatura, tryb awaryjny) i powtórz pomiar.'}}
+ ]},
+{id:'dpf',name:'DPF: sprawność i zużycie',desc:'Różnica ciśnień na filtrze względem referencji przy stałych obrotach. Rozróżnia zapchanie i przesunięte zero czujnika ΔP.',
+ idle:800,pts:[[2000,25],[3000,25]],idleS:20,intro:'Silnik rozgrzany, bieg w luzie, hamulec ręczny. Bez aktywnej regeneracji.',
+ pair:{lab:'Różnica ciśnień DPF (ΔP)',u:'hPa',min:0,max:250,tol:12,dec:0,tgt:function(x){return 8+70*x*x}},
+ ex:[{l:'Temp. przed DPF',u:'°C',d:0,v:function(c){return 250+170*c.x}},{l:'Przepływ spalin',u:'kg/h',d:0,v:function(c){return 20+150*c.x}}],
+ faults:[
+  {id:'SPRAWNY_D',healthy:true,title:'Silnik sprawny',opis:'Diesel sprawny: ΔP filtra zgodne z referencją.'},
+  {id:'DPF_ZAPCHANY',title:'DPF zapchany (wg referencji)',opis:'ΔP rośnie szybciej z obrotami niż w referencji.',sg:1,sh:function(x){return .2+.8*x*x},why:'ΔP na filtrze jest wyraźnie wyższe od referencji przy tych samych obrotach: przesłanka zapchania filtra. Najpierw sprawdź czujnik ΔP i jego przewody.'},
+  {id:'DPF_ZERO',title:'Przesunięte zero czujnika ΔP',opis:'Stałe przesunięcie ΔP także na jałowym.',sg:1,sh:function(x){return .9+.1*x},why:'Stałe przesunięcie ΔP także na biegu jałowym wskazuje raczej na zero czujnika niż na zapchany filtr (przesłanka). Sprawdź czujnik i przewody ciśnieniowe.'}
+ ]},
+{id:'doladowanie',name:'Ciśnienie doładowania',desc:'Ciśnienie doładowania zadane i zmierzone pod obciążeniem (jazda lub hamownia). Rozróżnia wyciek i siłownik turbiny.',
+ idle:800,pts:[[2500,10],[3200,8]],idleS:15,intro:'Test pod obciążeniem: jazda lub hamownia, droga wolna, druga osoba przy tablecie.',
+ pair:{lab:'Ciśnienie doładowania (bezwzględne)',u:'kPa',min:80,max:280,tol:12,dec:0,tgt:function(x){return 100+135*Math.pow(x,1.3)}},
+ ex:[{l:'Wypełnienie VGT',u:'%',d:0,v:function(c){return 20+60*c.x-(c.fid==='SILOWNIK_TURBINY'?c.f*15:0)}},{l:'MAF',u:'kg/h',d:0,v:function(c){return 12+110*c.x-(c.fid==='WYCIEK_DOLADOWANIA'?c.f*18*c.x:0)}}],
+ faults:[
+  {id:'SPRAWNY_D',healthy:true,title:'Silnik sprawny',opis:'Diesel sprawny: doładowanie dochodzi do wartości zadanej.'},
+  {id:'WYCIEK_DOLADOWANIA',title:'Wyciek w układzie doładowania',opis:'Zmierzone doładowanie niższe od zadanego pod obciążeniem.',sg:-1,sh:function(x){return .1+.9*sm(x*1.1)},why:'Doładowanie pod obciążeniem jest niższe od zadanego, a przepływ powietrza spada: ślad nieszczelności układu doładowania. Sprawdź połączenia, intercooler, przewody.'},
+  {id:'SILOWNIK_TURBINY',title:'Siłownik turbiny nie dochodzi do celu',opis:'Doładowanie z opóźnieniem i niedoborem względem celu.',sg:-1,sh:function(x){return .1+.9*sm(x*1.1)},tau:function(f){return .6+3.5*f},why:'Doładowanie reaguje z opóźnieniem i nie dochodzi do celu: przesłanka dotycząca siłownika/regulacji turbiny. Sprawdź podciśnienie, siłownik, przewody i czujnik pozycji.'}
+ ]},
+{id:'fazy',name:'Fazy rozrządu i regulacja VVT',desc:'Kąt fazy wałków zadany i zmierzony, ciśnienie oleju. Rozróżnia zacięty przestawiacz i niskie ciśnienie oleju.',
+ idle:800,pts:[[1500,15],[3000,20]],idleS:20,intro:'Silnik rozgrzany, bieg w luzie, hamulec ręczny, poziom oleju prawidłowy.',
+ pair:{lab:'Kąt fazy wałka ssącego',u:'°',min:0,max:45,tol:3,dec:1,tgt:function(x){return 32*Math.sin(Math.PI*Math.min(x/.95,1))}},
+ ex:[{l:'Ciśnienie oleju',u:'bar',d:1,v:function(c){return 1.6+2.4*c.x-(c.fid==='VVT_SLABY_OLEJ'?c.f*1.1:0)}},{l:'Faza wałka wyd.',u:'°',d:1,v:function(c){return -20*Math.sin(Math.PI*Math.min(c.x/.95,1))*(c.fid==='VVT_WYDECH_ZACIETY'?1-c.f:1)}}],
+ faults:[
+  {id:'SPRAWNY_FAZY',healthy:true,title:'Silnik sprawny',opis:'Benzyna z VVT sprawna: faza podąża za zadaną.'},
+  {id:'VVT_SSACY_ZACIETY',title:'Przestawiacz ssący zacięty',opis:'Faza wałka ssącego prawie się nie zmienia.',sg:-1,sh:function(x){return .35+.65*bump(x/.95)},why:'Faza wałka ssącego nie podąża za zadaną. Przesłanka zacięcia przestawiacza lub zaworu sterującego: sprawdź olej, zawór i zasilanie zaworu, zanim wskażesz część.'},
+  {id:'VVT_SLABY_OLEJ',title:'Faza nie nadąża (niskie ciśn. oleju)',opis:'Faza nie nadąża przy niskim ciśnieniu oleju.',sg:-1,sh:function(x){return .2+.8*bump(x/.95)},tau:function(f){return .6+2.4*f},why:'Faza nie nadąża, a ciśnienie oleju jest obniżone: najpierw sprawdź poziom, jakość i ciśnienie oleju. Przesłanka, nie wskazanie przestawiacza.'},
+  {id:'VVT_WYDECH_ZACIETY',title:'Przestawiacz wydechowy zacięty',opis:'Faza wałka wydechowego nie podąża za zadaną.',pair:{lab:'Kąt fazy wałka wydechowego',u:'°',min:-30,max:5,tol:3,dec:1,tgt:function(x){return -20*Math.sin(Math.PI*Math.min(x/.95,1))}},sg:1,sh:function(x){return .35+.65*bump(x/.95)},why:'Faza wałka wydechowego nie podąża za zadaną. Przesłanka zacięcia przestawiacza lub zaworu; wyklucz olej i zasilanie zaworu.'}
+ ]},
+{id:'scr',scr:true,name:'SCR / AdBlue / NOx',desc:'Redukcja NOx, dozowanie, ciśnienie reagenta, gotowość czujników. Wynik dotyczy jawnego profilu demonstracyjnego, nie całego pojazdu.',
+ idle:800,pts:[[2000,30],[2500,30]],idleS:25,intro:'Silnik rozgrzany, bieg w luzie, hamulec ręczny, SCR po jeździe.',
+ pair:{lab:'Redukcja NOx (profil demonstracyjny)',u:'%',min:-40,max:100,tol:18,dec:0,tgt:function(){return 90}},
+ ex:[{l:'Temp. spalin SCR',u:'°C',d:0,v:function(c){return 240+120*c.x}},{l:'Dozowanie',u:'ml/h',d:0,v:function(c){return c.fid==='SCR_BRAK_DOZOWANIA'&&c.f>=.5?0:150+700*c.x}}],
+ faults:[
+  {id:'SCR_SPRAWNY',healthy:true,title:'Silnik sprawny',opis:'SCR sprawny (redukcja ok. 92 %).'},
+  {id:'SCR_NISKA_REDUKCJA',title:'Niska redukcja NOx (ok. 35 %)',opis:'Niska redukcja NOx przy sprawnym dozowaniu.',sg:-1,sh:function(){return 1},fixed:{st:'NP',note:'Redukcja NOx (ok. 35 %) jest poniżej kryterium profilu demonstracyjnego przy sprawnym dozowaniu. Wynik dotyczy testu, nie całego pojazdu; przyczyny nie wskazuję.'}},
+  {id:'SCR_NOX_ZA_WYZSZE',title:'NOx za SCR większe niż przed',opis:'NOx za SCR większe niż przed (alternatywne wyjaśnienia, bez wskazania części).',sg:-1,sh:function(){return 1.4},fixed:{st:'NP',note:'NOx za SCR jest większe niż przed. Możliwe są alternatywne wyjaśnienia (czujnik, przepływ, kalibracja): asystent nie wskazuje części.'}},
+  {id:'SCR_BRAK_DOZOWANIA',title:'Brak dozowania',opis:'Brak dozowania mimo gorących spalin, bez podanej przyczyny blokady.',sg:-1,sh:function(){return 1},fixed:{st:'OB',note:'Brak dozowania mimo gorących spalin. Opis przebiegu bez werdyktu: przyczyna blokady dozowania nie jest podana przez sterownik.'}},
+  {id:'SCR_NISKIE_CISNIENIE',title:'Niskie ciśnienie reagenta',opis:'Ciśnienie reagenta znacznie niższe od zadanego.',pair:{lab:'Ciśnienie reagenta',u:'bar',min:0,max:12,tol:1,dec:1,tgt:function(){return 9}},sg:-1,sh:function(){return 1.1},fixed:{st:'PR',note:'Ciśnienie reagenta jest znacznie niższe od zadanego. Przesłanka dotycząca układu dozowania; wyklucz poziom i zamarznięcie reagenta, filtr, przewody.'}},
+  {id:'SCR_NOX_ZA_NIEGOTOWY',title:'Czujnik NOx za SCR bez gotowości',opis:'Czujnik NOx za SCR bez gotowości (odczyt 0 nie jest pomiarem).',sg:0,sh:function(){return 0},fixed:{st:'WN',note:'Czujnik NOx za SCR nie zgłasza gotowości, odczyt 0 nie jest pomiarem. Poczekaj na gotowość czujnika i powtórz test.'}},
+  {id:'SCR_REGENERACJA',title:'Aktywna regeneracja DPF w zapisie',opis:'Aktywna regeneracja DPF w czasie zapisu.',sg:0,sh:function(){return 0},fixed:{st:'WN',note:'W czasie zapisu trwała aktywna regeneracja DPF, więc warunki pomiaru SCR nie są spełnione. Asystent niczym nie steruje; zakończ regenerację i powtórz.'}}
+ ]}
+];
+FN.forEach(function(f,i){f.n=i+1});
+var TITLE0={wtryskiwacze:{B:'SPRAWNY BENZYNA'}};
+
+/* ================= SCENARIUSZE (jak scenariuszeDla) ================= */
+var NAS_GRAN=.4;
+function scenarios(fn){
+ var L=[],sp=fn.faults[0];
+ var wady=fn.faults.filter(function(x){return !x.healthy});
+ var glowna=wady.filter(function(x){return (x.sil||'D')===(sp.sil||'D')})[0]||wady[0];
+ fn.faults.forEach(function(x){
+  var h=!!x.healthy;
+  L.push({k:h?'SPRAWNY':'USTERKA',t:h?(fn.id==='wtryskiwacze'?'SPRAWNY DIESEL':'SILNIK SPRAWNY'):x.title,d:x.opis,fault:x,sev:1,ect:86});
+ });
+ if(fn.id==='wtryskiwacze'){ /* druga sprawna: benzyna */
+  L.splice(1,0,{k:'SPRAWNY',t:'SPRAWNY BENZYNA',d:'Benzyna MPI sprawna: korekty paliwa i zapłony w paśmie.',fault:{id:'SPRAWNY_B',healthy:true,sil:'B',title:'Benzyna sprawna',opis:'',pair:{lab:'Korekta paliwa łączna',u:'%',min:-20,max:30,tol:6,dec:1,tgt:function(){return 0}}},sev:1,ect:86});
+ }
+ L.push({k:'GRANICZNY',t:'GRANICZNY',d:'Usterka „'+glowna.title.toLowerCase()+'” blisko progu oceny: suwak „odległość od progu” przesuwa ją w obie strony w trakcie jazdy.',fault:glowna,sev:NAS_GRAN,ect:86});
+ L.push({k:'ZIMNY',t:'ZIMNY SILNIK',d:'Silnik sprawny, ale zimny (22 °C): warunki pomiaru niespełnione, asystent powinien czekać lub zgłosić brak warunków, nie oceniać.',fault:sp,sev:1,ect:22,cold:true});
+ L.push({k:'WLASNY',t:'WŁASNY',d:'Wybór wariantu usterki i jej nasilenia suwakiem; usterkę można włączać i wyłączać w trakcie.',fault:glowna,sev:.7,ect:86,own:true});
+ return L;
+}
+
+/* ================= ETAPY (jak sciezka) ================= */
+function stages(fn){
+ var s=[],pts=fn.pts,idle=fn.idle;
+ s.push({t:'confirm',title:'WARUNKI',txt:fn.intro+' Potwierdź.',cond:'potwierdzenie diagnosty',lim:600});
+ s.push({t:'ect',title:'ROZGRZANIE SILNIKA',txt:'Poczekaj, aż temperatura cieczy osiągnie ok. 70 °C.',cond:'temperatura cieczy ≥ 70 °C',lim:90,gate:true});
+ s.push({t:'stab',title:'STABILIZACJA JAŁOWEGO',txt:'Nie dotykaj pedału. Czekam, aż obroty się ustalą.',cond:'obroty stabilne ±30 obr/min przez 6 s',s:6,lim:40});
+ s.push({t:'time',title:'ZAPIS JAŁOWEGO',txt:'Nie dotykaj pedału. Zapisuję bieg jałowy.',cond:'zapis '+fn.idleS+' s na jałowym',s:fn.idleS,rec:true,lim:fn.idleS+20});
+ pts.forEach(function(p,i){
+  if(i===0)s.push({t:'time',title:'PRZYGOTOWANIE',txt:'Za chwilę poproszę o podniesienie obrotów do ok. '+p[0]+' obr/min. Stopa na pedale, jeszcze bez gazu.',cond:'3 s',s:3,lim:12,quiet:true});
+  s.push({t:'up',title:'PUNKT '+(i+1)+' Z '+pts.length+': PODNIEŚ OBROTY',txt:'Podnieś obroty do ok. '+p[0]+' obr/min, płynnie.',cond:'obroty ≥ '+Math.round(p[0]*.97/10)*10+' obr/min',cel:p[0],lim:25});
+  s.push({t:'hold',title:'PUNKT '+(i+1)+' Z '+pts.length+': TRZYMAJ',txt:'Trzymaj stałe obroty ok. '+p[0]+'.',cond:'obroty '+(p[0]-150)+'–'+(p[0]+150)+' przez '+p[1]+' s',cel:p[0],s:p[1],rec:true,lim:p[1]+25});
+ });
+ s.push({t:'down',title:'OBNIŻ DO JAŁOWEGO',txt:'Zwolnij pedał. Obroty wrócą do biegu jałowego.',cond:'obroty poniżej '+(idle+100)+' obr/min',lim:30});
+ s.push({t:'stab2',title:'ZAPIS JAŁOWEGO PO ZMIANIE',txt:'Nie dotykaj pedału. Zapisuję bieg jałowy po zmianie.',cond:'stabilny jałowy przez 8 s',s:8,rec:true,lim:40});
+ return s;
+}
+
+/* ================= SYMULATOR ================= */
+var S=null,fnCur=null,scList=[],scSel=0,results={},raf=0,lastT=0,tempo=2;
+function pairOf(){var f=S.fault;return f.pair||fnCur.pair}
+function sevEff(){return S.on&&!S.fault.healthy?S.sev:0}
+function xOf(){return cl((S.rpm-fnCur.idle)/(3000-fnCur.idle),0,1)}
+function initSim(sc){
+ var fn=fnCur;
+ S={sc:sc,fault:sc.fault,on:!sc.fault.healthy,sev:sc.sev,t:0,rpm:0,cel:fn.idle,ect:sc.ect,ectMan:null,mode:'auto',gas:0,
+  tg:0,me:0,st:stages(fn),i:0,stT:0,hold:0,paused:false,rec:[],hist:[],hAcc:0,flags:{cond:false,toggled:false},lim:false,done:false,res:null,inband:false,limAdd:0};
+ S.rpm=fn.idle;S.cel=fn.idle;
+ var p=pairOf(),x=0;S.tg=p.tgt(x);S.me=S.tg;
+}
+function ectRate(){return S.sc.cold?.1:.45}
+function stageDrive(st){return (st.t==='up'||st.t==='hold')?st.cel:fnCur.idle}
+function tick(dt){
+ if(!S||S.done||S.paused)return;
+ var fn=fnCur,st=S.st[S.i],p=pairOf();
+ S.t+=dt;S.stT+=dt;
+ /* silnik */
+ if(S.mode==='auto')S.cel=stageDrive(st);
+ var k=1-Math.exp(-dt/.7);S.rpm+=(S.cel-S.rpm)*k;
+ var rn=S.rpm+gauss()*(S.rpm<fn.idle+150?5:9);
+ S.rpmShow=rn;
+ if(S.ectMan!=null)S.ect=S.ectMan;else S.ect+=Math.max(0,92-S.ect)*ectRate()*dt/ (92-30);
+ var x=xOf();
+ var f=sevEff(),t0=p.tgt(x);
+ if(S.fault.tgtZero&&f>=.5)t0=0;
+ var dev=f*2*p.tol*(S.fault.sg||0)*(S.fault.sh?S.fault.sh(x,S.t):0);
+ var tau=(S.fault.tau&&f>0)?S.fault.tau(f):.6;
+ var tk=1-Math.exp(-dt/.35);
+ S.tg+=(t0-S.tg)*tk;
+ S.me+=((t0+dev)-S.me)*(1-Math.exp(-dt/tau));
+ S.mShow=S.me+gauss()*.03*p.tol;S.tShow=S.tg;
+ S.x=x;S.f=f;
+ /* etap */
+ var ok=false,inb=false;
+ switch(st.t){
+  case 'confirm':break;
+  case 'ect':if(S.ect>=70){S.hold+=dt;if(S.hold>=2)ok=true}else S.hold=0;break;
+  case 'stab':case 'stab2':case 'time':
+   inb=Math.abs(S.rpm-fn.idle)<(st.t==='stab'?30:110);
+   if(inb)S.hold+=dt;else S.hold=0;
+   if(S.hold>=(st.s||6))ok=true;break;
+  case 'up':if(S.rpm>=st.cel*.97)ok=true;break;
+  case 'hold':inb=Math.abs(S.rpm-st.cel)<=150;if(inb)S.hold+=dt;else S.hold=0;if(S.hold>=st.s)ok=true;break;
+  case 'down':if(S.rpm<=fn.idle+100)ok=true;break;
+ }
+ S.inband=inb&&S.hold>1.2;
+ if(st.rec&&S.inband)S.rec.push((S.me-S.tg)/p.tol);
+ if(ok)nextStage();
+ else if(!S.lim&&st.t!=='confirm'&&S.stT>st.lim+S.limAdd){S.lim=true;S.paused=true;showLimit()}
+ /* historia wykresu */
+ S.hAcc+=dt;
+ if(S.hAcc>=.2){S.hAcc=0;S.hist.push({t:S.t,tg:S.tg,me:S.me});while(S.hist.length&&S.hist[0].t<S.t-60)S.hist.shift()}
+}
+function nextStage(){
+ S.i++;S.stT=0;S.hold=0;S.limAdd=0;S.lim=false;
+ if(S.i>=S.st.length){finish();return}
+ var st=S.st[S.i];
+ if(st.t==='time'&&!st.rec&&false){}
+}
+function p90(a){var s=a.map(Math.abs).sort(function(x,y){return x-y});return s.length?s[Math.min(s.length-1,Math.floor(s.length*.9))]:0}
+function finish(stopped){
+ S.done=true;S.paused=true;
+ var fn=fnCur,p=pairOf(),f=sevEff(),F=S.fault,r={n:S.rec.length,D:p90(S.rec),pair:p,notes:[]};
+ var mean=S.rec.length?S.rec.reduce(function(a,b){return a+b},0)/S.rec.length:0;r.bias=mean*p.tol;r.p90=r.D*p.tol;
+ var key;
+ if(stopped&&S.rec.length<20){key='BD';r.why='Przerwano przed zakończeniem procedury: zapisano za mało próbek w oknach pomiarowych, żeby ocenić funkcję.'}
+ else if(S.flags.cond){key='WN';r.why='Procedurę kontynuowano mimo niespełnionego warunku (limit czasu etapu): '+(fn.id?'np. silnik nie osiągnął temperatury pracy':'')+'. Warunki pomiaru nie były spełnione, więc asystent nie ocenia funkcji. Rozgrzej silnik i powtórz.';}
+ else if(r.n<20){key='BD';r.why='Za mało ważnych próbek w oknach zapisu (n = '+r.n+').'}
+ else if(F.fixed&&f>=.5){key=F.fixed.st;r.why=F.fixed.note}
+ else if(F.id==='KATALIZATOR_S2'&&f>=.5){key='ZG';r.why=F.note}
+ else{
+  if(r.D<1){key=fn.scr?'ZP':'ZG';r.why='Zmierzone wartości mieszczą się w paśmie ±'+fm(p.tol,p.dec)+' '+p.u+' wokół zadanych (p90 odchyłki: '+fm(r.p90,p.dec+1)+' '+p.u+').'}
+  else if(r.D<1.6){key='PR';r.why=(F.why||'Odchyłka przekracza próg oceny.')}
+  else{key=fn.scr?'NP':'NI';r.why=(F.why||'Odchyłka wyraźnie przekracza próg oceny.')}
+ }
+ if(S.flags.toggled)r.notes.push('Usterkę włączano lub wyłączano w trakcie zapisu: wynik odzwierciedla mieszany przebieg.');
+ if(key==='ZG'&&F.id==='KATALIZATOR_S2')r.notes.push('Katalizator nie jest oceniany z amplitudy sondy.');
+ r.key=key;S.res=r;results[fn.id]=key;
+ if(raf)showResult();
+}
+
+/* ================= UI: ekrany ================= */
+var scrs={home:$('s-home'),menu:$('s-menu'),scen:$('s-scen'),ride:$('s-ride')};
+function show(n){if(n!=='home'||window.__shown)try{$('app').scrollIntoView({block:'start'})}catch(e){}window.__shown=1;Object.keys(scrs).forEach(function(k){scrs[k].classList.toggle('on',k===n)});if(n!=='ride')stopLoop();if(n==='menu')buildTiles();if(n==='ride'){startLoop();resize()}}
+var tt=0;function toast(m){var e=$('toast');e.textContent=m;e.classList.add('on');clearTimeout(tt);tt=setTimeout(function(){e.classList.remove('on')},3200)}
+document.querySelectorAll('[data-go]').forEach(function(b){b.addEventListener('click',function(){show(b.dataset.go)})});
+document.querySelectorAll('[data-off]').forEach(function(b){b.addEventListener('click',function(){toast('„'+b.dataset.off+'” nie jest częścią tej symulacji. Tu działają funkcje prowadzone i analizatory.')})});
+
+function buildTiles(){
+ var h='';
+ FN.forEach(function(f){
+  var r=results[f.id],b='';
+  if(r){var s=ST[r];b='<div class="bd '+(s.c==='ok'?'':s.c)+'">WYNIK: '+s.l.split(' (')[0].replace('ZGODNE Z KRYTERIUM PROFILU','ZGODNE Z PROFILEM').replace('NIEZGODNE Z KRYTERIUM PROFILU','NIEZGODNE Z PROFILEM')+'</div>'}
+  h+='<button class="ft" data-f="'+f.id+'"><div class="hd"><div class="n">'+f.n+'</div><div class="t">'+f.name+'</div></div><div class="d">'+f.desc+'</div>'+b+'<div class="bt"><span>● 6/6 parametrów</span><em>GRUPA</em></div></button>';
+ });
+ $('tiles').innerHTML=h;
+ document.querySelectorAll('.ft').forEach(function(b){b.addEventListener('click',function(){openFn(b.dataset.f)})});
+}
+function openFn(id){
+ fnCur=FN.filter(function(f){return f.id===id})[0];scList=scenarios(fnCur);scSel=0;
+ $('scT').textContent=fnCur.n+'. '+fnCur.name;
+ var h='';scList.forEach(function(s,i){h+='<button class="sc" data-i="'+i+'"><span class="k '+s.k+'">'+{SPRAWNY:'SILNIK SPRAWNY',USTERKA:'USTERKA',GRANICZNY:'GRANICZNY',ZIMNY:'ZIMNY SILNIK',WLASNY:'WŁASNY'}[s.k]+'</span><b>'+s.t+'</b></button>'});
+ $('scs').innerHTML=h;
+ document.querySelectorAll('.sc').forEach(function(b){b.addEventListener('click',function(){selSc(+b.dataset.i)})});
+ var o=fnCur.faults.filter(function(x){return !x.healthy}).map(function(x){return '<option value="'+x.id+'">'+x.title+'</option>'}).join('');$('cVar').innerHTML=o;
+ selSc(0);show('scen');
+}
+function selSc(i){
+ scSel=i;var s=scList[i];
+ document.querySelectorAll('.sc').forEach(function(b,j){b.classList.toggle('sel',j===i)});
+ $('scD').innerHTML='<b style="color:var(--gold-l)">'+s.t+'.</b> '+s.d;
+ $('cust').classList.toggle('on',!!s.own);
+ if(s.own){$('cVar').value=s.fault.id;$('cSev').value=Math.round(s.sev*100);$('cSevV').textContent=Math.round(s.sev*100)+' %'}
+}
+$('cVar').addEventListener('change',function(){var s=scList[scSel];s.fault=fnCur.faults.filter(function(x){return x.id===$('cVar').value})[0]});
+$('cSev').addEventListener('input',function(){var s=scList[scSel];s.sev=$('cSev').value/100;$('cSevV').textContent=$('cSev').value+' %'});
+$('start').addEventListener('click',function(){
+ var sc=scList[scSel];sc=Object.assign({},sc);initSim(sc);$('rT').textContent=fnCur.n+'. '+fnCur.name;
+ hideOv();setupRide();show('ride');
+});
+
+/* ----- jazda: sterowanie ----- */
+function setupRide(){
+ $('mA').classList.add('on');$('mR').classList.remove('on');S.mode='auto';
+ var sc=S.sc;
+ $('ect').value=Math.round(S.ect);
+ $('bECT').style.display='none';
+ $('vP').style.display=sc.own?'':'none';$('vN').style.display=sc.own?'':'none';
+ $('sev').value=Math.round(S.sev*100);
+ syncCtl(true);
+}
+function faultNote(){
+ var sc=S.sc,f=S.fault;
+ if(f.healthy&&!sc.own)return 'Silnik sprawny: usterka nie jest wprowadzona. Przycisk USTERKA ON/OFF nic nie zmienia.';
+ return 'Scenariusz: <b>'+f.title+'</b> · usterka '+(S.on?'<b style="color:var(--fail)">WŁĄCZONA</b>':'wyłączona');
+}
+function syncCtl(force){
+ var sc=S.sc;
+ $('fN').innerHTML=faultNote();
+ $('sevL').textContent=sc.k==='GRANICZNY'?'Odległość od progu':'Nasilenie usterki';
+ $('sevH').innerHTML=sc.k==='GRANICZNY'?'Lewo: w normie · środek: próg oceny · prawo: wyraźna usterka.':(S.fault.healthy?'':'Próg oceny przy ok. 50 %.');
+ $('sevV').textContent=Math.round(S.sev*100)+' %';
+ $('bFault').textContent='USTERKA '+(S.on?'ON':'OFF');
+ $('bFault').style.opacity=(S.fault.healthy&&!sc.own)?.5:1;
+}
+$('mA').onclick=function(){S.mode='auto';this.classList.add('on');$('mR').classList.remove('on')};
+$('mR').onclick=function(){S.mode='man';this.classList.add('on');$('mA').classList.remove('on');S.cel=S.rpm;$('rpm').value=Math.round(S.rpm);$('gas').value=Math.round((S.rpm-fnCur.idle)/(4000-fnCur.idle)*100)};
+$('gas').addEventListener('input',function(){var gv=$('gas').value;S.mode='man';$('mA').classList.remove('on');$('mR').classList.add('on');S.cel=fnCur.idle+gv/100*(4000-fnCur.idle);$('rpm').value=Math.round(S.cel)});
+$('rpm').addEventListener('input',function(){S.mode='man';$('mA').classList.remove('on');$('mR').classList.add('on');S.cel=+$('rpm').value;$('gas').value=Math.round(Math.max(0,(S.cel-fnCur.idle)/(4000-fnCur.idle)*100))});
+$('ect').addEventListener('input',function(){S.ectMan=+$('ect').value;S.ect=S.ectMan;$('bECT').style.display=''});
+$('bECT').onclick=function(){S.ectMan=null;this.style.display='none'};
+$('sev').addEventListener('input',function(){S.sev=$('sev').value/100;if(S.rec.length)S.flags.toggled=S.flags.toggled||false;syncCtl()});
+$('bFault').onclick=function(){if(S.fault.healthy&&!S.sc.own){toast('Silnik sprawny: nie ma usterki do włączenia.');return}S.on=!S.on;if(S.rec.length)S.flags.toggled=true;syncCtl()};
+$('vP').onclick=function(){cycleVar(-1)};$('vN').onclick=function(){cycleVar(1)};
+function cycleVar(d){
+ var w=fnCur.faults.filter(function(x){return !x.healthy}),i=w.indexOf(S.fault);if(i<0)i=0;
+ S.fault=w[(i+d+w.length)%w.length];S.on=true;S.hist=[];var p=pairOf();S.tg=p.tgt(S.x||0);S.me=S.tg;syncCtl();toast('Wariant: '+S.fault.title);
+}
+document.querySelectorAll('#tempo button').forEach(function(b){b.onclick=function(){tempo=+b.dataset.t;document.querySelectorAll('#tempo button').forEach(function(x){x.classList.toggle('on',x===b)})}});
+$('bOk').onclick=function(){var st=S.st[S.i];if(st&&st.t==='confirm'&&!S.done)nextStage();else toast('Nie ma teraz czego potwierdzać. Prowadź silnik według polecenia.')};
+$('bPause').onclick=function(){if(S.done)return;S.paused=!S.paused;this.textContent=S.paused?'WZNÓW':'PAUZA'};
+$('bStop').onclick=function(){if(!S.done)finish(true)};
+$('bBack').onclick=function(){hideOv();show('scen')};
+function hideOv(){$('ovLim').classList.remove('on');$('ovRes').classList.remove('on');$('bPause').textContent='PAUZA'}
+function showLimit(){var st=S.st[S.i];$('limT').innerHTML='Etap „'+st.title+'” trwa dłużej niż limit, a warunek nie jest spełniony ('+st.cond+'). Możesz czekać dalej, przerwać albo kontynuować mimo to: wtedy wynik będzie oznaczony jako <b>WARUNKI NIEWYSTARCZAJĄCE</b>.';$('ovLim').classList.add('on')}
+$('lWait').onclick=function(){S.limAdd+=30;S.lim=false;S.paused=false;$('ovLim').classList.remove('on')};
+$('lGo').onclick=function(){S.flags.cond=true;S.paused=false;$('ovLim').classList.remove('on');nextStage()};
+$('lStop').onclick=function(){$('ovLim').classList.remove('on');finish(true)};
+
+function showResult(){
+ var r=S.res,s=ST[r.key],p=r.pair,fn=fnCur;
+ var lv3=[['POZIOM 1','OBSERWACJA','pomiar opisuje przebieg'],['POZIOM 2','PRZESŁANKA','wynik wskazuje przyczynę ogólną'],['POZIOM 3','POTWIERDZENIE','pomiar plus test diagnosty']];
+ var h='<h3>'+fn.n+'. '+fn.name+'</h3><div class="lvbadge '+s.c+'">'+s.l+'</div>';
+ h+='<div class="lv3">'+lv3.map(function(x,i){return '<div class="'+(s.lv===i+1?'on':'')+'"><b>'+x[0]+': '+x[1]+'</b>'+x[2]+'</div>'}).join('')+'</div>';
+ h+='<p>'+r.why+'</p>';
+ h+='<div class="nums"><div><b>'+fm(r.p90,p.dec+1)+' '+p.u+'</b><span>odchyłka p90 (próg ±'+fm(p.tol,p.dec)+')</span></div><div><b>'+fm(r.bias,p.dec+1)+' '+p.u+'</b><span>średnia odchyłka ze znakiem</span></div><div><b>'+r.n+'</b><span>próbek w oknach zapisu</span></div><div><b>'+fm(r.D,2)+'</b><span>odchyłka / próg</span></div></div>';
+ h+='<ul><li>Asystent ocenia z pomiaru; nie zna usterki i nie wskazuje części do wymiany.</li><li>Najpierw wyklucza się ciśnienie, zasilanie, powietrze, elektrykę i zapłon.</li>'+r.notes.map(function(n){return '<li>'+n+'</li>'}).join('')+'</ul>';
+ h+='<div class="truth"><b>Ujawnienie scenariusza (tylko w symulacji):</b> '+S.sc.t+(S.fault.healthy?' · brak usterki':' · '+(S.fault.title===S.sc.t?'':S.fault.title+', ')+'nasilenie '+Math.round(S.sev*100)+' %, usterka '+(S.on?'włączona':'wyłączona'))+(S.sc.cold?' · start 22 °C':'')+'.</div>';
+ h+='<div class="row2"><button class="bigbtn" id="rAgain">POWTÓRZ</button><button class="bigbtn" id="rScen">WYBÓR SCENARIUSZA</button><button class="bigbtn gold" id="rMenu">MENU FUNKCJI</button></div>';
+ $('resC').innerHTML=h;$('ovRes').classList.add('on');
+ $('rAgain').onclick=function(){hideOv();initSim(S.sc);setupRide()};
+ $('rScen').onclick=function(){hideOv();show('scen')};
+ $('rMenu').onclick=function(){hideOv();show('menu')};
+}
+
+/* ----- rysowanie ----- */
+var cv=$('cv'),cx=cv.getContext('2d'),W=0,Hh=0,dpr=1;
+function resize(){var r=cv.getBoundingClientRect();dpr=Math.min(2,window.devicePixelRatio||1);W=Math.max(10,r.width);Hh=Math.max(10,r.height);cv.width=Math.round(W*dpr);cv.height=Math.round(Hh*dpr)}
+window.addEventListener('resize',function(){if(raf)resize()});
+function draw(){
+ if(!S)return;var p=pairOf();cx.setTransform(dpr,0,0,dpr,0,0);cx.clearRect(0,0,W,Hh);
+ var L=54,R=10,T=26,B=18,w=W-L-R,h=Hh-T-B;
+ cx.fillStyle='#0a0c0f';cx.fillRect(0,0,W,Hh);
+ cx.font='13px Roboto,Arial';cx.fillStyle='#e8e8e8';cx.fillText(p.lab+' ['+p.u+']: zadana ── / zmierzona ---  (odchyłka na czerwono)',8,16);
+ var lo=p.min,hi=p.max;
+ function Y(v){return T+h-(cl(v,lo,hi)-lo)/(hi-lo)*h}
+ cx.strokeStyle='#1c2128';cx.fillStyle='#6f7a89';cx.lineWidth=1;cx.font='11px Roboto,Arial';
+ for(var i=0;i<=4;i++){var v=lo+(hi-lo)*i/4,y=Y(v);cx.beginPath();cx.moveTo(L,y);cx.lineTo(W-R,y);cx.stroke();cx.fillText(fm(v,hi-lo<10?1:0),6,y+4)}
+ var t1=S.t,t0=t1-60;function X(t){return L+(t-t0)/60*w}
+ var H2=S.hist.slice();H2.push({t:S.t,tg:S.tg,me:S.me});
+ if(H2.length>1){
+  /* pasmo tolerancji */
+  cx.fillStyle='rgba(214,168,82,.10)';cx.beginPath();H2.forEach(function(q,i){var x=X(q.t),y=Y(q.tg+p.tol);i?cx.lineTo(x,y):cx.moveTo(x,y)});
+  for(var j=H2.length-1;j>=0;j--)cx.lineTo(X(H2[j].t),Y(H2[j].tg-p.tol));cx.closePath();cx.fill();
+  /* odchyłka */
+  cx.fillStyle='rgba(239,83,80,.38)';
+  for(var k=1;k<H2.length;k++){var a=H2[k-1],b=H2[k];if(Math.abs(a.me-a.tg)>p.tol||Math.abs(b.me-b.tg)>p.tol){cx.beginPath();cx.moveTo(X(a.t),Y(a.tg));cx.lineTo(X(b.t),Y(b.tg));cx.lineTo(X(b.t),Y(b.me));cx.lineTo(X(a.t),Y(a.me));cx.closePath();cx.fill()}}
+  cx.lineWidth=2.5;cx.strokeStyle='#f0d078';cx.setLineDash([]);cx.beginPath();H2.forEach(function(q,i){var x=X(q.t),y=Y(q.tg);i?cx.lineTo(x,y):cx.moveTo(x,y)});cx.stroke();
+  cx.strokeStyle='#ef5350';cx.setLineDash([8,6]);cx.beginPath();H2.forEach(function(q,i){var x=X(q.t),y=Y(q.me);i?cx.lineTo(x,y):cx.moveTo(x,y)});cx.stroke();cx.setLineDash([]);
+ }
+ cx.strokeStyle='#d6a852';cx.lineWidth=1;cx.beginPath();cx.moveTo(W-R,T);cx.lineTo(W-R,T+h);cx.stroke();
+ cx.fillStyle='#6f7a89';cx.fillText('−60 s',L,Hh-4);cx.fillText('teraz',W-R-34,Hh-4);
+ if(S.paused&&!S.done){cx.fillStyle='#f0d078';cx.font='bold 16px Roboto,Arial';cx.fillText('PAUZA',L+10,T+22)}
+}
+function ui(){
+ if(!S)return;var st=S.st[Math.min(S.i,S.st.length-1)],n=S.st.length;
+ $('rS').textContent='krok '+(Math.min(S.i+1,n))+' z '+n+': '+st.title.toLowerCase();
+ $('stK').textContent='ETAP '+Math.min(S.i+1,n)+' z '+n+' · POLECENIE ASYSTENTA';
+ $('stC').textContent=st.txt;
+ var jest='';if(st.t==='confirm')jest='czeka na POTWIERDZAM';else if(st.s)jest='jest '+fm(S.hold,0)+' z '+st.s+' s'+(S.inband||st.t==='stab'?'':' · poza zakresem');else if(st.t==='ect')jest='ECT '+fm(S.ect,0)+' °C';else jest='obroty '+fm(S.rpm,0)+' obr/min';
+ $('stW').textContent='warunek: '+st.cond+' · '+jest;
+ $('stP').style.width=(st.s?cl(S.hold/st.s,0,1)*100:(st.t==='ect'?cl((S.ect-20)/50,0,1)*100:0))+'%';
+ var p=pairOf(),f=S.f||0;
+ var ctx={t:S.t,x:S.x||0,f:f,fid:S.fault.id,pos:S.me};
+ var items=[{l:'Obroty',u:'obr/min',v:fm(S.rpmShow||S.rpm,0)},{l:'Temp. cieczy',u:'°C',v:fm(S.ect,0)},{l:'Zadana',u:p.u,v:fm(S.tShow,p.dec)},{l:'Zmierzona',u:p.u,v:fm(S.mShow,p.dec)}];
+ fnCur.ex.forEach(function(e){items.push({l:e.l,u:e.u,v:fm(e.v(ctx),e.d)})});
+ var dv=Math.abs(S.me-S.tg)>p.tol;
+ $('rd').innerHTML=items.map(function(q,i){return '<div><div class="l">'+q.l+'</div><div class="v"'+(i===3&&dv?' style="color:#ff6b66"':'')+'>'+q.v+' <small>'+q.u+'</small></div></div>'}).join('');
+ $('gV').textContent=fm(Math.max(0,(S.rpm-fnCur.idle)/(4000-fnCur.idle)*100),0)+' %';
+ $('rV').textContent=fm(S.rpm,0)+' obr/min';$('eV').textContent=fm(S.ect,0)+' °C';
+ if(S.mode==='auto'){$('gas').value=Math.round(Math.max(0,(S.rpm-fnCur.idle)/(4000-fnCur.idle)*100));$('rpm').value=Math.round(S.rpm)}
+ if(S.ectMan==null)$('ect').value=Math.round(S.ect);
+}
+function frame(ts){
+ raf=requestAnimationFrame(frame);var dt=Math.min(.1,(ts-lastT)/1000);lastT=ts;if(!(dt>0))return;
+ var sim=dt*tempo,n=Math.ceil(sim/.05);for(var i=0;i<n;i++)tick(sim/n);
+ draw();ui();
+}
+function startLoop(){if(!raf){lastT=performance.now();raf=requestAnimationFrame(frame)}}
+function stopLoop(){if(raf){cancelAnimationFrame(raf);raf=0}}
+
+/* tapeta (lazy, bez ruchu przy prefers-reduced-motion) */
+(function(){var v=$('wall'),rm=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;if(rm)return;v.src=v.dataset.src;var p=v.play();if(p&&p.catch)p.catch(function(){})})();
+
+/* hooki testowe */
+window.__sim={
+ FN:FN,scenarios:scenarios,
+ open:function(id,i,opt){openFn(id);selSc(i);if(opt){var s=scList[scSel];if(opt.sev!=null)s.sev=opt.sev;if(opt.fault)s.fault=fnCur.faults.filter(function(x){return x.id===opt.fault})[0]}$('start').click();stopLoop()},
+ run:function(max){ /* auto: potwierdzaj, brak interakcji, do końca */
+  var g=0;while(!S.done&&g<max*20){var st=S.st[S.i];if(st.t==='confirm')nextStage();if(S.lim){S.flags.cond=true;S.paused=false;S.lim=false;nextStage()}tick(.05);g++}
+  return S.res&&{key:S.res.key,D:S.res.D,n:S.res.n,t:S.t}},
+ S:function(){return S},ST:ST,tick:tick,draw:function(){resize();draw();ui()},results:results,show:show
+};
+buildTiles();
+})();
+</script></div></body></html>

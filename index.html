@@ -1641,6 +1641,25 @@ html.boot-seen #bootScreen{display:none!important}
 </section>
 <style>.artykuly{padding:34px 0 10px}.art-grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}.art-card{display:flex;flex-direction:column;gap:6px;background:linear-gradient(180deg,rgba(214,168,82,.10),rgba(255,255,255,.03));border:1px solid var(--border);border-top:3px solid var(--accent);border-radius:var(--radius);padding:18px 20px;text-decoration:none;color:var(--text);min-height:190px}.art-card:hover{border-color:var(--accent);transform:translateY(-2px)}.art-card b{display:block;font-size:1.2rem;line-height:1.3}.art-card span{color:var(--muted);line-height:1.45}.art-tag{font-style:normal;font-size:.75rem;font-weight:800;letter-spacing:.1em;color:var(--accent)}.art-go{margin-top:auto;font-style:normal;font-weight:800;color:var(--accent);padding-top:8px}.art-all{text-align:center;margin:18px 0 0}.art-all .btn{display:inline-flex;align-items:center;justify-content:center;min-height:52px;padding:0 24px;text-decoration:none}.lab-art{display:block;margin-top:10px;text-align:center;font-weight:700;color:#ffd9ad;text-decoration:none;padding:6px}.lab-art:hover{text-decoration:underline}</style>
 
+<style>
+.ai-frame{display:flex;flex-direction:column;background:radial-gradient(circle at 80% 8%,rgba(255,176,46,.26),transparent 60%),#060d16;border:3px solid #b98a3a;border-radius:20px;margin:0;overflow:hidden;padding:10px 14px}
+.ai-frame::before,.ai-frame::after{content:"";position:absolute;width:34px;height:34px;border:2px solid rgba(255,176,46,.6);pointer-events:none}
+.ai-frame::before{left:8px;top:8px;border-right:0;border-bottom:0}.ai-frame::after{right:8px;bottom:8px;border-left:0;border-top:0}
+.ai-fh{display:flex;align-items:center;gap:10px}.ai-fh img{width:40px;height:40px;object-fit:contain}
+.ai-fh b{display:block;color:#d6a852;letter-spacing:.14em;font-size:1rem;line-height:1.1}.ai-fh small{color:#a3b0c2;letter-spacing:.3em;font-size:.65rem}
+.ai-pill{margin-left:auto;border:1.5px solid #e65100;color:#ff8a3d;border-radius:14px;padding:3px 10px;font-size:.75rem;font-weight:800}
+.ai-fb{flex:1;min-height:0;display:flex;align-items:center;justify-content:space-around;gap:10px;padding-top:6px}
+.ai-ft{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;max-width:44%}
+.ai-ft svg{width:clamp(60px,10vw,96px)}.ai-ft b{color:#f0d575;font-size:clamp(1.1rem,2.2vw,1.6rem);letter-spacing:.06em}.ai-ft small{color:#a3b0c2;font-size:.85rem;line-height:1.3}
+.ai-vid{height:100%;max-height:100%;aspect-ratio:9/16;width:auto;object-fit:cover;border-radius:12px;border:1px solid #6b5a33;background:#040a11;display:block}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded',function(){var v=document.getElementById('aiVideo');if(!v)return;
+ var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+ function load(){if(v.dataset.loaded)return;v.dataset.loaded=1;v.src=v.dataset.src;if(!reduce){var p=v.play();if(p&&p.catch)p.catch(function(){})}}
+ if('IntersectionObserver' in window){new IntersectionObserver(function(e,o){if(e[0].isIntersecting){load();o.disconnect()}},{rootMargin:'200px'}).observe(v)}else{load()}
+});
+</script>
 <section id="galeria" class="galeria">
   <div class="container">
     <div class="section-title">
@@ -1650,6 +1669,7 @@ html.boot-seen #bootScreen{display:none!important}
 
     <div class="gal-filters" aria-label="Filtry sekcji LAB">
       <button class="gal-filter-btn active" data-filter="all">Wszystko</button>
+      <button class="gal-filter-btn" data-filter="ASYST">AI ASYSTENT</button>
       <button class="gal-filter-btn" data-filter="PRAD">Prąd</button>
       <button class="gal-filter-btn" data-filter="CAN">CAN</button>
       <button class="gal-filter-btn" data-filter="KOMP">Kompresja</button>
@@ -1657,6 +1677,22 @@ html.boot-seen #bootScreen{display:none!important}
     </div>
 
     <div class="lab-grid gal-grid">
+      <article class="lab-card gal-card" data-cat="ASYST" id="aiAsystent">
+        <div class="lab-thumb gal-thumb ai-frame">
+          <div class="ai-fh"><img src="lab/img/logo-emblem.png" alt="" width="40" height="40"><div><b>EKOTRONIK</b><small>SYSTEM</small></div><span class="ai-pill">● PROJEKT</span></div>
+          <div class="ai-fb">
+            <div class="ai-ft"><svg viewBox="0 0 54 44" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="27" cy="20" r="11" stroke="#4de3f5"/><circle cx="27" cy="20" r="3.5" stroke="#d6a852"/><path d="M27 9V4M27 36v4M16 20H9M38 20h7M19 12l-4-4M35 12l4-4M19 28l-4 4M35 28l4 4" stroke="#d6a852"/></svg><b>AI ASYSTENT</b><small>prowadzi diagnostę krok po kroku</small></div>
+            <video id="aiVideo" class="ai-vid" muted loop playsinline preload="none" poster="assets_v8/asystent/tapeta_plakat.webp" data-src="assets_v8/asystent/tapeta.mp4" aria-label="Animowana tapeta projektu EKOTRONIK AI ASYSTENT" width="540" height="960"></video>
+          </div>
+        </div>
+        <div class="lab-body gal-body">
+          <h3 class="lab-title gal-title">EKOTRONIK AI ASYSTENT</h3>
+          <p class="lab-desc gal-desc">Aplikacja na Androida, która prowadzi diagnostę krok po kroku: dobiera parametry, porównuje wartości zadane ze zmierzonymi i ocenia wynik w trzech poziomach. Współpracuje z głowicą pomiarową EKOTRONIK (ESP32).</p>
+          <p class="lab-goal">Cel: pokazać, że prosty sprzęt i dobrze poprowadzony pomiar dają wiarygodną diagnozę.</p>
+          <a class="lab-open lab-btn" href="lab/asystent.html">Otwórz projekt →</a>
+        </div>
+      </article>
+
       <article class="lab-card gal-card" data-cat="PRAD">
         <div class="lab-thumb gal-thumb">
           <span class="lab-badge gal-badge">SYMULACJA</span>

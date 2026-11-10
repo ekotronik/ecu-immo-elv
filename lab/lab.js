@@ -20,6 +20,7 @@
    prad:'<svg viewBox="0 0 54 44" fill="none" stroke="#d6a852" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="12" width="36" height="22" rx="3"/><path d="M42 18h4v10h-4M13 12V9h6v3M29 12V9h6v3"/><path d="M25 16l-5 7h7l-5 7" stroke="#5adce8"/></svg>',
    can:'<svg viewBox="0 0 54 44" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h10v-6h10v6h10v-6h10" stroke="#4de3f5"/><path d="M4 32h10v6h10v-6h10v6h10" stroke="#6be36b"/><path d="M44 8v30" stroke="#d6a852" stroke-dasharray="2 4"/></svg>',
    komp:'<svg viewBox="0 0 54 44" fill="none" stroke="#d6a852" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="14" y="6" width="26" height="16" rx="2"/><path d="M18 22v6h18v-6M24 28v8M30 28v8M20 36h14"/><path d="M4 40c4 0 4-6 7-6s3 6 6 6" stroke="#5adce8"/></svg>',
+   ai:'<svg viewBox="0 0 54 44" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="27" cy="20" r="11" stroke="#4de3f5"/><circle cx="27" cy="20" r="3.5" stroke="#d6a852"/><path d="M27 9V4M27 36v4M16 20H9M38 20h7M19 12l-4-4M35 12l4-4M19 28l-4 4M35 28l4 4" stroke="#d6a852"/></svg>',
    roz:'<svg viewBox="0 0 54 44" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="19" cy="22" r="13" stroke="#d6a852"/><circle cx="19" cy="22" r="4" stroke="#d6a852"/><path d="M19 9v-4M31 14l3-3M7 14l-3-3M32 22h4M6 22H2M31 30l3 3M7 30l-3 3" stroke="#d6a852"/><path d="M38 38h4V26h5V14" stroke="#5adce8"/></svg>'
   };
   /* nagłówek aplikacji: logo EKOTRONIK + symbol analizatora + status symulacji */
@@ -45,4 +46,23 @@
   };
   LAB.f1=function(x,n){return (n===undefined?x.toFixed(1):x.toFixed(n)).replace('.',',')};
   LAB.sg=function(x,n){return (x>=0?'+':'−')+LAB.f1(Math.abs(x),n)};
+})();
+/* Suwaki na żywo dla scenariusza „Własny”. Przycisk SUWAKI jest nad ekranem pomiaru, więc działa też w trybie pełnoekranowym. */
+(function(){
+  LAB.live=function(cfg){
+    const vals={};cfg.defs.forEach(d=>vals[d.id]=d.val);
+    const fab=document.createElement('button');fab.className='lv-fab hidden';fab.type='button';fab.textContent='⚙ SUWAKI';
+    const sh=document.createElement('div');sh.className='lv-sheet hidden';sh.setAttribute('role','dialog');sh.setAttribute('aria-label','Suwaki symulacji');
+    let h='<div class="lv-h"><b>'+(cfg.title||'Scenariusz własny')+'</b><button type="button" class="lv-x" aria-label="Zamknij">✕</button></div><div class="lv-sub">'+(cfg.sub||'Przesuń suwak – symulacja reaguje od razu.')+'</div><div class="lv-b">';
+    cfg.defs.forEach(d=>{h+='<div class="lv-r"><div class="lv-t"><span>'+d.label+'</span><b id="lvv_'+d.id+'"></b></div><input type="range" id="lvi_'+d.id+'" min="'+d.min+'" max="'+d.max+'" step="'+d.step+'" value="'+d.val+'" aria-label="'+d.label+'"><div class="lv-hint" id="lvh_'+d.id+'"></div></div>'});
+    h+='</div>'+(cfg.presets?'<div class="lv-p">'+cfg.presets.map((p,i)=>'<button type="button" class="btn" data-pi="'+i+'">'+p.n+'</button>').join('')+'</div>':'');
+    sh.innerHTML=h;document.body.appendChild(fab);document.body.appendChild(sh);
+    const fmt=(d,v)=>LAB.f1(v,d.dec===undefined?(d.step<1?1:0):d.dec)+(d.unit?' '+d.unit:'');
+    function paint(d){const v=vals[d.id],e=document.getElementById('lvv_'+d.id);e.textContent=fmt(d,v);const hh=document.getElementById('lvh_'+d.id);hh.textContent=d.hint?d.hint(v):''}
+    function set(id,v,fin){vals[id]=+v;document.getElementById('lvi_'+id).value=v;cfg.onChange(vals,!!fin,id);cfg.defs.forEach(paint)}
+    cfg.defs.forEach(d=>{paint(d);const r=document.getElementById('lvi_'+d.id);r.addEventListener('input',()=>set(d.id,r.value,false));r.addEventListener('change',()=>set(d.id,r.value,true))});
+    fab.onclick=()=>{cfg.defs.forEach(paint);sh.classList.toggle('hidden')};sh.querySelector('.lv-x').onclick=()=>sh.classList.add('hidden');
+    if(cfg.presets)sh.querySelector('.lv-p').addEventListener('click',e=>{const b=e.target.closest('[data-pi]');if(!b)return;const p=cfg.presets[+b.dataset.pi];Object.keys(p.v).forEach(k=>set(k,p.v[k],false));cfg.onChange(vals,true,null);cfg.defs.forEach(paint)});
+    return{vals,show:function(on){fab.classList.toggle('hidden',!on);if(!on)sh.classList.add('hidden')},open:function(){cfg.defs.forEach(paint);sh.classList.remove('hidden')}};
+  };
 })();

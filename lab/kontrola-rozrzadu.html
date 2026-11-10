@@ -314,7 +314,7 @@ function mzUi(){
  const V=S?curView():null,v=nowV(),A=S?S.A:null;
  const mode=browse!==null?'PRZEGLĄDANIE':frozen?'PAUZA A–B':(running?'LIVE':done?'ZAKOŃCZONO':'GOTOWY');
  const ch=$('chMode');ch.textContent=(mode==='LIVE'?'● ':'')+mode;ch.className='mz-chip '+(mode==='LIVE'?'live':mode==='ZAKOŃCZONO'?'':'warn');
- $('chSc').textContent='SYMULACJA · scen. '+(SC.indexOf(sc)+1);
+ $('chSc').textContent='SYMULACJA · scen. '+(SCU.indexOf(sc)+1);
  $('mzSt').textContent=(running?'Pomiar trwa':done?'Pomiar zakończony':S?'Pomiar wstrzymany':'Gotowy do pomiaru')+(S?' · '+(S.t.toFixed(1).replace('.',','))+' s · '+(V?STN[V.st]+' · '+Math.round(V.rpm)+' obr/min':'czekam na obroty'):'')+(rec?' · ● REC '+recS.toFixed(1).replace('.',',')+' s':'')+' · '+SNS[sn];
  const bn=$('mzBan');
  if(v){bn.className='mz-ban '+v.k;$('mzBt').textContent=(v.kind==='noref'||v.kind==='bad'?'':'')+v.t;
@@ -369,9 +369,17 @@ function ui(){
 function results(v){LAB.set('wW',v.w);LAB.set('wD',v.d);LAB.set('wSt',v.st);LAB.set('wN',v.n);$('wStC').className='card4 st '+v.k;$('tb').innerHTML=v.rows.map(r=>{if(!r.n)return '<tr><td>'+r.k+'</td><td colspan="6" class="dm">brak danych</td></tr>';const z=v.kind==='bad'?'fail':v.kind==='noref'?'warn':zone(r.d);return '<tr><td>'+r.k+'</td><td>'+Math.round(r.rpm)+'</td><td>'+f1(r.m)+'°</td><td>'+(sc.noref?'—':sg(r.d)+'°')+'</td><td>'+f1(r.sd,2)+'°</td><td>'+r.n+'</td><td class="z-'+z+'">'+(v.kind==='noref'?'BRAK WZORCA':zl[z])+'</td></tr>'}).join('')}
 function report(){const v=nowV();return 'RAPORT – ANALIZATOR ROZRZĄDU (SYMULACJA)\nScenariusz: '+sc.n+'\nCzujniki: '+SN[sn]+'\nWzorzec: '+(sc.noref?'brak':REF+'°')+', T1 '+T1+'°, T2 '+T2+'°\nZdarzeń CMP: '+(S?S.A.ev.length:0)+'\n\n'+(v?'Wniosek: '+v.w+'\nDowód: '+v.d+'\nStatus: '+v.st+'\nNastępny krok: '+v.n:'Brak danych.')+'\n\nZdarzenia:\n'+evs.map(x=>LAB.mmss(x.t/60)+'  '+x.txt).join('\n')+'\n\nPrzebiegi pochodzą z modelu symulacji. Czujniki, głowica i pojazd nie były użyte.'}
 function showTab(x){document.querySelectorAll('#tabs .btn').forEach(b=>b.classList.toggle('on',b.dataset.t===x));document.querySelectorAll('[data-p]').forEach(p=>p.classList.toggle('hidden',p.dataset.p!==x));if(x==='rap')LAB.set('rep',report());if(x==='wyn'&&S){const v=nowV();if(v)results(v)}if(x==='prd'&&proofData)drawLin();window.scrollTo(0,0)}
-function setSc(i){sc=SC[i];document.querySelectorAll('#scBtns .btn').forEach((b,k)=>b.classList.toggle('sel',k===i));LAB.set('scDesc',(i+1)+'. '+sc.n+' – '+sc.pr);reset()}
+const CUS={k:'custom',n:'★ Własny – suwaki na żywo',pr:'Ustawiasz sam: przesunięcie rozrządu (także tuż przy progach T1 i T2) i szum sygnału. Suwaki są pod przyciskiem SUWAKI, także na ekranie pomiaru. Po puszczeniu suwaka pomiar startuje od nowa.',off:REF,sg:[.35,.25,.2]};
+const SCU=SC.concat([CUS]);
+const LV=LAB.live({title:'Rozrząd – scenariusz własny',sub:'Offset CMP względem wzorca 100°. Granice: T1 = 2° (dobrze), T2 = 6° (ostrzeżenie).',
+ defs:[
+  {id:'off',label:'Przesunięcie rozrządu',min:-25,max:25,step:.1,val:0,unit:'°',hint:v=>{const a=Math.abs(v);return a<T1?'w normie (poniżej progu T1, zapas '+LAB.f1(T1-a)+'°)':a<T2?'ostrzeżenie (między T1 a T2, '+LAB.f1(a-T1)+'° za T1)':'usterka (ponad T2 o '+LAB.f1(a-T2)+'°)'+(a>12?' · zbliża się przeskok zęba (17,1°)':'')}},
+  {id:'sg',label:'Szum czasu zboczy',min:.5,max:8,step:.1,val:1,unit:'×',hint:v=>v>4?'bardzo zakłócony sygnał':v>2?'podwyższony szum':'normalny szum'}],
+ presets:[{n:'Norma',v:{off:0,sg:1}},{n:'Tuż przy T1',v:{off:1.8,sg:1}},{n:'Tuż przy T2',v:{off:5.8,sg:1}},{n:'1 ząb',v:{off:TOOTH,sg:1}}],
+ onChange:(v,fin)=>{if(sc!==CUS)return;CUS.off=REF+v.off;CUS.sg=[.35*v.sg,.25*v.sg,.2*v.sg];if(fin&&S){const was=running&&mzOn;reset();if(was)startMeasure()}}});
+function setSc(i){sc=SCU[i];document.querySelectorAll('#scBtns .btn').forEach((b,k)=>b.classList.toggle('sel',k===i));LAB.set('scDesc',(i+1)+'. '+sc.n+' – '+sc.pr);LV.show(sc===CUS);if(sc===CUS)LV.open();reset()}
 function setSn(i){sn=i;document.querySelectorAll('#snBtns .btn').forEach((b,k)=>b.classList.toggle('sel',k===i));if(S)reset()}
-$('scBtns').innerHTML=SC.map((s,i)=>'<button class="btn" data-i="'+i+'">'+(i+1)+'  '+s.n+'</button>').join('');
+$('scBtns').innerHTML=SCU.map((s,i)=>'<button class="btn" data-i="'+i+'">'+(i+1)+'  '+s.n+'</button>').join('');
 $('snBtns').innerHTML=SN.map((s,i)=>'<button class="btn" data-i="'+i+'">'+s+'</button>').join('');
 $('scBtns').addEventListener('click',e=>{const b=e.target.closest('[data-i]');if(b)setSc(+b.dataset.i)});
 $('snBtns').addEventListener('click',e=>{const b=e.target.closest('[data-i]');if(b)setSn(+b.dataset.i)});
