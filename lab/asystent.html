@@ -10,12 +10,7 @@
 <meta property="og:url" content="https://ekotronik.github.io/ecu-immo-elv/lab/asystent.html"><meta property="og:title" content="EKOTRONIK AI ASYSTENT – symulacja aplikacji | EKOTRONIK SYSTEM"><meta property="og:description" content="Interaktywna symulacja aplikacji EKOTRONIK AI ASYSTENT: funkcje prowadzone i scenariusze.">
 <meta property="og:image" content="https://ekotronik.github.io/ecu-immo-elv/assets_v8/og_ekotronik_system.png">
 <link rel="stylesheet" href="lab.css"><style>
-.stage{display:flex;gap:12px;align-items:flex-start}.stage .app{flex:1;min-width:0}
-.hero{flex:0 0 300px;margin:10px 0;aspect-ratio:9/16;max-height:calc(100dvh - 16px);align-self:flex-start;position:sticky;top:8px;border:1px solid var(--border);border-radius:18px;background:#02050a;box-shadow:0 0 0 1px #000,0 10px 40px #000a;overflow:hidden}
-.hero .herovid{width:100%;height:100%;object-fit:contain;display:block}
-@media (min-width:1101px) and (max-width:1500px){.tb .lg b{font-size:1.7rem}.tb .lg img{height:60px;width:60px}.tb .wp ~ .wp ~ .wp{display:none}}
-@media (max-width:1100px){.hero{display:none}}
-.app{position:relative;overflow:hidden;border:1px solid var(--border);border-radius:18px;background:#05080c;margin:10px 0;height:calc(100dvh - 16px);min-height:640px;max-height:1400px;box-shadow:0 0 0 1px #000,0 10px 40px #000a}
+.app{position:relative;overflow:hidden;border:1px solid #6b5a33;border-radius:16px;background:#05080c;margin:10px 0;height:calc(100dvh - 16px);min-height:640px;max-height:1400px;box-shadow:0 0 0 1px #000,0 10px 40px #000a}
 .app .wall{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.5;pointer-events:none}
 .app .veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,8,12,.55),rgba(5,8,12,.78));pointer-events:none}
 .scr{position:absolute;inset:0;display:none;flex-direction:column;gap:8px;padding:10px}
@@ -125,7 +120,7 @@ input[type=range][disabled]{opacity:.5}
  .app{min-height:760px}
 }
 @media (max-width:520px){.ft .d{display:none}.ft .t{font-size:.95rem}}
-@media (prefers-reduced-motion:reduce){.hero .herovid{display:none}}
+
 
 /* ===== panel jak w aplikacji 0.7.89 (zdjęcia tabletu): granat + pomarańczowe obrysy ===== */
 .app{--border:#d98a2b;--ap:#f0a030}
@@ -260,7 +255,7 @@ input[type=range][disabled]{opacity:.5}
 </style></head><body><div class="wrap">
 <div class="hdr" id="hdr"></div><div class="crumb" id="crumb"></div>
 
-<div class="stage"><aside class="hero"><video class="herovid" id="wall" muted loop playsinline preload="none" poster="../assets_v8/asystent/tapeta_plakat.webp" data-src="../assets_v8/asystent/tapeta.mp4" aria-label="Animacja: obracająca się głowa asystenta"></video></aside><div class="app" id="app">
+<div class="app" id="app">
  
  <div class="veil"></div>
 
@@ -322,7 +317,7 @@ input[type=range][disabled]{opacity:.5}
   <div class="ov" id="ovRes"><div class="card" id="resC"></div></div>
  </section>
  <div class="toast" id="toast"></div>
-</div></div>
+</div>
 
 <p class="aboutp"><b>To jest symulacja aplikacji EKOTRONIK AI ASYSTENT działająca w przeglądarce.</b> Pojazd, głowica pomiarowa i sterownik są emulowane; wartości i progi ocen pochodzą z modelu symulatora aplikacji (propozycje do potwierdzenia na zapisach z pojazdów). Asystent tylko prowadzi diagnostę: nie steruje silnikiem, nie uruchamia regeneracji, nie kasuje adaptacji i nie wskazuje części do wymiany. Analizatory są w osobnych oknach LAB (nie są tu powielane): <a href="prad-spoczynkowy.html">prąd spoczynkowy</a>, <a href="analizator-can.html">CAN</a>, <a href="kompresja-wzgledna.html">kompresja względna</a>, <a href="kontrola-rozrzadu.html">rozrząd</a>.</p>
 
@@ -855,7 +850,6 @@ function frame(ts){
 }
 function startLoop(){if(!raf){lastT=performance.now();raf=requestAnimationFrame(frame)}}
 function stopLoop(){if(raf){cancelAnimationFrame(raf);raf=0}}
-(function(){var v=$('wall'),rm=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;if(rm)return;v.src=v.dataset.src;var p=v.play();if(p&&p.catch)p.catch(function(){})})();
 
 /* hooki testowe */
 window.__core={$:$,show:show,toast:toast,fm:fm,cl:cl,gauss:gauss,openFn:openFn,register:function(n,el,h){scrs[n]=el;hooks[n]=h||{}}};
