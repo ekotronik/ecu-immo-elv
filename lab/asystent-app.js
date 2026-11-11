@@ -466,7 +466,7 @@ function homeRender(){
   $('hAsk').onclick=function(){var q=$('hQ').value.trim();SESS.answer=v?(q?'Pytanie: „'+q+'”. ':'')+answerFor(v):'Brak sesji pojazdu. Naciśnij START w Diagnostyce i wybierz scenariusz, a asystent odpowie na podstawie pomiaru.';$('hAns').textContent=SESS.answer.replace(/<[^>]+>/g,'')};
   var _offFn=function(){TOAST('To okno symulacji nie obejmuje tej funkcji: tu działają START / Diagnostyka, Live Data / Wykresy i Funkcje prowadzone.')};
   $('fAn').onclick=_offFn;var _unusedAn=function(){hub('ANALIZATORY','wybierz analizator',[
-    {t:'Analizator prądu spoczynkowego',d:'pobór prądu przez samochód w uśpieniu, cęgi CC-65 (osobne okno LAB)',go:function(){location.href='prad-spoczynkowy.html'}},
+    {t:'Analizator prądu spoczynkowego',d:'pobór prądu przez samochód w uśpieniu, cęgi prądowe (osobne okno LAB)',go:function(){location.href='prad-spoczynkowy.html'}},
     {t:'Analizator CAN (EKO-CAN)',d:'sygnał i dane magistrali (osobne okno LAB)',go:function(){location.href='analizator-can.html'}},
     {t:'Tester kompresji względnej',d:'porównanie cylindrów z prądu rozrusznika (osobne okno LAB)',go:function(){location.href='kompresja-wzgledna.html'}},
     {t:'Kontrola rozrządu',d:'synchronizacja wału i rozrządu w pracy silnika (osobne okno LAB)',go:function(){location.href='kontrola-rozrzadu.html'}},

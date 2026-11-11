@@ -54,7 +54,7 @@ table.st td{padding:8px;border-bottom:1px solid rgba(107,90,51,.35);font-size:1r
 <div data-p="pom"><div class="two">
  <div class="panel">
   <div class="pt"><i>01 /</i>Tester kompresji względnej</div>
-  <div class="psub">ekran pomiaru (radar, słupki cylindrów, prąd rozrusznika) otwiera się na pełny ekran po START ROZRUCHU · cęgi CC-650 na przewodzie rozrusznika, znacznik cylindra 1 z wtryskiwacza · porównanie cylindrów między sobą, bez normy producenta</div>
+  <div class="psub">ekran pomiaru (radar, słupki cylindrów, prąd rozrusznika) otwiera się na pełny ekran po START ROZRUCHU · cęgi prądowe na przewodzie rozrusznika, znacznik cylindra 1 z wtryskiwacza · porównanie cylindrów między sobą, bez normy producenta</div>
   <div class="kpis">
    <div class="kpi"><span class="lbl">Obroty rozruchu</span><div class="v gd" id="kRpm">—</div></div>
    <div class="kpi"><span class="lbl">Prąd średni</span><div class="v cy" id="kI">—</div></div>
@@ -90,14 +90,14 @@ table.st td{padding:8px;border-bottom:1px solid rgba(107,90,51,.35);font-size:1r
  <div class="kp" id="prK"></div>
  <div class="scroll"><table class="st" id="prT"></table></div>
  <div><div class="lbl">Czułość: względny szczyt prądu cylindra 3 a zadana nieszczelność (pozostałe cylindry zdrowe)</div><div class="cwrap"><canvas id="cSens"></canvas></div><div class="hint" id="prSensT"></div></div>
- <div class="note">Co to potwierdza: że szczyt prądu rozrusznika maleje monotonicznie ze spadkiem sprężania, że porównanie względne (wzorzec = mediana lepszej połowy cylindrów, każdy cykl liczony sam do siebie) wskazuje właściwy cylinder, nie daje fałszywej usterki przy słabym akumulatorze i uczciwie mówi „brak wniosku” bez znacznika. Czego NIE potwierdza: zachowania prawdziwego rozrusznika, cęgów CC-650, głowicy ani konkretnego silnika. Metoda względna nie wykrywa równomiernie obniżonej kompresji (scenariusz 11) i test to pokazuje.</div>
+ <div class="note">Co to potwierdza: że szczyt prądu rozrusznika maleje monotonicznie ze spadkiem sprężania, że porównanie względne (wzorzec = mediana lepszej połowy cylindrów, każdy cykl liczony sam do siebie) wskazuje właściwy cylinder, nie daje fałszywej usterki przy słabym akumulatorze i uczciwie mówi „brak wniosku” bez znacznika. Czego NIE potwierdza: zachowania prawdziwego rozrusznika, cęgów prądowych, głowicy ani konkretnego silnika. Metoda względna nie wykrywa równomiernie obniżonej kompresji (scenariusz 11) i test to pokazuje.</div>
 </div></div>
 
 <div data-p="rap" class="hidden"><div class="panel"><div class="pt"><i>●</i>Raport</div><pre id="rep" style="white-space:pre-wrap;font:inherit;color:var(--text)">Raport pojawi się po rozruchu.</pre></div></div>
 
-<div class="about"><section class="panel about"><h2>Cel projektu</h2><p>Wskazać cylinder o obniżonej kompresji, zanim ktokolwiek rozbierze silnik. Test jest względny: porównuje cylindry między sobą na podstawie prądu rozrusznika (cęgi CC-650) i znacznika cylindra 1, więc nie potrzebuje normy producenta, ale też nie zastępuje manometru ani testu szczelności. Gdy nie ma pewności (brak znacznika, mało cykli, słaba powtarzalność), tester mówi „brak wniosku”, zamiast zgadywać.</p></section>
+<div class="about"><section class="panel about"><h2>Cel projektu</h2><p>Wskazać cylinder o obniżonej kompresji, zanim ktokolwiek rozbierze silnik. Test jest względny: porównuje cylindry między sobą na podstawie prądu rozrusznika (cęgi prądowe) i znacznika cylindra 1, więc nie potrzebuje normy producenta, ale też nie zastępuje manometru ani testu szczelności. Gdy nie ma pewności (brak znacznika, mało cykli, słaba powtarzalność), tester mówi „brak wniosku”, zamiast zgadywać.</p></section>
 <section class="panel about"><h2>Co tu widzisz</h2><ul><li>Ekran pomiaru jak w aplikacji EKOTRONIK: radar cylindrów z złotym pierścieniem wzorca (wskaźnik odchyłki: zmierzone nałożone na zadane), słupki cylindrów, prąd rozrusznika z markerami znacznika, kafle, zakładki RADAR / WYKRES / OCENA / KONTROLE.</li><li>Dwanaście scenariuszy z aplikacji: zdrowy silnik, zużyty cylinder, diesel z nieszczelnym zaworem, dwa cylindry (uszczelka), słaby akumulator, R6, odwrócone cęgi i znacznik aktywny niski, znacznik dwa razy na cykl, brak znacznika, V8, równomiernie obniżona kompresja, zero cęgów i opóźnienie toru.</li><li>Zakładka Przydatność: automatyczny test koncepcji pomiaru, w tym czułość i fałszywe alarmy.</li></ul>
-<p class="note">To SYMULACJA. Przebieg generuje fizyczny model rozruchu, nie silnik z auta. Cęgi CC-650, głowica ESP32 i pojazd nie były w tym teście używane. Progi −10% (uwaga) i −15% (niska) są robocze.</p></section></div>
+<p class="note">To SYMULACJA. Przebieg generuje fizyczny model rozruchu, nie silnik z auta. Cęgi prądowe, głowica pomiarowa i pojazd nie były w tym teście używane. Progi −10% (uwaga) i −15% (niska) są robocze.</p></section></div>
 </div>
 
 <div class="mz hidden" id="mz">
