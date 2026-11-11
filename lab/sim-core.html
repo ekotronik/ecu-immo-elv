@@ -42,10 +42,10 @@ h1{font-size:2.3rem;font-weight:700;letter-spacing:-.01em}
 h2{font-size:1.6rem;font-weight:600}
 h3{font-size:1.12rem;font-weight:600}
 p{margin:0;max-width:68ch}
-.eyebrow{font-family:var(--f-mono);font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
-header{display:flex;flex-direction:column;gap:12px}
 .back{font-family:var(--f-mono);font-size:.8rem;color:var(--accent);text-decoration:none;align-self:flex-start;padding:6px 0;min-height:32px}
 .back:hover{text-decoration:underline}
+.eyebrow{font-family:var(--f-mono);font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+header{display:flex;flex-direction:column;gap:12px}
 .lede{color:var(--muted);font-size:1.05rem}
 section{display:flex;flex-direction:column;gap:16px}
 code,.mono{font-family:var(--f-mono);font-size:.88em}
@@ -138,7 +138,7 @@ footer{border-top:1px solid var(--line);padding-top:18px;color:var(--muted);font
 <section>
   <div class="bench">
     <div class="bezel">
-      <div class="tabs"><button id="vMain" type="button" aria-pressed="true">Ekran główny</button><button id="vCan" type="button" aria-pressed="false">Ekran CAN (klawisz C)</button></div>
+      <div class="tabs"><button id="vMain" type="button" aria-pressed="true">Ekran główny</button><button id="vCan" type="button" aria-pressed="false">Ramki CAN</button><button id="vWave" type="button" aria-pressed="false">Przebiegi CAN</button><span class="cap" style="align-self:center">klawisz C przełącza</span></div>
       <canvas id="tft" width="320" height="240" aria-label="Symulacja ekranu dotykowego 320x240"></canvas>
       <div class="cap"><span>TFT 2,8" · 320×240 · dotyk</span><span id="stateCap">stan: —</span></div>
       <div class="rings" id="rings"></div>
@@ -158,7 +158,8 @@ footer{border-top:1px solid var(--line);padding-top:18px;color:var(--muted);font
       <div class="card">
         <h3>Jak czytać panel</h3>
         <p class="small">Pierścień czerwony: obwód wyłączony. Zielony: włączony. Pulsujący: przeciążenie lub zwarcie. Pulsujący przycisk naciśnij raz, żeby potwierdzić błąd, i drugi raz, żeby znów włączyć obwód.</p>
-        <p class="small">Stuknij panel CAN na ekranie, żeby zobaczyć listę ramek. Kolejne stuknięcie wraca do ekranu głównego.</p>
+        <p class="small">Stuknij panel CAN na ekranie, żeby zobaczyć listę ramek. Kolejne stuknięcie pokazuje przebiegi CAN-H i CAN-L, a następne wraca do ekranu głównego.</p>
+        <p class="small">Przebiegi są odtwarzane bit po bicie z odebranej ramki (ID, dane, CRC, ACK). Poziomy napięć mierzy przetwornik ADC.</p>
       </div>
     </div>
   </div>
@@ -292,7 +293,8 @@ function frameGen(f,t){
 }
 const FPS_NOM=FR.reduce((a,f)=>a+1000/f.p,0);
 let view='main';
-function setView(v){view=v;document.getElementById('vMain').setAttribute('aria-pressed',v==='main');document.getElementById('vCan').setAttribute('aria-pressed',v==='can');}
+function setView(v){view=v;document.getElementById('vMain').setAttribute('aria-pressed',v==='main');document.getElementById('vCan').setAttribute('aria-pressed',v==='can');document.getElementById('vWave').setAttribute('aria-pressed',v==='wave');}
+const NEXTV={main:'can',can:'wave',wave:'main'};
 
 // ---------- autotest ----------
 function buildTest(){
@@ -344,10 +346,11 @@ document.getElementById('bCanMute').onclick=e=>{S.can.mute=!S.can.mute;e.target.
 document.getElementById('bCanErr').onclick=e=>{S.can.err=!S.can.err;e.target.textContent=S.can.err?'Usuń błędy CAN':'Błędy CAN';if(!S.can.err){S.can.tec=0;S.can.rec=0;}};
 document.getElementById('vMain').onclick=()=>setView('main');
 document.getElementById('vCan').onclick=()=>setView('can');
-addEventListener('keydown',e=>{if(e.key==='c'||e.key==='C')setView(view==='can'?'main':'can');});
+document.getElementById('vWave').onclick=()=>setView('wave');
+addEventListener('keydown',e=>{if(e.key==='c'||e.key==='C')setView(NEXTV[view]);});
 cv.style.cursor='pointer';
 cv.addEventListener('click',e=>{if(S.sys!=='RUN'&&S.sys!=='CRANK')return;const r=cv.getBoundingClientRect();const x=(e.clientX-r.left)*320/r.width,y=(e.clientY-r.top)*240/r.height;
-  if(view==='main'){if(x>=161&&y>=20&&y<112)setView('can');}else setView('main');});
+  if(view==='main'){if(x>=161&&y>=20&&y<112)setView('can');}else setView(NEXTV[view]);});
 document.getElementById('bDemo').onclick=()=>{S.can.mute=false;S.can.err=false;S.can.tec=0;S.can.rec=0;
   document.getElementById('bCanMute').textContent='ECU nie nadaje na CAN';document.getElementById('bCanErr').textContent='Błędy CAN';
   if(S.sys!=='RUN'&&S.sys!=='CRANK'){Object.assign(S,{sys:'RUN',up0:now()-42000,flt:[0,0,0,0],hint:null,failIdx:null});}
@@ -472,6 +475,60 @@ function testScreen(t){
   if(S.sys==='GREEN'){RR(10,206,300,28,4,P.green,true);T(22,213,'TEST OK',2,P.black);T(122,217,'wszystkie obwody OFF za '+Math.max(0,3-Math.floor((t-S.greenT)/1000))+' s',1,P.black);}
   else{const p=Math.min(1,(t-S.t0)/1000/(STEP*S.test.length));RR(10,214,300,10,3,P.frame);R(12,216,Math.round(296*p),6,P.cyan);}
 }
+function canBits(f,acked){
+  const raw=[0],fields=[];const mark=(n,c)=>fields.push({n,c,s:raw.length});
+  mark('ID','#2ec5ff');for(let i=10;i>=0;i--)raw.push((f.id>>i)&1);
+  mark('CTRL','#7c8a98');raw.push(0,0,0);for(let i=3;i>=0;i--)raw.push((f.dlc>>i)&1);
+  mark('DANE','#20d468');for(let j=0;j<f.dlc;j++)for(let i=7;i>=0;i--)raw.push((f.d[j]>>i)&1);
+  let crc=0;for(const b of raw){const nx=b^((crc>>14)&1);crc=(crc<<1)&0x7FFF;if(nx)crc^=0x4599;}
+  mark('CRC','#ffb000');for(let i=14;i>=0;i--)raw.push((crc>>i)&1);
+  const endRaw=raw.length;const bits=[],map=[];let run=0,last=-1;
+  for(let k=0;k<endRaw;k++){map[k]=bits.length;const b=raw[k];bits.push(b);
+    if(b===last)run++;else{run=1;last=b;}
+    if(run===5){bits.push(1-b);last=1-b;run=1;}}
+  const fl=fields.map((x,i)=>({n:x.n,c:x.c,s:map[x.s],e:i+1<fields.length?map[fields[i+1].s]:bits.length}));
+  const ackS=bits.length;bits.push(1,acked?0:1,1);fl.push({n:'ACK',c:acked?'#e8eef2':'#ff3b30',s:ackS,e:ackS+3});
+  const eofS=bits.length;for(let i=0;i<10;i++)bits.push(1);fl.push({n:'EOF',c:'#2a3644',s:eofS,e:bits.length});
+  return {bits,fl,crc};
+}
+let waveSel=0,waveT=0,waveSnap=null;
+function waveScreen(t){
+  const c=S.can;R(0,0,320,240,P.bg);header(t);
+  RR(204,3,52,13,3,P.cyan);T(209,6,'PRZEB.',1,P.cyan);
+  const live=c.fps>5, master=S.on[0];
+  if(live&&(t-waveT>1600||!waveSnap)){waveT=t;waveSel=(waveSel+1)%FR.length;const f=FR[waveSel];
+    waveSnap={id:f.id,dlc:f.dlc,d:f.d.slice(),...canBits(f,!(c.err))};}
+  const vc={'ECU OK':P.green,'CZEKA':P.frame,'BRAK RAMEK':P.red,'BLEDY':P.amber,'BUS-OFF':P.red}[c.verdict];
+  const vw=c.verdict.length*6+10;RR(316-vw,21,vw,14,3,vc,true);T(321-vw,24,c.verdict,1,c.verdict==='CZEKA'?P.dim:P.black);
+  T(4,24,live&&waveSnap?`ID ${waveSnap.id.toString(16).toUpperCase().padStart(3,'0')}  DLC ${waveSnap.dlc}  500k  ${waveSnap.bits.length} bit`:(master?'magistrala w spoczynku':'brak zasilania kl.30'),1,live?P.text:P.dim);
+  const x0=26,w=290;const snap=live?waveSnap:null;const n=snap?snap.bits.length:100;const step=w/n;
+  const nz=(i,k)=>{const v=Math.sin(i*12.9898+k*78.233+waveT*0.001)*43758.5453;return v-Math.floor(v)-.5;};const noise=(i,k)=>c.err&&live?nz(i,k)*0.5:nz(i,k)*0.06;
+  function scope(y0,h,lab,col,rec,dom){
+    R(x0,y0,w,h,P.panel);const vy=v=>y0+h-3-Math.round((Math.max(1,Math.min(4,v))-1)/3*(h-6));
+    [1.5,2.5,3.5].forEach(v=>{R(x0,vy(v),w,1,P.grid);T(2,vy(v)-3,v.toFixed(1),1,P.dim);});
+    for(let i=0;i<=8;i++)R(x0+Math.round(i*w/8),y0,1,h,P.grid);
+    T(x0+4,y0+3,lab,1,col);
+    if(snap)snap.fl.forEach(f=>{if(f.n==='ACK'&&c.err){R(x0+f.s*step,y0,(f.e-f.s)*step,h,'#3a0907');}});
+    g.strokeStyle=col;g.lineWidth=2;g.beginPath();
+    let prev=null;
+    for(let i=0;i<n;i++){const b=snap?snap.bits[i]:1;const base=master?(b?rec:dom):0;const y=vy(base+noise(i,dom));const x=x0+i*step;
+      if(prev===null)g.moveTo(x,y);else g.lineTo(x,prev),g.lineTo(x,y);g.lineTo(x+step,y);prev=y;}
+    g.stroke();
+  }
+  scope(38,64,'CAN-H',P.hred||'#ff5a4e',2.5,3.5);
+  scope(106,64,'CAN-L',P.cyan,2.5,1.5);
+  if(snap){snap.fl.forEach(f=>{const x=x0+f.s*step,ww=(f.e-f.s)*step;R(x,174,Math.max(1,ww-1),8,f.c);
+      if(ww>f.n.length*6+2)T(x+2,184,f.n,1,f.c==='#2a3644'?P.dim:f.c);});
+    T(4,198,'DANE',1,P.dim);for(let j=0;j<snap.dlc;j++)T(34+j*18,198,snap.d[j].toString(16).toUpperCase().padStart(2,'0'),1,P.green);
+    T(184,198,'CRC '+snap.crc.toString(16).toUpperCase().padStart(4,'0'),1,P.amber);
+    T(250,198,c.err?'brak ACK':'ACK OK',1,c.err?P.red:P.text);}
+  else{{const m=master?'Brak ramek: linie w recesywie 2.5 V':'Wlacz MASTER i IGN, aby obudzic ECU';T(160-m.length*3,184,m,1,P.dim);}}
+  R(0,210,320,1,P.frame);
+  T(4,214,'H rec/dom',1,P.dim);T(64,214,master?(live?'2.5/3.5V':'2.5/--'):'0.0/0.0V',1,P.text);
+  T(124,214,'L rec/dom',1,P.dim);T(184,214,master?(live?'2.5/1.5V':'2.5/--'):'0.0/0.0V',1,P.text);
+  T(244,214,'dV',1,P.dim);T(260,214,live?'2.0V':'0.0V',1,P.text);
+  T(4,226,'Przebieg odtworzony z odebranej ramki, poziomy z ADC',1,P.dim);
+}
 function canScreen(t){
   const c=S.can;R(0,0,320,240,P.bg);header(t);
   RR(214,3,30,13,3,P.cyan);T(220,6,'CAN',1,P.cyan);
@@ -516,6 +573,7 @@ function frame(t){
   if(S.sys==='POWEROFF'){R(0,0,320,240,P.bg);}
   else if(S.sys==='TEST'||S.sys==='GREEN'||(S.sys==='FAULT'&&S.failIdx!=null&&S.reason.startsWith('TEST'))){testScreen(t);if(S.sys==='FAULT')message(t);}
   else if(view==='can'){canScreen(t);}
+  else if(view==='wave'){waveScreen(t);}
   else{R(0,0,320,240,P.bg);header(t);power();canPanel(t);tiles(t);message(t);}
   // pierścienie
   const alt=Math.floor(t/400)%2;
