@@ -472,6 +472,37 @@ function testScreen(t){
   if(S.sys==='GREEN'){RR(10,206,300,28,4,P.green,true);T(22,213,'TEST OK',2,P.black);T(122,217,'wszystkie obwody OFF za '+Math.max(0,3-Math.floor((t-S.greenT)/1000))+' s',1,P.black);}
   else{const p=Math.min(1,(t-S.t0)/1000/(STEP*S.test.length));RR(10,214,300,10,3,P.frame);R(12,216,Math.round(296*p),6,P.cyan);}
 }
+function oscCan(t,live,c){
+  // dwa tory: CAN-H (gora) i CAN-L (dol), kazdy ok. 55 px, skala 0,5..4,5 V
+  const X0=30,X1=316,lanes=[{y:40,col:P.hred||'#ff5a4e',n:'H',dom:3.5},{y:97,col:P.cyan,n:'L',dom:1.5}];
+  const bit=i=>{let h=Math.imul(i^0x9e3779b9,2654435761)>>>0;h^=h>>>15;h=Math.imul(h,2246822519)>>>0;return ((h>>>13)&3)<2?1:0;};
+  const idle=S.on[0];
+  lanes.forEach((ln,k)=>{
+    const y0=ln.y,h=55,vy=v=>y0+Math.round((4.5-v)/4*(h-6))+3;
+    R(0,y0,320,h,P.panel);
+    // siatka: 2,5 V (recesywny) i poziom dominujacy
+    [[2.5,'2.5'],[ln.dom,ln.dom.toFixed(1)]].forEach(([v,l],j)=>{const y=vy(v);
+      for(let x=X0;x<X1;x+=4)R(x,y,2,1,P.frame);T(2,y-4,l,1,j?ln.col:P.dim);});
+    R(X0-1,y0,1,h,P.frame);
+    let py=null;
+    for(let x=X0;x<X1;x++){
+      let v;
+      if(!live){v=idle?2.5:0;}
+      else{
+        const p=(x-X0)/17+t*0.0022,i=Math.floor(p),f=p-i,prv=bit(i-1),cur=bit(i);
+        const w=Math.min(1,f/0.1),val=prv+(cur-prv)*w;
+        v=2.5+(k?-val:val);
+        const sg=k?-1:1;
+        if(c.err){const e=Math.max(0,1-f*3)*(cur!==prv?1:0);v+=sg*Math.sin(f*60+i)*0.5*e+(Math.sin(x*1.7+t*0.03)*0.12);}
+        else v+=Math.sin(x*2.3+t*0.01)*0.03;
+      }
+      const y=vy(Math.max(.5,Math.min(4.5,v)));
+      const a=py===null?y:py;R(x,Math.min(a,y)-1,1,Math.abs(a-y)+2,ln.col);py=y;
+    }
+    RR(X1-16,y0+2,14,12,2,ln.col,true);T(X1-12,y0+3,ln.n,1,P.black);
+  });
+  T(2,40,'V',1,P.dim);
+}
 function canScreen(t){
   const c=S.can;R(0,0,320,240,P.bg);header(t);
   RR(214,3,30,13,3,P.cyan);T(220,6,'CAN',1,P.cyan);
@@ -484,15 +515,17 @@ function canScreen(t){
   const load=c.fps*125/500000;T(232,24,'obc',1,P.dim);R(254,25,40,6,P.grid);R(254,25,Math.round(40*Math.min(1,load/0.6)),6,load>0.5?P.amber:P.green);
   T(298,24,Math.round(load*100)+'%',1,P.text);
   R(0,38,320,1,P.frame);
-  T(6,42,'ID  DLC DANE',1,P.dim);T(196,42,'OKRES',1,P.dim);T(260,42,'LICZNIK',1,P.dim);
+  oscCan(t,live,c);
+  R(0,153,320,1,P.frame);
+  T(6,156,'ID  DLC DANE',1,P.dim);T(196,156,'OKRES',1,P.dim);T(260,156,'LICZNIK',1,P.dim);
   if(!live){
     const on15=S.on[2]&&S.on[0];
     const [a,b]=c.tec>=255?['BUS-OFF','Kontroler odlaczony. Sprawdz zwarcie CAN-H/L']:
       !on15?['ECU SPI','Wlacz MASTER i IGN (kl.15), aby obudzic ECU']:
       c.mute?['BRAK RAMEK','kl.15 jest, ECU milczy. Sprawdz CAN-H/L, 120R']:['CZEKAM NA RAMKI','Wykrywanie predkosci 500/250/125/1000k'];
-    T(160-a.length*6,100,a,2,on15?P.red:P.dim);T(160-b.length*3,124,b,1,'#c4ced8');
+    T(160-a.length*6,170,a,1,on15?P.red:P.dim);T(160-b.length*3,182,b,1,'#c4ced8');
   } else {
-    FR.forEach((f,i)=>{const y=53+i*10;
+    FR.slice(0,3).forEach((f,i)=>{const y=167+i*9;
       T(6,y,f.id.toString(16).toUpperCase().padStart(3,'0'),1,P.cyan);T(30,y,String(f.dlc),1,P.dim);
       for(let j=0;j<f.dlc;j++){const hot=t-f.chg[j]<600;T(42+j*18,y,f.d[j].toString(16).toUpperCase().padStart(2,'0'),1,hot?P.amber:P.text);}
       T(196,y,(f.p+'ms').padStart(6,' '),1,P.dim);T(260,y,String(f.n).padStart(9,' '),1,P.text);});
