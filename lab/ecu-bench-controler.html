@@ -109,11 +109,11 @@
 <div class="about">
 <section class="panel about"><h2>Cel projektu</h2><p>ECU BENCH CONTROLER zastępuje stacyjkę na stanowisku testowym sterowników silnika. Podaje zasilanie na zaciski 30, 75, 15 i 50 w tej samej kolejności co w samochodzie. Pilnuje prądu każdego obwodu i wyłącza tylko ten, w którym jest przeciążenie lub zwarcie. Sprawdza też, czy podłączony sterownik poprawnie nadaje na magistrali CAN.</p></section>
 <section class="panel about"><h2>Zasada działania</h2><ul>
-<li><b>POWER i autotest.</b> Wyłącznik POWER zasila cały kontroler, program go nie steruje. Po włączeniu kontroler sprawdza układy na I2C (2× MCP23017, 4× INA226), pozycję spoczynkową przycisków, zero prądu i napięcie zasilacza. Potem sprawdza przekaźniki: najpierw po kolei, potem wszystkie razem. Każdy przekaźnik jest potwierdzany napięciem na jego wyjściu, a po wyłączeniu sprawdzane jest, czy styk nie jest sklejony. W tym czasie pierścienie migają na przemian zielony/czerwony. Po udanym teście świecą 3 s na zielono, potem przechodzą na czerwony: obwody są wyłączone.</li>
+<li><b>POWER i autotest.</b> Wyłącznik POWER zasila cały kontroler, program go nie steruje. Po włączeniu kontroler sprawdza swoje układy sterujące i pomiarowe, pozycję spoczynkową przycisków, zero prądu i napięcie zasilacza. Potem sprawdza przekaźniki: najpierw po kolei, potem wszystkie razem. Każdy przekaźnik jest potwierdzany napięciem na jego wyjściu, a po wyłączeniu sprawdzane jest, czy styk nie jest sklejony. W tym czasie pierścienie migają na przemian zielony/czerwony. Po udanym teście świecą 3 s na zielono, potem przechodzą na czerwony: obwody są wyłączone.</li>
 <li><b>Kolejność zacisków.</b> MASTER podaje stałe zasilanie (kl. 30). ACC (kl. 75) i IGN (kl. 15) można włączyć dopiero przy włączonym MASTER. START (kl. 50) działa tylko przy włączonym obwodzie nadrzędnym, tylko dopóki przycisk jest trzymany i najwyżej 1,5 s. Kolejność pilnuje sprzęt (kaskada przekaźników: wyjście jednego zasila styk następnego) i program. Niedozwolone naciśnięcie nic nie włącza, a ekran podpowiada, co włączyć najpierw. MASTER wyłącza wszystko.</li>
-<li><b>Ochrona prądowa.</b> Każde wyjście ma układ INA226, który mierzy prąd i napięcie. Po przekroczeniu progu INA226 sam ustawia linię alarmu. Kontroler wyłącza wtedy w kilka milisekund ten obwód i obwody z niego zasilane, a pierścień jego przycisku pulsuje. Zwarcie na ACC wyłącza ACC i START, a MASTER zostaje. INA226 na MASTER mierzy prąd całego stanowiska. Bezpieczniki zostają jako ostatnia ochrona przed dużym zwarciem.</li>
+<li><b>Ochrona prądowa.</b> Każde wyjście ma własny pomiar prądu i napięcia. Po przekroczeniu progu pomiar sam zgłasza alarm. Kontroler wyłącza wtedy w kilka milisekund ten obwód i obwody z niego zasilane, a pierścień jego przycisku pulsuje. Zwarcie na ACC wyłącza ACC i START, a MASTER zostaje. Pomiar na MASTER obejmuje prąd całego stanowiska. Bezpieczniki zostają jako ostatnia ochrona przed dużym zwarciem.</li>
 <li><b>Kontrola CAN.</b> Wbudowany kontroler CAN sam wykrywa prędkość magistrali (500, 250, 125 lub 1000 kbit/s). Potwierdza ramki sterownika (ACK), ale sam nic nie nadaje. Na ekranie jest werdykt: ECU OK, CZEKA (zapłon wyłączony), BRAK RAMEK (zapłon włączony, a ECU milczy), BLEDY lub BUS-OFF. Dwa dodatkowe ekrany pokazują listę odbieranych ramek na żywo oraz przebiegi CAN-H i CAN-L.</li>
-<li><b>Bezpieczeństwo programu.</b> Watchdog 3 s: po zawieszeniu kontroler uruchamia się ponownie z wyłączonymi przekaźnikami i robi autotest. Utrata MCP23017 lub INA226 w trakcie pracy wyłącza wszystkie obwody.</li>
+<li><b>Bezpieczeństwo programu.</b> Watchdog 3 s: po zawieszeniu kontroler uruchamia się ponownie z wyłączonymi przekaźnikami i robi autotest. Utrata łączności z układem sterującym lub pomiarowym w trakcie pracy wyłącza wszystkie obwody.</li>
 </ul></section>
 <section class="panel about"><h2>Jak obsługiwać panel</h2><ul>
 <li><b>Pierścienie przycisków:</b> czerwony = obwód wyłączony, zielony = włączony, pulsuje = przeciążenie lub zwarcie. Pulsujący przycisk naciśnij raz, żeby potwierdzić błąd (pierścień wraca na czerwony), i drugi raz, żeby znów włączyć obwód.</li>
@@ -121,13 +121,13 @@
 <li><b>Przełączanie ekranów:</b> stuknij panel CAN, żeby zobaczyć ramki, stuknij jeszcze raz, żeby zobaczyć przebiegi, a następne stuknięcie wraca do ekranu głównego. Dotyk tylko przełącza ekrany i nigdy nie steruje obwodami. W symulacji działają też zakładki nad ekranem i klawisz C.</li>
 <li><b>W symulacji:</b> klawisze 1–4 to MASTER, ACC, IGN i START. START trzeba przytrzymać. Przyciski „Wypróbuj” wywołują usterki, a scenariusze testowe same naciskają przyciski i sprawdzają każdy krok.</li>
 </ul></section>
-<section class="panel about"><h2>Sprzęt</h2><ul>
-<li>ESP32-S3 (16 MB flash, 8 MB PSRAM): sterowanie, ekran, kontroler CAN.</li>
-<li>Wyświetlacz TFT 2,8" ILI9341 320×240 z panelem dotykowym.</li>
-<li>2× MCP23017: przekaźniki oraz przyciski i pierścienie LED, ULN2803 do pierścieni.</li>
-<li>4 przekaźniki w kaskadzie, 4× INA226 z bocznikami 10 mΩ, transceiver CAN 3,3 V z przełączaną terminacją 120 Ω.</li>
+<section class="panel about"><h2>Budowa</h2><ul>
+<li>Sterownik z kolorowym ekranem dotykowym 320×240.</li>
+<li>Panel z wyłącznikiem POWER i czterema przyciskami z podświetlanymi pierścieniami.</li>
+<li>Cztery obwody w kaskadzie, każdy z własnym pomiarem prądu i napięcia.</li>
+<li>Złącze CAN z przełączaną terminacją 120 Ω.</li>
 </ul>
-<p class="note">To SYMULACJA. Wartości pomiarów i ramki CAN są przykładowe. Przebieg CAN-H/CAN-L jest odtwarzany bit po bicie z odebranej ramki, bo przetwornik ESP32 jest za wolny na 500 kbit/s. Sprzęt i pojazd nie były w tym teście używane. © 2026 EKOTRONIK</p></section>
+<p class="note">To SYMULACJA. Wartości pomiarów i ramki CAN są przykładowe. Przebieg CAN-H/CAN-L jest odtwarzany bit po bicie z odebranej ramki, bo pomiar napięcia w kontrolerze jest za wolny na 500 kbit/s. Sprzęt i pojazd nie były w tym teście używane. © 2026 EKOTRONIK</p></section>
 </div>
 </div>
 <script>
@@ -154,7 +154,7 @@ function RR(x,y,w,h,r,col,fill){g.beginPath();g.roundRect(x+.5,y+.5,w-1,h-1,r);i
 // ---------- model ----------
 const NAMES=['MASTER','ACC','IGN','START'], KL=['30','75','15','50'];
 const REQ=[-1,0,0,1];               // START wymaga ACC (do potwierdzenia)
-const LIMIT=[20,8,10,15];           // A, próg INA226
+const LIMIT=[20,8,10,15];           // A, próg wyłączenia
 const LOAD=[0.35,1.3,3.4,0];        // prąd własny obwodu
 const S={sys:'POWEROFF',on:[0,0,0,0],flt:[0,0,0,0],fltI:[0,0,0,0],blkT:[0,0,0,0],hint:null,hintT:0,
   reason:'',reason2:'',crank0:0,last:null,cur:{vmin:99,imax:0},vbat:12.6,amp:[0,0,0,0],
@@ -440,7 +440,7 @@ function waveScreen(t){
   T(4,214,'H rec/dom',1,P.dim);T(64,214,master?(live?'2.5/3.5V':'2.5/--'):'0.0/0.0V',1,P.text);
   T(124,214,'L rec/dom',1,P.dim);T(184,214,master?(live?'2.5/1.5V':'2.5/--'):'0.0/0.0V',1,P.text);
   T(244,214,'dV',1,P.dim);T(260,214,live?'2.0V':'0.0V',1,P.text);
-  T(4,226,'Przebieg odtworzony z odebranej ramki, poziomy z ADC',1,P.dim);
+  T(4,226,'Przebieg odtworzony z ramki, poziomy zmierzone',1,P.dim);
 }
 function canScreen(t){
   const c=S.can;R(0,0,320,240,P.bg);header(t);

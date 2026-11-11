@@ -76,14 +76,14 @@ table.st td{padding:8px;border-bottom:1px solid rgba(107,90,51,.35);font-size:1r
  <div class="kp" id="prK"></div>
  <div class="scroll"><table class="st" id="prT"></table></div>
  <div><div class="lbl">Liniowość: kąt zmierzony a kąt zadany (przesunięcie CMP od −20° do +60° OWK, trzy stany pracy silnika)</div><div class="cwrap"><canvas id="cLin" style="aspect-ratio:2.1/1"></canvas></div><div class="hint" id="prLinT"></div></div>
- <div class="note">Co to potwierdza: że sam sposób pomiaru (zliczanie zębów CKP od luki i interpolacja zbocza CMP w obrębie zęba) daje kąt z błędem rzędu dziesiątych części stopnia nawet przy rozruchu z silnie falującymi obrotami i szumie czasu zboczy, oraz że werdykt zgadza się z założeniami scenariusza. Czego NIE potwierdza: zachowania prawdziwych czujników i okablowania, głowicy ESP32 ani konkretnego auta. To nadal symulacja.</div>
+ <div class="note">Co to potwierdza: że sam sposób pomiaru (zliczanie zębów CKP od luki i interpolacja zbocza CMP w obrębie zęba) daje kąt z błędem rzędu dziesiątych części stopnia nawet przy rozruchu z silnie falującymi obrotami i szumie czasu zboczy, oraz że werdykt zgadza się z założeniami scenariusza. Czego NIE potwierdza: zachowania prawdziwych czujników i okablowania, głowicy pomiarowej ani konkretnego auta. To nadal symulacja.</div>
 </div></div>
 
 <div data-p="rap" class="hidden"><div class="panel"><div class="pt"><i>●</i>Raport</div><pre id="rep" style="white-space:pre-wrap;font:inherit;color:var(--text)">Raport pojawi się po pomiarze.</pre></div></div>
 
 <div class="about"><section class="panel about"><h2>Cel projektu</h2><p>Sprawdzić fazę rozrządu bez rozbierania silnika: analizator mierzy położenie impulsu CMP względem luki koła CKP 60-2 i porównuje je ze wzorcem. Jeden ząb koła wałka rozrządu 42-zębowego to ok. 17,1° obrotu wału korbowego, więc przeskok łańcucha lub paska widać od razu, a rozciąganie łańcucha jako odchyłkę rosnącą z obrotami.</p></section>
 <section class="panel about"><h2>Co tu widzisz</h2><ul><li>Ten sam ekran pomiaru co w aplikacji EKOTRONIK: oscylogram CKP (zielony, z luką odniesienia) i CMP (niebieski), znacznik R0, pole wzorca, nałożony na nie pomiar B ze wskaźnikiem odchyłki, pasek historii odchyłek, przyciski jak w aplikacji.</li><li>Siedem scenariuszy: ustawienie prawidłowe, przeskok o 1 ząb w obie strony, przeskok o 3 zęby, dryft łańcucha, zły sygnał, pomiar bez wzorca.</li><li>Zakładka Przydatność: automatyczny test całej koncepcji pomiaru na wszystkich scenariuszach.</li></ul>
-<p class="note">To SYMULACJA. Przebiegi generuje model, nie silnik z auta. Czujniki, głowica ESP32 i pojazd nie były w tym teście używane. Progi T1 i T2 oraz wzorzec są robocze.</p></section></div>
+<p class="note">To SYMULACJA. Przebiegi generuje model, nie silnik z auta. Czujniki, głowica pomiarowa i pojazd nie były w tym teście używane. Progi T1 i T2 oraz wzorzec są robocze.</p></section></div>
 </div>
 
 <div class="mz hidden" id="mz">
