@@ -25,10 +25,10 @@
 .bezel .tabs button[aria-pressed="true"]{background:#d6a852;color:#0e0c08;border-color:var(--gold-l)}
 .bezel .tabs button:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
 .bezel .tabs .cap{display:inline;align-self:center;font-size:.85rem;color:var(--muted)}
-.bezel canvas{width:min(100%,640px);aspect-ratio:4/3;image-rendering:pixelated;display:block;margin:0 auto;border-radius:3px;background:#000}
+.bezel canvas{width:min(100%,640px);aspect-ratio:4/3;display:block;margin:0 auto;border-radius:3px;background:#000}
 /* cały panel (zakładki + ekran + przyciski) mieści się w wysokości okna */
-.bezel canvas{width:min(100%,640px,max(320px,calc((100vh - 230px) * 4 / 3)))}
-@supports (height:100svh){.bezel canvas{width:min(100%,640px,max(320px,calc((100svh - 230px) * 4 / 3)))}}
+.bezel canvas{width:min(100%,560px,max(300px,calc((100vh - 300px) * 4 / 3)))}
+@supports (height:100svh){.bezel canvas{width:min(100%,560px,max(300px,calc((100svh - 300px) * 4 / 3)))}}
 .bench{scroll-margin-top:8px}
 @media (max-height:820px){
   .bezel{padding:10px 10px 8px;gap:8px}
@@ -145,6 +145,9 @@ const rows=[['green','Obwód włączony, CAN OK, wartość w normie','zielony st
 
 function T(x,y,s,size,col){g.fillStyle=col;g.font=`600 ${10*size}px "IBM Plex Mono", monospace`;g.textBaseline='top';
   for(let i=0;i<s.length;i++) g.fillText(s[i],x+i*6*size,y-size);}
+// ostry obraz: bufor w rozdzielczości ekranu urządzenia, rysowanie nadal w układzie 320x240
+function hiDpi(){const k=Math.max(1,Math.min(6,Math.ceil((cv.clientWidth||320)*(window.devicePixelRatio||1)/320)));
+  if(cv.width!==320*k){cv.width=320*k;cv.height=240*k;}g.setTransform(k,0,0,k,0,0);}
 function R(x,y,w,h,col){g.fillStyle=col;g.fillRect(x,y,w,h);}
 function RR(x,y,w,h,r,col,fill){g.beginPath();g.roundRect(x+.5,y+.5,w-1,h-1,r);if(fill){g.fillStyle=col;g.fill();}else{g.strokeStyle=col;g.lineWidth=1;g.stroke();}}
 
@@ -480,6 +483,7 @@ function frame(t){
   if(S.sys==='TEST')testTick();
   if(S.sys==='GREEN'&&t-S.greenT>3000)S.sys='RUN';
   physics(t,dt);
+  hiDpi();
   if(S.sys==='POWEROFF'){R(0,0,320,240,P.bg);}
   else if(S.sys==='TEST'||S.sys==='GREEN'||(S.sys==='FAULT'&&S.failIdx!=null&&S.reason.startsWith('TEST'))){testScreen(t);if(S.sys==='FAULT')message(t);}
   else if(view==='can'){canScreen(t);}
