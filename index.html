@@ -97,8 +97,9 @@
     .brand-kula canvas,.brand-kula .kula-rim{position:absolute;left:50%;top:50%;width:232px;height:232px;transform:translate(-50%,-50%);pointer-events:none}
     @media (max-width: 720px){.brand-kula{width:190px;height:177px;background-size:192px}.brand-kula canvas,.brand-kula .kula-rim{width:192px;height:192px}}
     /* tlo hero: jednolity granat jak w logo; bez ozdobnikow obok logo */
-    .hero-card{background:#07182c !important}
-    .hero-bg{background:#07182c !important;filter:none !important;transform:none !important}
+    .hero-card{background:#030a14 !important}
+    .hero-bg{background:linear-gradient(rgba(3,10,20,.35),rgba(3,10,20,.35)),#030a14 url("assets_v8/hero/tlo_obwody.webp") center/cover no-repeat !important;filter:none !important;transform:none !important}
+    @media (max-width:720px){.hero-bg{background-image:linear-gradient(rgba(3,10,20,.35),rgba(3,10,20,.35)),url("assets_v8/hero/tlo_obwody_tel.webp") !important}}
     .hero-bg::after{display:none !important}
     .hero-card .scan,.hero-left .eko-logo-wrap,.hero-left .brand-text{display:none !important}
     .brand-logo{width:230px;height:auto;display:block;border-radius:18px;filter: drop-shadow(0 16px 26px rgba(0,0,0,.55))}
@@ -1266,6 +1267,8 @@ html.boot-seen #bootScreen{display:none!important}
 }
   </script>
   <script src="config.public.js"></script>
+<link rel="preload" as="image" href="assets_v8/hero/tlo_obwody.webp" media="(min-width:721px)" fetchpriority="low">
+<link rel="preload" as="image" href="assets_v8/hero/tlo_obwody_tel.webp" media="(max-width:720px)" fetchpriority="low">
 </head>
 <body class="ignition">
 <script>try{if(sessionStorage.getItem("eko_boot_seen")==="1")document.documentElement.classList.add("boot-seen");sessionStorage.setItem("eko_boot_seen","1")}catch(e){}</script>
@@ -1430,7 +1433,6 @@ html.boot-seen #bootScreen{display:none!important}
   <div class="wrap hero">
     <div class="hero-card reveal" id="heroCard">
       <div class="hero-bg" id="heroBg"></div>
-      <div class="pcb-bg" aria-hidden="true"><div class="pcb-in" id="pcbIn"><img src="assets_v8/hero/pcb_tlo.svg" alt="" width="1200" height="1400" decoding="async"></div><img class="pcb-cl" id="pcbCl" src="assets_v8/hero/pcb_cl.svg" alt="" width="880" height="520" decoding="async"><canvas id="pcbTw" aria-hidden="true"></canvas></div>
       <div class="scan" aria-hidden="true"></div>
 
       <div class="hero-inner">
