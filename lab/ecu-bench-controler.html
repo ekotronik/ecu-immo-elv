@@ -25,7 +25,19 @@
 .bezel .tabs button[aria-pressed="true"]{background:#d6a852;color:#0e0c08;border-color:var(--gold-l)}
 .bezel .tabs button:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
 .bezel .tabs .cap{display:inline;align-self:center;font-size:.85rem;color:var(--muted)}
-.bezel canvas{width:100%;max-width:640px;aspect-ratio:4/3;image-rendering:pixelated;display:block;margin:0 auto;border-radius:3px;background:#000}
+.bezel canvas{width:min(100%,640px);aspect-ratio:4/3;image-rendering:pixelated;display:block;margin:0 auto;border-radius:3px;background:#000}
+/* cały panel (zakładki + ekran + przyciski) mieści się w wysokości okna */
+.bezel canvas{width:min(100%,640px,max(320px,calc((100vh - 230px) * 4 / 3)))}
+@supports (height:100svh){.bezel canvas{width:min(100%,640px,max(320px,calc((100svh - 230px) * 4 / 3)))}}
+.bench{scroll-margin-top:8px}
+@media (max-height:820px){
+  .bezel{padding:10px 10px 8px;gap:8px}
+  .bezel .tabs button{min-height:38px;padding:0 12px}
+  .rings{gap:14px;padding-top:0}
+  .ring button{width:48px;height:48px;border-width:4px}
+  .ring.power button{width:40px;height:40px;margin:4px 0}
+  .try .btn{min-height:40px}
+}
 .bezel .cap{font-size:.8rem;color:var(--muted);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
 .rings{display:flex;justify-content:center;gap:22px;padding-top:4px;flex-wrap:wrap}
 .ring{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:.72rem;color:var(--muted)}
@@ -94,7 +106,29 @@
   <div class="logbox"><table><thead><tr><th>#</th><th>Krok</th><th>Oczekiwane</th><th>Stan</th><th>Wynik</th></tr></thead><tbody id="log"><tr><td></td><td colspan="4" class="small">Wybierz scenariusz i uruchom go. Wyniki kroków pojawią się tutaj.</td></tr></tbody></table></div>
 </div>
 
-<p class="note" style="margin-top:14px">To SYMULACJA. Wartości pomiarów i ramki CAN są przykładowe. © 2026 EKOTRONIK</p>
+<div class="about">
+<section class="panel about"><h2>Cel projektu</h2><p>ECU BENCH CONTROLER zastępuje stacyjkę na stanowisku testowym sterowników silnika. Podaje zasilanie na zaciski 30, 75, 15 i 50 w tej samej kolejności co w samochodzie. Pilnuje prądu każdego obwodu i wyłącza tylko ten, w którym jest przeciążenie lub zwarcie. Sprawdza też, czy podłączony sterownik poprawnie nadaje na magistrali CAN.</p></section>
+<section class="panel about"><h2>Zasada działania</h2><ul>
+<li><b>POWER i autotest.</b> Wyłącznik POWER zasila cały kontroler, program go nie steruje. Po włączeniu kontroler sprawdza układy na I2C (2× MCP23017, 4× INA226), pozycję spoczynkową przycisków, zero prądu i napięcie zasilacza. Potem sprawdza przekaźniki: najpierw po kolei, potem wszystkie razem. Każdy przekaźnik jest potwierdzany napięciem na jego wyjściu, a po wyłączeniu sprawdzane jest, czy styk nie jest sklejony. W tym czasie pierścienie migają na przemian zielony/czerwony. Po udanym teście świecą 3 s na zielono, potem przechodzą na czerwony: obwody są wyłączone.</li>
+<li><b>Kolejność zacisków.</b> MASTER podaje stałe zasilanie (kl. 30). ACC (kl. 75) i IGN (kl. 15) można włączyć dopiero przy włączonym MASTER. START (kl. 50) działa tylko przy włączonym obwodzie nadrzędnym, tylko dopóki przycisk jest trzymany i najwyżej 1,5 s. Kolejność pilnuje sprzęt (kaskada przekaźników: wyjście jednego zasila styk następnego) i program. Niedozwolone naciśnięcie nic nie włącza, a ekran podpowiada, co włączyć najpierw. MASTER wyłącza wszystko.</li>
+<li><b>Ochrona prądowa.</b> Każde wyjście ma układ INA226, który mierzy prąd i napięcie. Po przekroczeniu progu INA226 sam ustawia linię alarmu. Kontroler wyłącza wtedy w kilka milisekund ten obwód i obwody z niego zasilane, a pierścień jego przycisku pulsuje. Zwarcie na ACC wyłącza ACC i START, a MASTER zostaje. INA226 na MASTER mierzy prąd całego stanowiska. Bezpieczniki zostają jako ostatnia ochrona przed dużym zwarciem.</li>
+<li><b>Kontrola CAN.</b> Wbudowany kontroler CAN sam wykrywa prędkość magistrali (500, 250, 125 lub 1000 kbit/s). Potwierdza ramki sterownika (ACK), ale sam nic nie nadaje. Na ekranie jest werdykt: ECU OK, CZEKA (zapłon wyłączony), BRAK RAMEK (zapłon włączony, a ECU milczy), BLEDY lub BUS-OFF. Dwa dodatkowe ekrany pokazują listę odbieranych ramek na żywo oraz przebiegi CAN-H i CAN-L.</li>
+<li><b>Bezpieczeństwo programu.</b> Watchdog 3 s: po zawieszeniu kontroler uruchamia się ponownie z wyłączonymi przekaźnikami i robi autotest. Utrata MCP23017 lub INA226 w trakcie pracy wyłącza wszystkie obwody.</li>
+</ul></section>
+<section class="panel about"><h2>Jak obsługiwać panel</h2><ul>
+<li><b>Pierścienie przycisków:</b> czerwony = obwód wyłączony, zielony = włączony, pulsuje = przeciążenie lub zwarcie. Pulsujący przycisk naciśnij raz, żeby potwierdzić błąd (pierścień wraca na czerwony), i drugi raz, żeby znów włączyć obwód.</li>
+<li><b>Ekran:</b> u góry stan (AUTOTEST, GOTOWY, PRACA, ROZRUCH, BŁĄD). Po lewej napięcie zasilacza i prąd całkowity z paskami skali oraz minimum napięcia i maksimum prądu z ostatniego rozruchu. Po prawej stan CAN. Niżej cztery obwody z prądem każdego z nich, a na dole komunikat, co się dzieje albo co zrobić dalej.</li>
+<li><b>Przełączanie ekranów:</b> stuknij panel CAN, żeby zobaczyć ramki, stuknij jeszcze raz, żeby zobaczyć przebiegi, a następne stuknięcie wraca do ekranu głównego. Dotyk tylko przełącza ekrany i nigdy nie steruje obwodami. W symulacji działają też zakładki nad ekranem i klawisz C.</li>
+<li><b>W symulacji:</b> klawisze 1–4 to MASTER, ACC, IGN i START. START trzeba przytrzymać. Przyciski „Wypróbuj” wywołują usterki, a scenariusze testowe same naciskają przyciski i sprawdzają każdy krok.</li>
+</ul></section>
+<section class="panel about"><h2>Sprzęt</h2><ul>
+<li>ESP32-S3 (16 MB flash, 8 MB PSRAM): sterowanie, ekran, kontroler CAN.</li>
+<li>Wyświetlacz TFT 2,8" ILI9341 320×240 z panelem dotykowym.</li>
+<li>2× MCP23017: przekaźniki oraz przyciski i pierścienie LED, ULN2803 do pierścieni.</li>
+<li>4 przekaźniki w kaskadzie, 4× INA226 z bocznikami 10 mΩ, transceiver CAN 3,3 V z przełączaną terminacją 120 Ω.</li>
+</ul>
+<p class="note">To SYMULACJA. Wartości pomiarów i ramki CAN są przykładowe. Przebieg CAN-H/CAN-L jest odtwarzany bit po bicie z odebranej ramki, bo przetwornik ESP32 jest za wolny na 500 kbit/s. Sprzęt i pojazd nie były w tym teście używane. © 2026 EKOTRONIK</p></section>
+</div>
 </div>
 <script>
 (function(){
