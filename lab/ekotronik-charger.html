@@ -1,0 +1,755 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>EKOTRONIK CHARGER – symulacja | EKOTRONIK SYSTEM</title>
+<meta name="description" content="EKOTRONIK CHARGER PRO: nadzór ładowarki hulajnogi przez LTE. Interaktywna symulacja panelu w telefonie, wyświetlacza ładowarki i scenariuszy testowych.">
+<meta property="og:title" content="EKOTRONIK CHARGER PRO">
+<meta property="og:description" content="Nadzór ładowarki hulajnogi przez LTE. Interaktywna symulacja panelu telefonu i wyświetlacza ładowarki.">
+<link rel="canonical" href="https://ekotronik.github.io/ecu-immo-elv/lab/ekotronik-charger.html">
+<meta name="robots" content="index,follow">
+<link rel="icon" type="image/png" sizes="64x64" href="../assets_v8/favicon.png">
+<link rel="apple-touch-icon" href="../assets_v8/apple-touch-icon.png">
+<meta property="og:type" content="website"><meta property="og:locale" content="pl_PL"><meta property="og:site_name" content="EKOTRONIK SYSTEM">
+<meta property="og:url" content="https://ekotronik.github.io/ecu-immo-elv/lab/ekotronik-charger.html">
+<meta property="og:image" content="https://ekotronik.github.io/ecu-immo-elv/assets_v8/og_ekotronik_system.png">
+<link rel="stylesheet" href="lab.css">
+<style>
+[hidden]{display:none!important}
+.wrap{padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px))}
+.bench{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:12px;align-items:start;margin-top:12px}
+@media(max-width:1000px){.bench{grid-template-columns:minmax(0,1fr)}}
+.lcol{display:flex;flex-direction:column;gap:12px;min-width:0}
+.lcol>*{min-width:0}
+/* obudowa ładowarki z OLED */
+.box3d{background:linear-gradient(180deg,#14181d,#0a0c0f);border:1px solid var(--border);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:12px}
+.box3d .cap{font-size:.8rem;color:var(--muted);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.oledwrap{background:#000;border:6px solid #1c2126;border-radius:8px;box-shadow:inset 0 0 0 2px #2b3138,0 0 0 1px #000;padding:10px;max-width:560px;width:100%;margin:0 auto}
+#oled{width:100%;aspect-ratio:2/1;image-rendering:pixelated;display:block;background:#000;border-radius:2px}
+.leds{display:flex;justify-content:center;gap:18px;flex-wrap:wrap}
+.led{display:flex;align-items:center;gap:7px;font-size:.78rem;color:var(--muted);font-weight:700;letter-spacing:.04em}
+.led i{width:12px;height:12px;border-radius:50%;background:#2a2f35;box-shadow:inset 0 0 0 1px #000}
+.led.on i{background:#20d468;box-shadow:0 0 10px #20d468}
+.led.red i{background:#ff3b30;box-shadow:0 0 10px #ff3b30}
+.led.amb i{background:#ffb000;box-shadow:0 0 10px #ffb000}
+/* tor energii */
+.flow{overflow-x:auto}
+.flow svg{display:block;width:100%;min-width:560px;height:auto}
+.flow .wire{stroke:#2a3644;stroke-width:4;fill:none}
+.flow .wire.live{stroke:#d6a852}
+.flow .wire.dc.live{stroke:#5adce8;stroke-dasharray:10 8;animation:run 0.8s linear infinite}
+@keyframes run{to{stroke-dashoffset:-18}}
+@media (prefers-reduced-motion:reduce){.flow .wire.dc.live{animation:none}}
+.flow text{font-family:Roboto,system-ui,sans-serif;fill:#eceff3;font-size:13px;font-weight:700}
+.flow .sm{font-size:11px;fill:#a3b0c2;font-weight:600}
+.flow .bx{fill:#0f2135;stroke:#6b5a33;stroke-width:1.5}
+.flow .bx.on{stroke:#20d468}.flow .bx.err{stroke:#ef5350}
+/* stan fizyczny */
+.truth{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
+.truth .tile .v{font-size:1.3rem}
+/* telefon */
+.phone{background:#050608;border:2px solid #2b3138;border-radius:42px;padding:14px 10px 16px;box-shadow:0 10px 40px rgba(0,0,0,.6);position:relative;width:100%;max-width:400px;margin:0 auto}
+.phone::before{content:"";display:block;width:110px;height:22px;background:#000;border-radius:0 0 14px 14px;margin:-14px auto 6px}
+.phone iframe{display:block;width:100%;height:760px;border:0;border-radius:26px;background:#05070b}
+@media(max-width:1000px){.phone iframe{height:680px}}
+.pcap{font-size:.8rem;color:var(--muted);text-align:center;margin-top:8px}
+/* sterowanie symulacją */
+.try{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px}
+.try .btn{min-height:46px;font-size:.92rem;justify-content:flex-start;text-align:left;padding:6px 14px;width:100%}
+.try .btn[aria-pressed="true"]{background:#3a331f;border-color:var(--gold-l);color:var(--gold-l)}
+.speed{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.speed .btn{min-height:42px;padding:0 14px;font-size:.92rem}
+.speed .btn[aria-pressed="true"]{background:#d6a852;color:#0e0c08;border-color:var(--gold-l)}
+.speed .clock{margin-left:auto;font-family:"Roboto Mono",ui-monospace,Consolas,monospace;color:var(--gold-l);font-variant-numeric:tabular-nums}
+.sum{font-weight:800;font-size:1.05rem;margin:0}
+.bad{color:var(--fail)}.run{color:var(--cyan)}
+.selrow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:6px 0 10px}
+.selrow select.sel{flex:1 1 320px}
+.logbox{overflow-x:auto;margin-top:10px}
+.logbox table{min-width:620px}
+#log td:first-child{color:var(--muted);width:44px}
+#log td:last-child{font-weight:800;width:60px}
+#log tr.hd td{color:var(--gold);font-weight:800;background:rgba(255,255,255,.03)}
+.small{font-size:.86rem;color:var(--muted)}
+.mono{font-family:"Roboto Mono",ui-monospace,Consolas,monospace}
+.mq{list-style:none;margin:6px 0 0;padding:0;font-size:.8rem;max-height:210px;overflow:auto;font-family:"Roboto Mono",ui-monospace,Consolas,monospace}
+.mq li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:6px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.05);word-break:break-all}
+.mq .d{font-weight:800}.mq .up{color:var(--cyan)}.mq .dn{color:var(--gold-l)}
+.about table{min-width:520px}
+.about>*{min-width:0}
+.about .tw{overflow-x:auto}
+.about code{font-family:"Roboto Mono",ui-monospace,Consolas,monospace;color:var(--gold-l);font-size:.92em}
+kbd{border:1px solid var(--border);border-radius:5px;padding:0 5px;font-size:.85em}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="hdr">
+  <a class="brand" href="../index.html#galeria" aria-label="EKOTRONIK SYSTEM – wróć do LAB"><img src="img/logo-emblem.png" alt="Logo EKOTRONIK SYSTEM"><div><div class="w1">EKOTRONIK</div><div class="w2">SYSTEM</div></div></a>
+  <div class="symbox" role="img" aria-label="Symbol: EKOTRONIK CHARGER"><svg viewBox="0 0 54 44" fill="none" stroke="#d6a852" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10" width="34" height="24" rx="3"/><path d="M39 18h4v8h-4"/><path d="M24 14l-6 9h7l-5 8" stroke="#5adce8"/><path d="M45 6v6M49 4v10M45 30v8M49 32v4" stroke="#5adce8"/></svg><div><div class="st">EKOTRONIK CHARGER</div><div class="sd">nadzór ładowarki · LTE</div></div></div>
+  <div class="pill"><b>● SYMULACJA · firmware v3.5</b><br><span>Sprzęt: niesprawdzony z v3.5</span></div>
+</div>
+<div class="crumb"><a class="btn back" href="../index.html#galeria">← Powrót do LAB</a><div class="path">LAB › <b>EKOTRONIK CHARGER PRO</b></div></div>
+
+<div class="panel"><div class="pt">EKOTRONIK CHARGER PRO</div>
+  <p style="margin:8px 0 0;color:#d6dbe8">Moduł nadzoru fabrycznej ładowarki hulajnogi KuKirin G2. Mierzy napięcie, prąd i temperaturę, załącza ładowarkę przekaźnikiem SSR i łączy się z telefonem przez LTE i MQTT. Poniżej działa jego symulacja: logika firmware v3.5, prawdziwy panel telefonu v2.1 i wyświetlacz OLED z obudowy.</p>
+  <p class="small" style="margin:8px 0 0">Steruj z panelu w telefonie (przycisk <b>AUTO</b> startuje ładowanie). Zdarzenia w sprzęcie wywołasz przyciskami „Wypróbuj”. Ładowanie trwa godzinami, więc przyspiesz czas (×60, ×600) albo uruchom gotowy scenariusz.</p>
+</div>
+
+<div class="bench">
+  <div class="lcol">
+    <div class="box3d">
+      <div class="cap"><span><b style="color:var(--gold)">Obudowa ładowarki</b> · OLED 2,42" SSD1309 128×64</span><span id="stateCap">stan: —</span></div>
+      <div class="oledwrap"><canvas id="oled" width="128" height="64" aria-label="Wyświetlacz OLED ładowarki 128 na 64 piksele"></canvas></div>
+      <div class="leds" aria-label="Kontrolki">
+        <span class="led" id="ledPwr"><i></i>ZASILANIE</span>
+        <span class="led" id="ledSsr"><i></i>SSR</span>
+        <span class="led" id="ledLte"><i></i>LTE</span>
+        <span class="led" id="ledMqtt"><i></i>MQTT</span>
+        <span class="led" id="ledFlt"><i></i>BŁĄD</span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="pt" style="font-size:1.05rem">Tor energii i pomiaru</div>
+      <div class="flow">
+        <svg viewBox="0 0 700 150" role="img" aria-label="Schemat: sieć 230 V, przekaźnik SSR, ładowarka, INA226, hulajnoga">
+          <path id="w1" class="wire" d="M92 60H142"/>
+          <path id="w2" class="wire" d="M232 60H282"/>
+          <path id="w3" class="wire dc" d="M392 60H442"/>
+          <path id="w4" class="wire dc" d="M532 60H582"/>
+          <rect class="bx" id="bxNet" x="8" y="30" width="84" height="60" rx="10"/><text x="50" y="58" text-anchor="middle">SIEĆ</text><text class="sm" x="50" y="76" text-anchor="middle">230 V AC</text>
+          <rect class="bx" id="bxSsr" x="142" y="30" width="90" height="60" rx="10"/><text x="187" y="58" text-anchor="middle">SSR</text><text class="sm" id="tSsr" x="187" y="76" text-anchor="middle">GPIO26: OFF</text>
+          <rect class="bx" id="bxChg" x="282" y="30" width="110" height="60" rx="10"/><text x="337" y="58" text-anchor="middle">ŁADOWARKA</text><text class="sm" x="337" y="76" text-anchor="middle">54,6 V · 2 A</text>
+          <rect class="bx" id="bxIna" x="442" y="30" width="90" height="60" rx="10"/><text x="487" y="58" text-anchor="middle">INA226</text><text class="sm" id="tIna" x="487" y="76" text-anchor="middle">bocznik 15 mΩ</text>
+          <rect class="bx" id="bxBat" x="582" y="30" width="110" height="60" rx="10"/><text x="637" y="58" text-anchor="middle">HULAJNOGA</text><text class="sm" id="tBat" x="637" y="76" text-anchor="middle">odłączona</text>
+          <text class="sm" x="337" y="112" text-anchor="middle">DS18B20 na obudowie</text>
+          <text class="sm" id="tTemp" x="337" y="128" text-anchor="middle">—</text>
+          <text class="sm" x="487" y="112" text-anchor="middle" id="tPath">tor do 85 V</text>
+        </svg>
+      </div>
+      <div class="truth" style="margin-top:10px">
+        <div class="tile"><span class="lbl">Napięcie rzecz.</span><div class="v mono" id="rV">—</div><div class="s">na wyjściu ładowarki</div></div>
+        <div class="tile"><span class="lbl">Prąd rzecz.</span><div class="v mono" id="rI">—</div><div class="s">do akumulatora</div></div>
+        <div class="tile"><span class="lbl">Naładowanie</span><div class="v mono" id="rSoc">—</div><div class="s">model 48 V · 15 Ah</div></div>
+        <div class="tile"><span class="lbl">Temp. rzecz.</span><div class="v mono" id="rT">—</div><div class="s">obudowa ładowarki</div></div>
+      </div>
+      <p class="small" style="margin:8px 0 0">Wartości „rzeczywiste” zna tylko symulacja. ESP32 widzi je przez czujniki, więc po odłączeniu czujnika panel pokaże brak danych, a tu nadal widać prawdę.</p>
+    </div>
+  </div>
+
+  <div>
+    <div class="phone"><iframe id="phone" src="ekotronik-charger-panel.html" title="Panel EKOTRONIK CHARGER PRO v2.1 w telefonie"></iframe></div>
+    <div class="pcap">Panel telefonu v2.1 (ten sam plik co w telefonie), połączony z wirtualnym brokerem MQTT</div>
+  </div>
+</div>
+
+<div class="panel" style="margin-top:12px">
+  <div class="pt" style="font-size:1.1rem;color:var(--gold)">Wypróbuj</div>
+  <div class="speed" role="group" aria-label="Szybkość czasu">
+    <span class="lbl">Czas</span>
+    <button class="btn" type="button" data-sp="1" aria-pressed="true">×1</button>
+    <button class="btn" type="button" data-sp="60" aria-pressed="false">×60</button>
+    <button class="btn" type="button" data-sp="600" aria-pressed="false">×600</button>
+    <span class="clock" id="clock">czas pracy 00:00:00</span>
+  </div>
+  <div class="try">
+    <button class="btn gold" id="bPlug" type="button">Podłącz hulajnogę (25 %)</button>
+    <button class="btn" id="bUnplug" type="button">Odłącz hulajnogę</button>
+    <button class="btn" id="bHot" type="button" aria-pressed="false">Przegrzanie ładowarki</button>
+    <button class="btn" id="bOver" type="button" aria-pressed="false">Przeciążenie wyjścia 5,3 A</button>
+    <button class="btn" id="bDs" type="button" aria-pressed="false">Odłącz czujnik DS18B20</button>
+    <button class="btn" id="bIna" type="button" aria-pressed="false">Odłącz INA226</button>
+    <button class="btn" id="bLte" type="button" aria-pressed="false">Brak zasięgu LTE</button>
+    <button class="btn" id="bPath" type="button" aria-pressed="false">Obecny tor pomiarowy (INA226, 36 V)</button>
+    <button class="btn" id="bRogue" type="button">Obcy klient: SSR_ON na ekotronik/lte/cmd</button>
+    <button class="btn red" id="bReboot" type="button">Restart ESP32 (zanik zasilania)</button>
+  </div>
+</div>
+
+<div class="panel" id="scen" style="margin-top:12px">
+  <div class="pt">Scenariusze testowe</div>
+  <div class="selrow">
+    <span class="lbl">Scenariusz (symulacja)</span>
+    <select class="sel" id="scSel" aria-label="Wybierz scenariusz testowy"></select>
+    <button class="btn gold" id="scRun" type="button">URUCHOM</button>
+    <button class="btn cyan" id="runAll" type="button">URUCHOM WSZYSTKIE</button>
+  </div>
+  <p class="sum" id="scSum">Wynik: —</p>
+  <div class="logbox"><table><thead><tr><th>#</th><th>Krok</th><th>Oczekiwane</th><th>Stan</th><th>Wynik</th></tr></thead><tbody id="log"><tr><td></td><td colspan="4" class="small">Wybierz scenariusz i uruchom go. Scenariusz naciska przyciski w panelu telefonu i sprawdza, co pokazuje urządzenie i panel.</td></tr></tbody></table></div>
+</div>
+
+<div class="panel" style="margin-top:12px">
+  <div class="pt" style="font-size:1.05rem">Ruch MQTT</div>
+  <p class="small" style="margin:4px 0 0">↑ wysłane przez urządzenie, ↓ do urządzenia. Telemetria jest pokazywana co kilka sekund.</p>
+  <ul class="mq" id="mq"></ul>
+</div>
+
+<div class="about">
+  <div class="panel">
+    <h2>Jak to działa</h2>
+    <p>Fabryczna ładowarka hulajnogi ładuje akumulator sama. Moduł EKOTRONIK stoi obok niej: ESP32 przez przekaźnik SSR załącza zasilanie ładowarki, mierzy napięcie i prąd na jej wyjściu (INA226) oraz temperaturę obudowy (DS18B20). Modem A7670E łączy go z brokerem MQTT przez LTE, więc telefon nie musi być w tej samej sieci.</p>
+    <p>Symulacja wykonuje tę samą logikę co firmware v3.5: te same progi, czasy, komendy i pola telemetrii. Panel w ramce telefonu to niezmieniony plik panelu v2.1. Różni się tylko tym, że zamiast test.mosquitto.org rozmawia z brokerem wbudowanym w tę stronę.</p>
+  </div>
+  <div class="panel">
+    <h2>Ekran w ładowarce</h2>
+    <ul>
+      <li><b>Wiersz 1</b>: LTE i MQTT (ON/OFF) oraz jakość sygnału CSQ.</li>
+      <li><b>Wiersz 2</b>: stan przekaźnika, tryb AUTO lub MAN (ręczny) i stan ładowania: IDLE, CHARGING, DONE albo FAULT.</li>
+      <li><b>Wiersz 3</b>: zmierzone napięcie, prąd i temperatura. „INA:BRAK” lub „T:BRAK” oznacza brak czujnika.</li>
+      <li><b>Wiersz 4</b>: czas pracy i licznik komend, a przy błędzie jego przyczyna (ERR:…).</li>
+    </ul>
+    <p>Po włączeniu zasilania ekran pokazuje kolejne etapy rozruchu modemu: PWRKEY, test AT, karta SIM, sieć, dane LTE i MQTT. Dopiero wtedy panel w telefonie dostaje dane.</p>
+  </div>
+  <div class="panel">
+    <h2>Ładowanie automatyczne</h2>
+    <p>Przycisk <b>AUTO</b> wysyła <code>AUTO_ON</code>. Urządzenie sprawdza czujniki, załącza SSR i ładowarka zaczyna ładować prądem stałym około 2 A. Gdy akumulator dojdzie do 54,6 V, ładowarka przechodzi na stałe napięcie i prąd powoli spada. Po 5 minutach prądu poniżej 0,15 A firmware wyłącza SSR i pokazuje <b>DONE</b>.</p>
+    <p>Spadek prądu nie zawsze oznacza 100 %. To samo widać po odpięciu hulajnogi albo zadziałaniu BMS, dlatego panel pisze o tym wprost.</p>
+  </div>
+  <div class="panel">
+    <h2>Zabezpieczenia firmware v3.5</h2>
+    <div class="tw"><table>
+      <thead><tr><th>Zdarzenie</th><th>Reakcja</th><th>Tryb</th></tr></thead>
+      <tbody>
+        <tr><td>Temperatura DS18B20 ≥ 70 °C</td><td>SSR OFF, błąd TEMP, ponowne załączenie dopiero ≤ 60 °C</td><td>AUTO i ręczny</td></tr>
+        <tr><td>Prąd &gt; 5 A przez 5 s</td><td>SSR OFF, błąd NADPRAD</td><td>AUTO i ręczny</td></tr>
+        <tr><td>Odczyt INA226 &gt; zakres układu</td><td>SSR OFF, błąd INA POZA ZAKRESEM</td><td>AUTO i ręczny</td></tr>
+        <tr><td>Brak INA226 lub DS18B20 &gt; 10 s</td><td>SSR OFF, błąd BRAK POMIARU / BRAK CZUJNIKA</td><td>AUTO</td></tr>
+        <tr><td>Ładowanie dłużej niż 10 h</td><td>SSR OFF, błąd LIMIT CZASU</td><td>AUTO</td></tr>
+        <tr><td>Brak DS18B20 lub INA226 przy starcie</td><td>Odmowa <code>REJECT AUTO_ON</code></td><td>AUTO</td></tr>
+        <tr><td>Utrata LTE</td><td>Ochrona dalej działa lokalnie; panel pokazuje OFFLINE</td><td>zawsze</td></tr>
+        <tr><td>Restart ESP32</td><td>SSR startuje wyłączony; ładowanie trzeba wznowić</td><td>zawsze</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+  <div class="panel">
+    <h2>Komendy i tematy MQTT</h2>
+    <p>Panel wysyła komendy na <code>ekotronik/&lt;ID&gt;/cmd</code>, a urządzenie publikuje <code>…/telemetry</code> (JSON co 3 s) i <code>…/status</code> (ONLINE, OFFLINE oraz odpowiedzi ACK i REJECT). Globalne tematy <code>ekotronik/lte/…</code> są w v3.5 wyłączone, więc obcy klient nie przełączy ładowarki.</p>
+    <div class="tw"><table>
+      <thead><tr><th>Przycisk w panelu</th><th>Komenda</th><th>Działanie</th></tr></thead>
+      <tbody>
+        <tr><td>AUTO: START ŁADOWANIA</td><td><code>AUTO_ON</code></td><td>Start z automatycznym końcem</td></tr>
+        <tr><td>RĘCZNIE ON</td><td><code>SSR_ON</code></td><td>Załączenie bez auto-stopu, ochrona działa</td></tr>
+        <tr><td>STOP / OFF</td><td><code>SSR_OFF</code></td><td>Wyłączenie</td></tr>
+        <tr><td>KASUJ BŁĄD</td><td><code>RESET_FAULT</code></td><td>Kasuje błąd, gdy przyczyna ustąpiła</td></tr>
+        <tr><td>TRYB TEST</td><td><code>TEST_ON</code> / <code>TEST_OFF</code></td><td>Blokuje fizyczne wyjście SSR</td></tr>
+        <tr><td>PING, ODŚWIEŻ</td><td><code>PING</code>, <code>STATUS</code></td><td>Test łączności, nowa telemetria</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+  <div class="panel">
+    <h2>Założenia i ograniczenia symulacji</h2>
+    <ul>
+      <li>Akumulator to uproszczony model 13S, 48 V, 15 Ah (od 39 V do 54,6 V) z rezystancją wewnętrzną 0,25 Ω. Ładowarka: 54,6 V, 2 A. To przyjęte wartości, nie pomiary konkretnej hulajnogi.</li>
+      <li>INA226 mierzy najwyżej 36 V. Domyślnie symulacja zakłada poprawiony tor pomiarowy do 85 V. Przycisk „Obecny tor pomiarowy” pokazuje, co zrobi firmware z obecnym sprzętem: błąd INA POZA ZAKRESEM zaraz po starcie ładowania.</li>
+      <li>Zakładamy, że SSR przełącza zasilanie 230 V ładowarki. Dokładny schemat stopnia mocy nie jest jeszcze ustalony.</li>
+      <li>Firmware v3.5 został sprawdzony testami na komputerze, ale nie był jeszcze uruchomiony na prawdziwym ESP32.</li>
+    </ul>
+  </div>
+</div>
+
+<p class="note" style="margin-top:14px">To SYMULACJA. Pomiary są wynikiem modelu, a nie odczytem z urządzenia. © 2026 EKOTRONIK</p>
+</div>
+
+<script>
+(function(){
+"use strict";
+// ======================================================================
+// KONFIGURACJA (jak w firmware v3.5)
+// ======================================================================
+const FW='3.5', DEVICE_ID='ekotronik_lte_monitor_piotr_01';
+const T_TEL='ekotronik/'+DEVICE_ID+'/telemetry', T_ST='ekotronik/'+DEVICE_ID+'/status', T_CMD='ekotronik/'+DEVICE_ID+'/cmd';
+const SHUNT_OHMS=0.015, TEMP_CRITICAL_C=70, TEMP_RESUME_C=60, FULL_CURRENT_A=0.15, MAX_CURRENT_A=5.0;
+const OVERCURRENT_MS=5000, FULL_CONFIRM_MS=300000, MAX_CHARGE_MS=10*3600000, SENSOR_LOSS_MS=10000, DS_MAX_FAILS=3;
+const SENSOR_INTERVAL_MS=1000, OLED_INTERVAL_MS=1000, TELEMETRY_INTERVAL_MS=3000, SIGNAL_INTERVAL_MS=15000;
+const NET_CHECK_INTERVAL_MS=5000, MQTT_RECONNECT_MS=10000, LTE_RECONNECT_MS=30000, CMD_DEDUP_MS=2000;
+const STEP=100; // krok symulacji [ms]
+
+// ======================================================================
+// ŚWIAT FIZYCZNY
+// ======================================================================
+const CAP_AH=15, R_INT=0.25, V_CHG=54.6, I_CHG=2.0;
+const W={mains:true,scooter:false,soc:0.25,hot:false,over:false,dsGone:false,inaGone:false,coverage:true,oldPath:false,
+  temp:24,amb:22,V:0,I:0};
+function ocv(s){s=Math.max(0,Math.min(1,s));return 39.0+12.2*s+3.4*Math.pow(s,6);} // 39 V .. 54.6 V
+function physics(dt){
+  const on=W.mains&&D.power&&D.gpio;
+  let V=0,I=0;
+  if(W.scooter){
+    const vo=ocv(W.soc);
+    if(on){I=Math.max(0,Math.min(I_CHG,(V_CHG-vo)/R_INT));V=vo+I*R_INT;}else{V=vo;}
+    if(W.over&&on){I=5.3;V=Math.max(30,vo-2);}
+    W.soc=Math.min(1,W.soc+I*dt/(CAP_AH*3600));
+  }else if(on){V=W.over?3.0:V_CHG;I=W.over?5.3:0;}
+  W.V=V;W.I=I;
+  const loss=on?(6+0.12*V*I):0;
+  const target=W.amb+loss*0.22+(W.hot&&on?55:0)+(W.hot&&!on?8:0);
+  const tau=on?(W.hot?90:420):600; // obudowa stygnie wolniej, niż się nagrzewa
+  W.temp+=(target-W.temp)*Math.min(1,dt/tau);
+}
+
+// ======================================================================
+// URZĄDZENIE: port logiki firmware v3.5
+// ======================================================================
+let D;
+const prefs={test:false};
+function newDevice(){
+  return {power:true,gpio:false,ms:0,boot:{phase:0,until:0},blockedUntil:0,
+    modemAT:false,simOK:false,lteOK:false,mqttOK:false,
+    ssr:false,auto:true,test:prefs.test,state:'IDLE',fault:'',overTemp:false,
+    inaOK:false,inaOver:false,V:NaN,I:NaN,P:NaN,shuntMv:NaN,inaLastOk:0,
+    dsOK:false,dsFail:0,dsPending:false,dsTemp:NaN,espTemp:NaN,dsLastOk:0,
+    csq:-1,rssi:-113,signal:0,operator:'-',ip:'-',lastEvent:'BOOT',
+    lastSensor:-1e9,lastOled:-1e9,lastTel:0,lastSignal:0,lastNet:0,lastMqttRe:0,lastLteRe:0,
+    chargeStart:0,lowSince:0,overSince:0,lastCmd:'',lastCmdMs:-1e9,telDue:false,
+    pub:0,cmd:0,dup:0,lteFail:0,inbox:[],oled:['','','','',''],oledBoot:true};
+}
+function applyOutput(){D.gpio=D.ssr&&!D.test;}
+function setSSR(on){D.ssr=on;applyOutput();}
+function inaValid(){return D.inaOK&&!D.inaOver&&!isNaN(D.V)&&!isNaN(D.I);}
+function uptime(){const s=Math.floor(D.ms/1000);return p2(Math.floor(s/3600))+':'+p2(Math.floor(s%3600/60))+':'+p2(s%60);}
+function p2(n){return String(n).padStart(2,'0');}
+function csqToDbm(v){if(v<0||v===99)return -113;return -113+2*Math.min(31,v);}
+function csqToPct(v){if(v<0||v===99)return 0;return Math.floor(Math.min(31,v)*100/31);}
+
+function readSensors(){
+  const busMax=W.oldPath?36:85;
+  if(!D.inaOK)D.inaOK=!W.inaGone;
+  if(D.inaOK){
+    if(W.inaGone){D.inaOK=false;D.inaOver=false;invalidateINA();}
+    else{
+      const noise=W.I>0?(Math.random()-.5)*0.002:0;
+      let raw=Math.round((W.I+noise)*SHUNT_OHMS/0.0000025);raw=Math.max(-32768,Math.min(32767,raw));
+      const busV=W.oldPath?Math.min(40.96,W.V):W.V; // obecny tor: rejestr INA226 kończy się na 40,96 V
+      D.shuntMv=raw*0.0025;D.V=busV;D.I=raw*0.0000025/SHUNT_OHMS;D.P=D.V*D.I;
+      D.inaOver=(raw===32767||raw===-32768||busV>busMax);D.inaLastOk=D.ms;
+    }
+  }else{D.inaOver=false;invalidateINA();}
+  if(D.dsPending){
+    const t=W.dsGone?-127:Math.round((W.temp+(Math.random()-.5)*0.15)*16)/16;
+    const good=t>-55&&t<125&&!(t===85&&!D.dsOK);
+    if(good){D.dsTemp=t;D.dsOK=true;D.dsFail=0;D.dsLastOk=D.ms;}
+    else{D.dsFail=Math.min(255,D.dsFail+1);if(D.dsFail>=DS_MAX_FAILS){D.dsOK=false;D.dsTemp=NaN;}}
+  }
+  D.dsPending=true;
+  D.espTemp=Math.round((47+W.temp*0.1+(Math.random()-.5))*10)/10;
+}
+function invalidateINA(){D.V=D.I=D.P=D.shuntMv=NaN;}
+function enterFault(why){setSSR(false);D.state='FAULT';D.fault=why;D.lowSince=0;D.overSince=0;publishEvent('FAULT '+why+' SSR OFF');D.telDue=true;}
+function safetyLogic(){
+  const now=D.ms;
+  if(D.dsOK){
+    if(!D.overTemp&&D.dsTemp>=TEMP_CRITICAL_C)D.overTemp=true;
+    else if(D.overTemp&&D.dsTemp<=TEMP_RESUME_C){D.overTemp=false;publishEvent('TEMP OK '+D.dsTemp.toFixed(1)+'C');D.telDue=true;}
+  }
+  if(D.overTemp&&D.ssr){enterFault('TEMP '+D.dsTemp.toFixed(1)+'C');return;}
+  if(!D.ssr){D.overSince=0;return;}
+  if(D.inaOK&&D.inaOver){enterFault('INA POZA ZAKRESEM');return;}
+  if(inaValid()&&D.I>MAX_CURRENT_A){
+    if(!D.overSince)D.overSince=now;
+    if(now-D.overSince>OVERCURRENT_MS){enterFault('NADPRAD '+D.I.toFixed(2)+'A');return;}
+  }else D.overSince=0;
+}
+function autoLogic(){
+  if(!D.auto||D.state!=='CHARGING'||!D.ssr)return;
+  const now=D.ms;
+  if(!inaValid()){if(now-D.inaLastOk>SENSOR_LOSS_MS)enterFault('BRAK POMIARU INA226');return;}
+  if(!D.dsOK){if(now-D.dsLastOk>SENSOR_LOSS_MS)enterFault('BRAK CZUJNIKA TEMP');return;}
+  if(now-D.chargeStart>MAX_CHARGE_MS){enterFault('LIMIT CZASU LADOWANIA');return;}
+  if(inaValid()&&D.I>FULL_CURRENT_A)D.lowSince=0;
+  else{
+    if(!D.lowSince)D.lowSince=now;
+    if(now-D.lowSince>FULL_CONFIRM_MS){setSSR(false);D.state='DONE';D.lowSince=0;publishEvent('KONIEC LADOWANIA niski prad SSR OFF');D.telDue=true;}
+  }
+}
+function serviceSafety(){
+  if(D.ms-D.lastSensor>=SENSOR_INTERVAL_MS){D.lastSensor=D.ms;readSensors();safetyLogic();autoLogic();}
+}
+function canEnergize(forAuto){
+  if(D.overTemp)return 'TEMP';
+  if(D.inaOK&&D.inaOver)return 'INA POZA ZAKRESEM';
+  if(forAuto){if(!inaValid())return 'BRAK INA226';if(!D.dsOK)return 'BRAK DS18B20';}
+  return '';
+}
+function startCharging(automatic){D.auto=automatic;D.fault='';D.state='CHARGING';D.chargeStart=D.ms;D.lowSince=0;D.overSince=0;setSSR(true);}
+function handleCommand(raw){
+  let msg=String(raw).trim().toUpperCase();
+  if(!msg)return;
+  if(msg===D.lastCmd&&D.ms-D.lastCmdMs<CMD_DEDUP_MS){D.dup++;return;}
+  D.lastCmd=msg;D.lastCmdMs=D.ms;D.cmd++;
+  let why;
+  if(msg==='SSR_ON'||msg==='ON'){why=canEnergize(false);if(!why){startCharging(false);publishEvent('ACK SSR_ON');}else publishEvent('REJECT SSR_ON '+why);}
+  else if(msg==='SSR_OFF'||msg==='OFF'){D.auto=false;setSSR(false);if(D.state!=='FAULT')D.state='IDLE';publishEvent('ACK SSR_OFF');}
+  else if(msg==='AUTO_ON'||msg==='AUTO'){why=canEnergize(true);if(!why){startCharging(true);publishEvent('ACK AUTO_ON start ladowania');}else publishEvent('REJECT AUTO_ON '+why);}
+  else if(msg==='AUTO_OFF'){D.auto=false;publishEvent('ACK AUTO_OFF');}
+  else if(msg==='RESET_FAULT'||msg==='RESET'){if(D.overTemp)publishEvent('REJECT RESET_FAULT TEMP');else{D.fault='';if(D.state==='FAULT')D.state='IDLE';publishEvent('ACK RESET_FAULT');}}
+  else if(msg==='TEST_ON'){D.test=true;prefs.test=true;applyOutput();publishEvent('ACK TEST_ON wyjscie zablokowane');}
+  else if(msg==='TEST_OFF'){D.test=false;prefs.test=false;applyOutput();publishEvent('ACK TEST_OFF');}
+  else if(msg==='PING')publishEvent('PONG '+uptime());
+  else if(msg==='STATUS')publishEvent('ACK STATUS');
+  else publishEvent('UNKNOWN '+msg.slice(0,20));
+  D.telDue=true;
+}
+function jn(v,d){return (v===null||isNaN(v)||!isFinite(v))?'null':v.toFixed(d);}
+function makeJson(){
+  const iv=inaValid();
+  return '{'+[
+    '"device":"'+DEVICE_ID+'"','"fw":"'+FW+'"','"mode":"'+(D.test?'TEST':'NORMAL')+'"',
+    '"lte":"'+(D.lteOK?'ON':'OFF')+'"','"mqtt":"'+(D.mqttOK?'ON':'OFF')+'"','"operator":"'+D.operator+'"',
+    '"csq":'+D.csq,'"rssi":'+D.rssi,'"signal":'+D.signal,'"ip":"'+D.ip+'"',
+    '"ssr":"'+(D.ssr?'ON':'OFF')+'"','"ssr_out":"'+(D.test?'BLOCKED':(D.ssr?'ON':'OFF'))+'"','"auto":"'+(D.auto?'ON':'OFF')+'"',
+    '"state":"'+D.state+'"','"fault":"'+D.fault+'"','"over_temp":'+D.overTemp,
+    '"uptime":"'+uptime()+'"','"uptime_s":'+Math.floor(D.ms/1000),
+    '"charge_s":'+(D.state==='CHARGING'?Math.floor((D.ms-D.chargeStart)/1000):0),
+    '"low_current_s":'+(D.lowSince?Math.floor((D.ms-D.lowSince)/1000):0),
+    '"voltage":'+jn(iv?D.V:NaN,3),'"current":'+jn(iv?D.I:NaN,3),'"power":'+jn(iv?D.P:NaN,2),'"shunt_mv":'+jn(D.shuntMv,3),
+    '"ina_ok":'+D.inaOK,'"ina_overrange":'+D.inaOver,
+    '"temp":'+jn(D.dsOK?D.dsTemp:NaN,1),'"temp_src":"'+(D.dsOK?'DS18B20':'NONE')+'"','"temp_ds18b20":'+jn(D.dsOK?D.dsTemp:NaN,1),
+    '"temp_esp":'+jn(D.espTemp,1),'"ds_ok":'+D.dsOK,'"pub":'+D.pub,'"cmd":'+D.cmd,'"cmd_dup":'+D.dup,'"event":"'+D.lastEvent+'"'
+  ].join(',')+'}';
+}
+function publishTelemetry(){if(!D.mqttOK)return;if(B.publish(T_TEL,makeJson(),true,'dev'))D.pub++;}
+function publishEvent(e){D.lastEvent=e;if(D.mqttOK)B.publish(T_ST,e,false,'dev');}
+function oledMsg(a,b,c,d){D.oled=[oledTitle(),a||'',b||'',c||'',d||''];D.oledBoot=true;}
+function oledTitle(){return 'EKOTRONIK v'+FW+(D.test?' TEST':'');}
+function drawOLEDtext(){
+  const l1='LTE:'+(D.lteOK?'ON':'OFF')+' MQTT:'+(D.mqttOK?'ON':'OFF')+' '+D.csq;
+  const l2='SSR:'+(D.ssr?'ON':'OFF')+(D.auto?' AUTO ':' MAN ')+D.state;
+  let l3=inaValid()?D.V.toFixed(1)+'V '+D.I.toFixed(2)+'A ':(D.inaOver?'INA>36V! ':'INA:BRAK ');
+  l3+=D.dsOK?D.dsTemp.toFixed(1)+'C':'T:BRAK';
+  const l4=D.state==='FAULT'?'ERR:'+D.fault:'UP:'+uptime()+' C:'+D.cmd;
+  D.oled=[oledTitle(),l1,l2,l3,l4];D.oledBoot=false;
+}
+
+// rozruch modemu i łączność (czasy jak w firmware, w czasie symulacji)
+const BOOT=[
+  [0,1500,()=>oledMsg('START v'+FW,'SAFE',D.test?'TRYB TEST':'TRYB NORMAL','')],
+  [1,22100,()=>oledMsg('PWRKEY GPIO4','czekam 20 sek.','A7670E START','')],
+  [2,1500,()=>{oledMsg('TEST AT','czekam na modem','','');}],
+  [3,2400,()=>{D.modemAT=true;oledMsg('SIM','kontrola PIN','','');}],
+  [4,4000,()=>{D.simOK=true;oledMsg('SIM PIN','wysylam PIN','proba 1','');}],
+  [5,800,()=>oledMsg('SIM READY','PIN przyjety','','')],
+  [6,6000,()=>oledMsg('LTE','czekam siec','internet','')],
+  [7,1500,()=>{D.operator='Plus';D.csq=22;D.rssi=csqToDbm(22);D.signal=csqToPct(22);oledMsg('SIEC OK',D.operator,'CSQ '+D.csq,'');}],
+  [8,1500,()=>{D.ip='10.84.17.203';D.lteOK=true;oledMsg('LTE DATA OK',D.ip,'RSSI '+D.rssi,'');}],
+  [9,2000,()=>oledMsg('MQTT','laczenie','test.mosquitto.org','')],
+  [10,1000,()=>{connectMQTT(true);oledMsg('MQTT OK','PANEL v2.1','','');}],
+];
+function connectMQTT(silent){
+  if(!D.lteOK)return false;
+  D.mqttOK=true;B.deviceOnline();
+  B.publish(T_ST,'ONLINE',true,'dev');
+  publishEvent('MQTT ONLINE fw '+FW);publishTelemetry();
+  return true;
+}
+function deviceStep(){
+  D.ms+=STEP;
+  if(!D.power)return;
+  // rozruch: sekwencja ekranów, w tym czasie działa tylko ochrona (safeDelay)
+  if(D.boot.phase<BOOT.length){
+    serviceSafety();
+    if(D.ms>=D.boot.until){
+      const ph=BOOT[D.boot.phase];
+      if(ph[0]>=6&&!W.coverage){ // brak sieci przy starcie: dalej jak przy reconnect
+        D.boot.phase=BOOT.length;oledMsg('LTE BLAD','brak sieci','antena/zasieg','');D.lastLteRe=D.ms;return;}
+      ph[2]();D.boot.until=D.ms+ph[1];D.boot.phase++;
+      if(D.boot.phase===BOOT.length)D.boot.until=D.ms+1000;
+    }
+    return;
+  }
+  if(D.ms<D.boot.until){serviceSafety();return;}
+  if(D.ms<D.blockedUntil){serviceSafety();return;} // łączenie z LTE blokuje pętlę, ochrona działa
+  serviceSafety();
+  // MQTT
+  if(D.lteOK&&D.mqttOK){
+    while(D.inbox.length)handleCommand(D.inbox.shift());
+  }else if(D.lteOK&&!D.mqttOK&&D.ms-D.lastMqttRe>MQTT_RECONNECT_MS){D.lastMqttRe=D.ms;connectMQTT();}
+  // LTE
+  if(D.lteOK&&D.ms-D.lastNet>NET_CHECK_INTERVAL_MS){
+    D.lastNet=D.ms;
+    if(!W.coverage){D.lteOK=false;if(D.mqttOK){D.mqttOK=false;B.deviceLost(D.ms);}D.lastEvent='LTE LOST';D.csq=99;D.rssi=-113;D.signal=0;}
+  }
+  if(!D.lteOK&&D.ms-D.lastLteRe>LTE_RECONNECT_MS){
+    D.lastLteRe=D.ms;oledMsg('LTE RECONNECT','czekam siec','','');
+    if(W.coverage){D.blockedUntil=D.ms+4000;D.lteOK=true;D.lteFail=0;D.csq=22;D.rssi=csqToDbm(22);D.signal=csqToPct(22);D.reconnectPending=true;}
+    else{D.blockedUntil=D.ms+30000;D.lteFail++;}
+    return;
+  }
+  if(D.reconnectPending){D.reconnectPending=false;connectMQTT();publishEvent('LTE RECONNECTED');}
+  if(D.modemAT&&D.lteOK&&D.ms-D.lastSignal>SIGNAL_INTERVAL_MS){D.lastSignal=D.ms;D.csq=21+Math.round(Math.random()*2);D.rssi=csqToDbm(D.csq);D.signal=csqToPct(D.csq);}
+  if(D.telDue||D.ms-D.lastTel>TELEMETRY_INTERVAL_MS){D.telDue=false;D.lastTel=D.ms;publishTelemetry();}
+  if(D.ms-D.lastOled>OLED_INTERVAL_MS){D.lastOled=D.ms;drawOLEDtext();}
+}
+function bootDevice(){
+  const keepMs=D?D.ms:0;
+  D=newDevice();D.ms=keepMs;D.boot={phase:0,until:keepMs};
+  setSSR(false);readSensors();
+}
+
+// ======================================================================
+// WIRTUALNY BROKER MQTT
+// ======================================================================
+const phone=document.getElementById('phone');
+const B={retained:{},panelSubs:new Set(),panelUp:false,lwtAt:0,devSubs:new Set([T_CMD]),
+  pend:{},timer:null,mqLast:{},
+  toPanel(t,p,r){if(!this.panelUp||!this.panelSubs.has(t))return;
+    if(t===T_TEL){this.pend[t]={p,r};if(!this.timer)this.timer=setTimeout(()=>this.flush(),180);}
+    else{if(this.timer){clearTimeout(this.timer);this.flush();}post({eko:'msg',t,p,r});}},
+  flush(){this.timer=null;for(const t in this.pend){const m=this.pend[t];post({eko:'msg',t,p:m.p,r:m.r});}this.pend={};},
+  publish(t,p,r,from){
+    if(r)this.retained[t]=p;
+    mqLog(from==='dev'?'up':'dn',t,p);
+    if(from!=='dev'){ if(D.power&&D.mqttOK&&this.devSubs.has(t))D.inbox.push(p); }
+    else this.toPanel(t,p,false);
+    return true;},
+  deviceOnline(){this.lwtAt=0;},
+  deviceLost(ms){this.lwtAt=ms+90000;}, // keepalive 60 s × 1,5
+  tick(){if(this.lwtAt&&D.ms>=this.lwtAt){this.lwtAt=0;this.retained[T_ST]='OFFLINE';mqLog('lwt',T_ST,'OFFLINE (LWT brokera)');this.toPanel(T_ST,'OFFLINE',false);}}
+};
+function post(m){try{phone.contentWindow.postMessage(m,'*');}catch(e){}}
+const qWait={};let qN=0;
+addEventListener('message',e=>{
+  if(e.source!==phone.contentWindow)return;const d=e.data||{};
+  if(d.eko==='connect'){B.panelUp=true;B.panelSubs.clear();post({eko:'connack'});}
+  else if(d.eko==='disconnect'){B.panelUp=false;}
+  else if(d.eko==='sub'){B.panelSubs.add(d.t);if(B.retained[d.t]!==undefined)post({eko:'msg',t:d.t,p:B.retained[d.t],r:true});}
+  else if(d.eko==='pub'){B.publish(d.t,d.p,d.r,'panel');}
+  else if(d.eko==='qres'&&qWait[d.q]){qWait[d.q](d.out);delete qWait[d.q];}
+});
+function panelQuery(ids){return new Promise(res=>{const q=++qN;qWait[q]=res;post({eko:'query',q,ids});setTimeout(()=>{if(qWait[q]){delete qWait[q];res({});}},1500);});}
+function panelClick(id){post({eko:'click',id});}
+
+// podgląd ruchu MQTT
+const mqEl=document.getElementById('mq');let mqTelT=0;
+function mqLog(dir,t,p){
+  const now=performance.now();
+  if(t===T_TEL){if(now-mqTelT<2500)return;mqTelT=now;p=p.length>150?p.slice(0,150)+'…':p;}
+  const li=document.createElement('li');const a=document.createElement('span');a.className='d '+(dir==='up'?'up':'dn');a.textContent=dir==='up'?'↑':dir==='lwt'?'⚠':'↓';
+  const b=document.createElement('span');b.textContent=t+'  '+p;li.append(a,b);mqEl.insertBefore(li,mqEl.firstChild);
+  while(mqEl.childNodes.length>40)mqEl.removeChild(mqEl.lastChild);
+}
+
+// ======================================================================
+// CZAS SYMULACJI
+// ======================================================================
+let speed=1,acc=0,lastT=performance.now();
+function simStep(){physics(STEP/1000);deviceStep();B.tick();}
+function ff(ms){for(let i=0;i<ms/STEP;i++)simStep();}
+function ffUntil(cond,max){let t=0;while(t<max&&!cond()){ff(10000);t+=10000;}return t;}
+function hm(ms){const m=Math.round(ms/60000);return Math.floor(m/60)+' h '+(m%60)+' min';}
+document.querySelectorAll('[data-sp]').forEach(b=>b.onclick=()=>setSpeed(+b.dataset.sp));
+function setSpeed(s){speed=s;document.querySelectorAll('[data-sp]').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.sp===s)));}
+
+// ======================================================================
+// RYSOWANIE: OLED, kontrolki, schemat
+// ======================================================================
+const oc=document.getElementById('oled'),og=oc.getContext('2d');
+const OLED_ON='#7fe3ff';
+function drawOled(){
+  og.fillStyle='#000';og.fillRect(0,0,128,64);
+  if(!D.power)return;
+  og.fillStyle='#fff';og.textBaseline='alphabetic';
+  const L=D.oled;
+  og.font='bold 10px "Courier New",Courier,monospace';
+  og.fillText(String(L[0]).slice(0,21),0,10);
+  og.font='9px "Courier New",Courier,monospace';
+  const ys=D.oledBoot?[24,37,50,63]:[23,35,47,59];
+  for(let i=1;i<5;i++)og.fillText(String(L[i]).slice(0,21),0,ys[i-1]);
+  // próg jasności → wygląd pikseli OLED
+  const im=og.getImageData(0,0,128,64),d=im.data;
+  const r=0x7f,g=0xe3,b=0xff;
+  for(let i=0;i<d.length;i+=4){const on=d[i]>110;d[i]=on?r:0;d[i+1]=on?g:0;d[i+2]=on?b:0;d[i+3]=255;}
+  og.putImageData(im,0,0);
+}
+function led(id,cls){document.getElementById(id).className='led'+(cls?' '+cls:'');}
+const $=id=>document.getElementById(id);
+function fmt(v,d,u){return (v===null||isNaN(v))?'—':v.toFixed(d)+' '+u;}
+function render(){
+  drawOled();
+  led('ledPwr',D.power?'on':'');
+  led('ledSsr',D.gpio?'on':(D.ssr&&D.test?'amb':''));
+  led('ledLte',D.lteOK?'on':(D.power&&D.boot.phase>=BOOT.length?'red':''));
+  led('ledMqtt',D.mqttOK?'on':'');
+  led('ledFlt',D.state==='FAULT'?'red':'');
+  const on=W.mains&&D.power&&D.gpio;
+  $('w1').classList.toggle('live',W.mains);
+  $('w2').classList.toggle('live',on);
+  $('w3').classList.toggle('live',W.I>0.01);
+  $('w4').classList.toggle('live',W.scooter&&W.I>0.01);
+  $('bxSsr').setAttribute('class','bx'+(on?' on':''));
+  $('bxChg').setAttribute('class','bx'+(on?' on':'')+(W.hot&&on?' err':''));
+  $('bxIna').setAttribute('class','bx'+(W.inaGone||D.inaOver?' err':(D.inaOK?' on':'')));
+  $('bxBat').setAttribute('class','bx'+(W.scooter?(W.I>0.01?' on':''):''));
+  $('tSsr').textContent='GPIO26: '+(D.gpio?'ON':(D.ssr&&D.test?'ZABLOK.':'OFF'));
+  $('tIna').textContent=W.inaGone?'odłączony':(D.inaOver?'POZA ZAKRESEM':'bocznik 15 mΩ');
+  $('tBat').textContent=W.scooter?Math.round(W.soc*100)+' % · '+ocv(W.soc).toFixed(1)+' V':'odłączona';
+  $('tTemp').textContent=W.dsGone?'czujnik odłączony':'ESP32 widzi: '+(D.dsOK?D.dsTemp.toFixed(1)+' °C':'—');
+  $('tPath').textContent=W.oldPath?'obecny tor: max 36 V':'tor poprawiony: do 85 V';
+  $('rV').textContent=fmt(W.V,2,'V');$('rI').textContent=fmt(W.I,2,'A');
+  $('rSoc').textContent=W.scooter?Math.round(W.soc*100)+' %':'—';$('rT').textContent=fmt(W.temp,1,'°C');
+  $('clock').textContent='czas pracy '+uptime();
+  const sc={IDLE:'gotowy',CHARGING:'ładowanie',DONE:'koniec ładowania',FAULT:'BŁĄD: '+D.fault};
+  $('stateCap').textContent='stan: '+(!D.power?'wyłączony':D.boot.phase<BOOT.length?'rozruch modemu':sc[D.state])+(D.test?' · TEST':'');
+}
+function frame(t){
+  const dt=Math.min(250,t-lastT);lastT=t;
+  if(!busy){
+    const eff=(D.boot.phase<BOOT.length)?Math.max(speed,8):speed; // rozruch modemu przyspieszony
+    acc+=dt*eff;let n=0;
+    while(acc>=STEP&&n<4000){simStep();acc-=STEP;n++;}
+    if(n>=4000)acc=0;
+  }
+  render();requestAnimationFrame(frame);
+}
+
+// ======================================================================
+// PRZYCISKI „WYPRÓBUJ”
+// ======================================================================
+function tog(id,key,on){W[key]=on;$(id).setAttribute('aria-pressed',String(on));}
+$('bPlug').onclick=()=>{W.scooter=true;W.soc=0.25;};
+$('bUnplug').onclick=()=>{W.scooter=false;};
+$('bHot').onclick=()=>tog('bHot','hot',!W.hot);
+$('bOver').onclick=()=>tog('bOver','over',!W.over);
+$('bDs').onclick=()=>tog('bDs','dsGone',!W.dsGone);
+$('bIna').onclick=()=>tog('bIna','inaGone',!W.inaGone);
+$('bLte').onclick=()=>{W.coverage=!W.coverage;lteBtn();};
+$('bPath').onclick=()=>tog('bPath','oldPath',!W.oldPath);
+$('bRogue').onclick=()=>{B.publish('ekotronik/lte/cmd','SSR_ON',false,'panel');};
+$('bReboot').onclick=()=>{if(D.mqttOK){D.mqttOK=false;B.deviceLost(D.ms-80000);}bootDevice();};
+function lteBtn(){$('bLte').setAttribute('aria-pressed',String(!W.coverage));}
+
+// ======================================================================
+// SCENARIUSZE
+// ======================================================================
+const Wt=ms=>new Promise(r=>setTimeout(r,ms));
+let busy=false;
+function desc(){return 'SSR '+(D.ssr?'ON':'OFF')+(D.test?'(TEST)':'')+' · '+(D.auto?'AUTO':'MAN')+' · '+D.state+(D.fault?' '+D.fault:'')+
+  ' · '+(inaValid()?D.V.toFixed(1)+'V '+D.I.toFixed(2)+'A':'V/I brak')+' · '+(D.dsOK?D.dsTemp.toFixed(1)+'°C':'T brak')+' · MQTT '+(D.mqttOK?'ON':'OFF');}
+function resetWorld(){
+  Object.assign(W,{mains:true,scooter:false,soc:0.25,hot:false,over:false,dsGone:false,inaGone:false,coverage:true,oldPath:false,temp:24,V:0,I:0});
+  ['bHot','bOver','bDs','bIna','bLte','bPath'].forEach(id=>$(id).setAttribute('aria-pressed','false'));
+  prefs.test=false;
+}
+async function fresh(){ // urządzenie po rozruchu, połączone, panel z danymi
+  resetWorld();if(D.mqttOK){D.mqttOK=false;}bootDevice();B.lwtAt=0;
+  ff(46000);await Wt(400);
+}
+async function cmd(btn,settle){panelClick(btn);await Wt(150);ff(settle||1500);await Wt(350);}
+async function pq(ids){return await panelQuery(ids);}
+const SC=[
+ ['Rozruch urządzenia',async L=>{
+   resetWorld();bootDevice();ff(1000);
+   L('Włączenie zasilania','SSR OFF, ekran START, rozruch modemu',()=>!D.ssr&&!D.gpio&&D.boot.phase>0);
+   ff(30000);L('Po 30 s','karta SIM gotowa, trwa łączenie z siecią',()=>D.simOK&&!D.mqttOK);
+   ff(16000);await Wt(400);L('Po 46 s','LTE i MQTT ON, status ONLINE',()=>D.lteOK&&D.mqttOK&&B.retained[T_ST]==='ONLINE');
+   const q=await pq(['panelStatus','fw']);L('Panel w telefonie','PANEL ONLINE, firmware v3.5',()=>q.panelStatus==='PANEL ONLINE'&&q.fw==='v3.5');}],
+ ['Pełne ładowanie w trybie AUTO',async L=>{await fresh();
+   W.scooter=true;W.soc=0.25;ff(3000);
+   await cmd('btnAuto');L('Hulajnoga 25 %, AUTO w panelu','ACK AUTO_ON, SSR ON, CHARGING',()=>D.ssr&&D.gpio&&D.state==='CHARGING'&&D.auto);
+   ff(60000);await Wt(300);let q=await pq(['chargerState','current']);
+   L('Po minucie','prąd stały ok. 2 A, panel: ŁADOWANIE',()=>Math.abs(D.I-2)<0.1&&q.chargerState==='ŁADOWANIE');
+   let t1=ffUntil(()=>D.I<1.9,9*3600000);
+   L('Faza stałego prądu ('+hm(t1)+')','ładowarka dochodzi do 54,6 V, prąd zaczyna spadać',()=>W.V>54.4&&D.I<1.9&&D.state==='CHARGING');
+   let t2=ffUntil(()=>D.state!=='CHARGING',3*3600000);await Wt(300);q=await pq(['chargerState']);
+   L('Faza stałego napięcia ('+hm(t2)+')','prąd < 0,15 A przez 5 min: DONE, SSR OFF',()=>D.state==='DONE'&&!D.ssr&&W.soc>0.97);
+   L('Panel','ŁADOWANIE ZAKOŃCZONE',()=>q.chargerState==='ŁADOWANIE ZAKOŃCZONE');}],
+ ['Ręczne ON i OFF z telefonu',async L=>{await fresh();W.scooter=true;W.soc=0.6;
+   await cmd('btnOn');L('RĘCZNIE ON','ACK SSR_ON, SSR ON, tryb MAN',()=>D.ssr&&D.gpio&&!D.auto&&D.lastEvent==='ACK SSR_ON');
+   await cmd('btnOff');L('STOP / OFF','ACK SSR_OFF, SSR OFF',()=>!D.ssr&&!D.gpio&&D.lastEvent==='ACK SSR_OFF');
+   const q=await pq(['ssr']);L('Panel','SSR: OFF / OFF',()=>q.ssr==='OFF / OFF');}],
+ ['Odpięcie hulajnogi w czasie ładowania',async L=>{await fresh();W.scooter=true;W.soc=0.5;
+   await cmd('btnAuto');ff(20000);L('Ładowanie trwa','CHARGING, prąd 2 A',()=>D.state==='CHARGING'&&D.I>1.9);
+   W.scooter=false;ff(4*60000);L('Odpięcie, po 4 min','prąd 0 A, jeszcze CHARGING (odliczanie)',()=>D.state==='CHARGING'&&D.lowSince>0);
+   ff(70000);L('Po 5 min bez prądu','DONE, SSR OFF',()=>D.state==='DONE'&&!D.ssr);}],
+ ['Przegrzanie w trybie ręcznym',async L=>{await fresh();W.scooter=true;W.soc=0.4;
+   await cmd('btnOn');W.hot=true;$('bHot').setAttribute('aria-pressed','true');
+   const tf=ffUntil(()=>D.state==='FAULT',30*60000);await Wt(300);let q=await pq(['alarmFault']);
+   L('Ręcznie ON, ładowarka grzeje się ('+hm(tf)+')','≥ 70 °C: FAULT TEMP, SSR OFF mimo trybu ręcznego',()=>D.state==='FAULT'&&D.fault.startsWith('TEMP')&&!D.ssr);
+   L('Panel','BŁĄD: TEMP …',()=>(q.alarmFault||'').indexOf('TEMP')>0);
+   ff(2500);await cmd('btnOn');L('RĘCZNIE ON zaraz po błędzie','REJECT SSR_ON TEMP',()=>!D.ssr&&D.lastEvent==='REJECT SSR_ON TEMP');
+   W.hot=false;$('bHot').setAttribute('aria-pressed','false');ff(40*60000);
+   await cmd('btnReset');L('Ostygnięcie ≤ 60 °C, KASUJ BŁĄD','ACK RESET_FAULT, stan IDLE',()=>D.state==='IDLE'&&!D.overTemp);}],
+ ['Przeciążenie wyjścia',async L=>{await fresh();W.scooter=true;W.soc=0.4;
+   await cmd('btnOn');W.over=true;$('bOver').setAttribute('aria-pressed','true');ff(3000);
+   L('Prąd 5,3 A przez 3 s','SSR jeszcze ON (czas zwłoki 5 s)',()=>D.ssr);
+   ff(4000);L('Po 7 s','FAULT NADPRAD, SSR OFF',()=>D.state==='FAULT'&&D.fault.startsWith('NADPRAD')&&!D.ssr);
+   W.over=false;$('bOver').setAttribute('aria-pressed','false');}],
+ ['Utrata INA226 w czasie ładowania',async L=>{await fresh();W.scooter=true;W.soc=0.4;
+   await cmd('btnAuto');ff(10000);W.inaGone=true;$('bIna').setAttribute('aria-pressed','true');ff(4000);await Wt(300);
+   let q=await pq(['voltage','alarmIna']);
+   L('Odłączenie INA226','napięcie „--”, alarm POMIAR V/I: BRAK',()=>q.voltage==='--'&&(q.alarmIna||'').includes('BRAK'));
+   L('Przerwa < 10 s','SSR jeszcze ON',()=>D.ssr);
+   ff(10000);L('Po 14 s','FAULT BRAK POMIARU INA226, SSR OFF',()=>D.state==='FAULT'&&D.fault==='BRAK POMIARU INA226'&&!D.ssr);
+   W.inaGone=false;$('bIna').setAttribute('aria-pressed','false');}],
+ ['Brak czujnika temperatury',async L=>{await fresh();W.scooter=true;
+   W.dsGone=true;$('bDs').setAttribute('aria-pressed','true');ff(6000);await Wt(300);
+   let q=await pq(['temp','alarmTemp']);
+   L('Odłączenie DS18B20','temperatura „--”, alarm BRAK CZUJNIKA (nie 0,0 °C)',()=>q.temp==='--'&&(q.alarmTemp||'').includes('BRAK CZUJNIKA'));
+   await cmd('btnAuto');L('AUTO bez czujnika','REJECT AUTO_ON BRAK DS18B20',()=>!D.ssr&&D.lastEvent==='REJECT AUTO_ON BRAK DS18B20');
+   W.dsGone=false;$('bDs').setAttribute('aria-pressed','false');}],
+ ['Obecny tor pomiarowy (INA226 do 36 V)',async L=>{await fresh();W.oldPath=true;$('bPath').setAttribute('aria-pressed','true');W.scooter=true;W.soc=0.3;ff(3000);
+   await cmd('btnAuto');L('AUTO przy akumulatorze 48 V','odmowa: INA POZA ZAKRESEM',()=>!D.ssr&&D.lastEvent==='REJECT AUTO_ON INA POZA ZAKRESEM');
+   W.oldPath=false;$('bPath').setAttribute('aria-pressed','false');}],
+ ['Limit czasu ładowania 10 h',async L=>{await fresh();W.scooter=true;W.soc=0.0;
+   await cmd('btnAuto');
+   // uszkodzony pakiet: napięcie nie rośnie, prąd nie spada
+   let n=0;while(n++<10*3600000/60000){ff(60000);W.soc=Math.min(W.soc,0.5);}
+   ff(120000);L('Prąd nie spada przez 10 h','FAULT LIMIT CZASU LADOWANIA',()=>D.state==='FAULT'&&D.fault==='LIMIT CZASU LADOWANIA'&&!D.ssr);}],
+ ['Tryb TEST blokuje przekaźnik',async L=>{await fresh();W.scooter=true;W.soc=0.5;
+   await cmd('btnTest');L('TRYB TEST: WŁĄCZ','ACK TEST_ON',()=>D.test&&D.lastEvent.startsWith('ACK TEST_ON'));
+   ff(2500);await cmd('btnOn');L('RĘCZNIE ON w trybie TEST','SSR zadany ON, GPIO26 LOW, brak prądu',()=>D.ssr&&!D.gpio&&W.I===0);
+   const q=await pq(['modeBadge','ssr']);L('Panel','TEST: SSR ZABLOK., ZABLOKOWANE (TEST)',()=>(q.modeBadge||'').startsWith('TEST')&&(q.ssr||'').includes('ZABLOKOWANE'));
+   ff(2500);await cmd('btnTest');L('TRYB TEST: WYŁĄCZ','wyjście wraca, płynie prąd',()=>!D.test&&D.gpio);
+   ff(2500);await cmd('btnOff');}],
+ ['Podwójne kliknięcie',async L=>{await fresh();const c0=D.cmd;
+   panelClick('btnPing');panelClick('btnPing');await Wt(200);ff(1500);await Wt(300);
+   L('Dwa razy PING w 2 s','wykonany raz, drugi liczony jako duplikat',()=>D.cmd===c0+1&&D.dup>=1);}],
+ ['Obcy klient na wspólnym temacie',async L=>{await fresh();W.scooter=true;
+   B.publish('ekotronik/lte/cmd','SSR_ON',false,'panel');ff(1500);
+   L('SSR_ON na ekotronik/lte/cmd','zignorowane, SSR OFF',()=>!D.ssr&&D.lastEvent!=='ACK SSR_ON');}],
+ ['Utrata zasięgu LTE w czasie ładowania',async L=>{await fresh();W.scooter=true;W.soc=0.4;
+   await cmd('btnAuto');W.coverage=false;lteBtn();ff(10000);
+   L('Brak zasięgu','LTE OFF, ładowanie trwa lokalnie',()=>!D.lteOK&&D.ssr&&D.state==='CHARGING');
+   W.hot=true;ff(15*60000);await Wt(400);
+   L('Przegrzanie bez łączności','ochrona działa: FAULT TEMP, SSR OFF',()=>D.state==='FAULT'&&!D.ssr);
+   const q=await pq(['alarmLink']);L('Panel po 90 s (LWT)','URZĄDZENIE OFFLINE',()=>(q.alarmLink||'').includes('OFFLINE'));
+   W.hot=false;W.coverage=true;lteBtn();ff(70000);await Wt(400);
+   L('Zasięg wraca','LTE i MQTT ON, panel dostaje błąd TEMP',()=>D.lteOK&&D.mqttOK);}],
+ ['Restart ESP32 w czasie ładowania',async L=>{await fresh();W.scooter=true;W.soc=0.4;
+   await cmd('btnAuto');ff(20000);L('Ładowanie','SSR ON',()=>D.ssr);
+   if(D.mqttOK){D.mqttOK=false;B.deviceLost(D.ms-80000);}bootDevice();ff(2000);
+   L('Zanik zasilania ESP32','po starcie SSR OFF, czeka na AUTO',()=>!D.ssr&&!D.gpio&&D.state==='IDLE');
+   ff(46000);await Wt(400);await cmd('btnAuto');L('Po rozruchu AUTO','ładowanie wznowione',()=>D.ssr&&D.state==='CHARGING');}],
+];
+const logEl=$('log'),sumEl=$('scSum'),allBtn=$('runAll'),selEl=$('scSel'),runBtn=$('scRun');
+const grp=[['Ładowanie',[0,1,2,3]],['Zabezpieczenia',[4,5,6,7,8,9]],['Łączność i komendy',[10,11,12,13,14]]];
+grp.forEach(([t,ix])=>{const o=document.createElement('optgroup');o.label=t;ix.forEach(k=>{const e=document.createElement('option');e.value=k;e.textContent=(k+1)+'. '+SC[k][0];o.appendChild(e);});selEl.appendChild(o);});
+runBtn.onclick=()=>runList([+selEl.value]);
+allBtn.onclick=()=>runList(SC.map((_,k)=>k));
+async function runOne(k){
+  const [n,fn]=SC[k];const hd=document.createElement('tr');hd.className='hd';
+  const a=document.createElement('td');a.textContent=k+1;const b=document.createElement('td');b.colSpan=4;b.textContent=n;hd.append(a,b);logEl.appendChild(hd);
+  let ok=true,i=0;
+  await fn((act,exp,cond)=>{let r=false;try{r=!!cond();}catch(e){r=false;}ok=ok&&r;i++;
+    const tr=document.createElement('tr');
+    [k+1+'.'+i,act,exp,desc(),r?'OK':'BŁĄD'].forEach((t,j)=>{const td=document.createElement('td');td.textContent=t;if(j===3)td.className='small mono';if(j===4)td.className=r?'ok':'bad';tr.appendChild(td);});
+    logEl.appendChild(tr);render();});
+  return ok;
+}
+async function runList(ks){
+  if(busy)return;busy=true;[allBtn,runBtn,selEl].forEach(e=>e.disabled=true);
+  logEl.textContent='';let n=0;
+  for(const k of ks){if(await runOne(k))n++;await Wt(300);}
+  sumEl.innerHTML='';sumEl.append('Wynik: ');const s=document.createElement('span');s.className=n===ks.length?'ok':'bad';s.textContent=n+'/'+ks.length+' scenariuszy OK';sumEl.appendChild(s);
+  busy=false;[allBtn,runBtn,selEl].forEach(e=>e.disabled=false);
+}
+window.__runAll=()=>runList(SC.map((_,k)=>k));
+
+// start
+bootDevice();
+requestAnimationFrame(frame);
+})();
+</script><script data-goatcounter="https://ekotronik.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>

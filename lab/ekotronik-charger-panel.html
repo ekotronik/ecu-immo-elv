@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#07101a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="EKOTRONIK">
+<title>EKOTRONIK CHARGER PRO v2.1</title>
+<script src="ekotronik-charger-sim-paho.js"></script>
+<style>
+:root{
+  --bg:#05070b;--card:#101a29;--card2:#17263a;--line:#294158;
+  --green:#22e07a;--red:#ff4f4f;--orange:#ffb020;--blue:#39a8ff;
+  --text:#eef6ff;--muted:#8ea7bf;--dark:#223247;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{
+  margin:0;background:radial-gradient(circle at top,#193552 0%,#07101a 52%,#030509 100%);
+  color:var(--text);font-family:Arial,Helvetica,sans-serif;min-height:100vh;
+}
+.wrap{max-width:560px;margin:0 auto;padding:18px 16px 34px;padding-top:max(18px,env(safe-area-inset-top))}
+.header,.card{
+  border:1px solid var(--line);background:linear-gradient(160deg,var(--card),var(--card2));
+  border-radius:24px;padding:18px;box-shadow:0 0 26px rgba(0,0,0,.42);min-width:0;
+}
+h1{margin:0;font-size:28px;letter-spacing:1px}
+.sub{margin-top:8px;color:var(--muted);font-size:14px;line-height:1.35}
+.toprow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.badge{
+  text-align:center;padding:10px 6px;border-radius:999px;font-weight:900;border:1px solid rgba(255,255,255,.12);
+  background:#0d1723;color:var(--muted);font-size:14px
+}
+.badge.ok{background:#082918;color:var(--green);border-color:rgba(34,224,122,.45)}
+.badge.warn{background:#2c2108;color:var(--orange);border-color:rgba(255,176,32,.5)}
+.badge.err{background:#2a1010;color:var(--red);border-color:rgba(255,79,79,.5)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.wide{grid-column:1/3}
+.label{color:var(--muted);font-size:13px;letter-spacing:1px;text-transform:uppercase;margin-bottom:9px}
+.value{font-size:30px;font-weight:900;line-height:1.05}
+.unit{font-size:16px;color:var(--muted);font-weight:700}
+.hint{font-size:12px;color:var(--muted);margin-top:6px}
+.statusBig{font-size:23px;font-weight:900;letter-spacing:.8px}
+.statusText{margin-top:7px;color:var(--muted);font-size:14px;line-height:1.4}
+.info{display:grid;gap:9px;font-size:15px}
+.row{display:flex;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.07);padding-bottom:8px;gap:10px}
+.row span:first-child{color:var(--muted)}.row strong{text-align:right;word-break:break-word}
+.signalBar{height:18px;background:#07101a;border:1px solid var(--line);border-radius:999px;overflow:hidden;margin-top:8px}
+.signalFill{height:100%;width:0%;background:linear-gradient(90deg,var(--red),var(--orange),var(--green));transition:width .4s ease}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.controls .full{grid-column:1/3}
+button{
+  width:100%;padding:15px 8px;border:0;border-radius:18px;color:#fff;font-weight:900;font-size:15px;
+  background:var(--dark);box-shadow:0 8px 18px rgba(0,0,0,.25);transition:transform .08s ease,filter .18s ease,box-shadow .18s ease;
+}
+button:active{transform:scale(.96);filter:brightness(1.35);box-shadow:0 0 18px rgba(57,168,255,.55)}
+button:disabled{opacity:.45}
+button.green{background:var(--green);color:#062012}button.red{background:var(--red)}button.blue{background:var(--blue)}button.orange{background:var(--orange);color:#231600}
+button.active{outline:3px solid rgba(255,255,255,.28);filter:brightness(1.18)}
+.alerts{display:grid;gap:9px}
+.alert{padding:11px 12px;border-radius:14px;background:#07101a;border:1px solid var(--line);color:var(--muted);font-weight:700}
+.alert.ok{border-color:rgba(34,224,122,.45);color:var(--green)}.alert.warn{border-color:rgba(255,176,32,.5);color:var(--orange)}.alert.err{border-color:rgba(255,79,79,.55);color:var(--red)}
+.log{font-size:13px;color:var(--muted);line-height:1.55;max-height:160px;overflow:auto;background:#07101a;border:1px solid var(--line);border-radius:14px;padding:10px}
+.log .err{color:var(--red)}.log .ok{color:var(--green)}
+label.f{display:block;font-size:12px;color:var(--muted);margin:10px 0 4px}
+input{width:100%;padding:12px;border-radius:14px;border:1px solid var(--line);background:#09111b;color:#fff;font-size:15px}
+.two{display:grid;grid-template-columns:2fr 1fr;gap:8px}
+details summary{cursor:pointer;color:var(--muted);font-size:13px;margin-top:12px}
+.small,.footer{font-size:12px;color:var(--muted);line-height:1.45;margin-top:10px}.footer{text-align:center;margin-top:16px}
+#installBtn{display:none;margin-top:10px}
+@media (max-width:380px){.value{font-size:25px}h1{font-size:24px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <h1>EKOTRONIK CHARGER PRO</h1>
+    <div class="sub">Panel v2.1 · LTE / MQTT · Android i iPhone</div>
+    <div class="toprow">
+      <div class="badge err" id="panelStatus">PANEL OFFLINE</div>
+      <div class="badge" id="modeBadge">TRYB: --</div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card"><div class="label">Napięcie</div><div class="value"><span id="voltage">--</span> <span class="unit">V</span></div></div>
+    <div class="card"><div class="label">Prąd</div><div class="value"><span id="current">--</span> <span class="unit">A</span></div></div>
+    <div class="card"><div class="label">Moc</div><div class="value"><span id="power">--</span> <span class="unit">W</span></div></div>
+    <div class="card"><div class="label">Temperatura</div><div class="value"><span id="temp">--</span> <span class="unit">°C</span></div><div class="hint" id="tempSrc">&nbsp;</div></div>
+
+    <div class="card wide">
+      <div class="label">Stan ładowarki</div>
+      <div class="statusBig" id="chargerState">OCZEKIWANIE NA DANE</div>
+      <div class="statusText" id="message">Połącz panel (Konfiguracja na dole).</div>
+    </div>
+
+    <div class="card wide">
+      <div class="label">Sterowanie ładowarką</div>
+      <div class="controls">
+        <button class="blue full" id="btnAuto" onclick="sendCmdFlash('AUTO_ON',this)">AUTO: START ŁADOWANIA Z AUTO-STOPEM</button>
+        <button class="green" id="btnOn" onclick="sendCmdFlash('SSR_ON',this)">RĘCZNIE ON</button>
+        <button class="red" id="btnOff" onclick="sendCmdFlash('SSR_OFF',this)">STOP / OFF</button>
+        <button class="orange" id="btnReset" onclick="sendCmdFlash('RESET_FAULT',this)">KASUJ BŁĄD</button>
+        <button id="btnPing" onclick="sendCmdFlash('PING',this)">PING</button>
+        <button id="btnTest" onclick="toggleTest(this)">TRYB TEST: --</button>
+        <button id="btnStatus" onclick="sendCmdFlash('STATUS',this)">ODŚWIEŻ</button>
+      </div>
+      <div class="small">AUTO załącza ładowarkę i wyłącza ją po 5 min prądu &lt; 0,15 A, przy 70 °C, nadprądzie, utracie czujnika lub po 10 h.
+        RĘCZNIE ON pomija auto-stop, ale ochrona temperatury nadal działa. TRYB TEST blokuje fizyczne wyjście SSR (firmware v3.5).</div>
+    </div>
+
+    <div class="card wide">
+      <div class="label">Alarmy i zabezpieczenia</div>
+      <div class="alerts">
+        <div class="alert" id="alarmFault">BŁĄD: --</div>
+        <div class="alert" id="alarmTemp">TEMP: --</div>
+        <div class="alert" id="alarmIna">POMIAR V/I: --</div>
+        <div class="alert" id="alarmLink">ŁĄCZNOŚĆ: --</div>
+      </div>
+    </div>
+
+    <div class="card wide">
+      <div class="label">Łączność LTE / MQTT</div>
+      <div class="info">
+        <div class="row"><span>LTE / MQTT</span><strong id="lte">--</strong></div>
+        <div class="row"><span>Operator</span><strong id="operator">--</strong></div>
+        <div class="row"><span>RSSI</span><strong id="rssi">--</strong></div>
+        <div class="row"><span>Sygnał</span><strong id="signalTxt">--</strong></div>
+      </div>
+      <div class="signalBar"><div class="signalFill" id="signalFill"></div></div>
+    </div>
+
+    <div class="card wide">
+      <div class="label">Parametry urządzenia</div>
+      <div class="info">
+        <div class="row"><span>SSR zadany / wyjście</span><strong id="ssr">--</strong></div>
+        <div class="row"><span>AUTO</span><strong id="auto">--</strong></div>
+        <div class="row"><span>Czas ładowania</span><strong id="chargeTime">--</strong></div>
+        <div class="row"><span>Niski prąd od</span><strong id="lowTime">--</strong></div>
+        <div class="row"><span>Uptime</span><strong id="uptime">--</strong></div>
+        <div class="row"><span>Firmware</span><strong id="fw">--</strong></div>
+        <div class="row"><span>Temp. procesora</span><strong id="tempEsp">--</strong></div>
+        <div class="row"><span>Publikacje / komendy</span><strong id="counters">--</strong></div>
+        <div class="row"><span>Ostatnie dane</span><strong id="last">--</strong></div>
+      </div>
+    </div>
+
+    <div class="card wide">
+      <div class="label">Komunikaty</div>
+      <div class="log" id="log"></div>
+    </div>
+
+    <div class="card wide">
+      <div class="label">Konfiguracja</div>
+      <label class="f" for="deviceId">ID urządzenia</label>
+      <input id="deviceId" value="ekotronik_lte_monitor_piotr_01" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <label class="f" for="token">Token komend (jak CMD_TOKEN w firmware; puste = brak)</label>
+      <input id="token" type="password" autocomplete="off">
+      <details>
+        <summary>Broker MQTT</summary>
+        <div class="two">
+          <div><label class="f" for="host">Host (WebSocket TLS)</label><input id="host" value="test.mosquitto.org" autocapitalize="off" spellcheck="false"></div>
+          <div><label class="f" for="port">Port</label><input id="port" value="8081" inputmode="numeric"></div>
+        </div>
+        <label class="f" for="path">Ścieżka</label><input id="path" value="/mqtt" autocapitalize="off">
+        <div class="two">
+          <div><label class="f" for="user">Login (opcjonalnie)</label><input id="user" autocomplete="off" autocapitalize="off"></div>
+          <div><label class="f" for="pass">Hasło</label><input id="pass" type="password" autocomplete="off"></div>
+        </div>
+      </details>
+      <div style="margin-top:12px"><button class="blue" onclick="connectPanel()">POŁĄCZ PANEL</button></div>
+      <button class="green" id="installBtn">ZAINSTALUJ APLIKACJĘ</button>
+      <div class="small" id="pwaInfo"></div>
+      <div class="small">Ustawienia są zapamiętywane w tym telefonie. Panel łączy się sam przy kolejnym otwarciu.</div>
+    </div>
+  </div>
+
+  <div class="footer">EKOTRONIK CHARGER PRO — panel v2.1 (firmware v3.5, zgodny też z v3.4)</div>
+</div>
+
+<script>
+"use strict";
+var STALE_SEC = 15;
+var client = null, cfg = null, lastDataMs = 0, staleLogged = false, lastJ = null;
+
+function el(id){ return document.getElementById(id); }
+function setBadge(id, txt, type){ var e = el(id); e.textContent = txt; e.className = "badge " + (type || ""); }
+function setAlert(id, txt, type){ var e = el(id); e.textContent = txt; e.className = "alert " + (type || ""); }
+function logMsg(t, cls){
+  var d = document.createElement("div");
+  d.textContent = "[" + new Date().toLocaleTimeString() + "] " + t;
+  if (cls) d.className = cls;
+  var log = el("log"); log.insertBefore(d, log.firstChild);
+  while (log.childNodes.length > 80) log.removeChild(log.lastChild);
+}
+// null/undefined/"" -> brak; NIE zamienia null na 0
+function isNum(x){ return x !== null && x !== undefined && x !== "" && typeof x !== "boolean" && Number.isFinite(Number(x)); }
+function num(x, d){ return isNum(x) ? Number(x).toFixed(d) : "--"; }
+function val(x){ return (x === undefined || x === null || x === "") ? "--" : String(x); }
+function hms(s){ if (!isNum(s) || Number(s) <= 0) return "--"; s = Math.floor(Number(s)); var h = Math.floor(s/3600), m = Math.floor(s%3600/60), x = s%60; return (h ? h + " h " : "") + m + " min " + x + " s"; }
+
+// ---------- konfiguracja ----------
+var FIELDS = ["deviceId","token","host","port","path","user","pass"];
+function readCfg(){
+  var c = {}; FIELDS.forEach(function(k){ c[k] = el(k).value.trim(); });
+  c.port = parseInt(c.port, 10) || 8081;
+  if (!c.path) c.path = "/mqtt";
+  return c;
+}
+function saveCfg(c){ try { localStorage.setItem("ekotronik_cfg_v21", JSON.stringify(c)); } catch(e){} }
+function loadCfg(){
+  try {
+    var c = JSON.parse(localStorage.getItem("ekotronik_cfg_v21") || "null");
+    if (c) FIELDS.forEach(function(k){ if (c[k] !== undefined) el(k).value = c[k]; });
+    return !!c;
+  } catch(e){ return false; }
+}
+
+// ---------- MQTT ----------
+function topic(kind){ return "ekotronik/" + cfg.deviceId + "/" + kind; }
+
+function connectPanel(){
+  if (typeof Paho === "undefined"){ logMsg("Brak biblioteki Paho MQTT (sprawdź internet).", "err"); return; }
+  cfg = readCfg();
+  if (!/^[A-Za-z0-9_\-]+$/.test(cfg.deviceId)){ logMsg("Niepoprawne ID urządzenia.", "err"); return; }
+  saveCfg(cfg);
+  try { if (client && client.isConnected()) client.disconnect(); } catch(e){}
+  lastDataMs = 0; lastJ = null;
+
+  var cid = "EKOTRONIK_PANEL21_" + Math.random().toString(16).slice(2, 10);
+  client = new Paho.Client(cfg.host, cfg.port, cfg.path, cid);
+  client.onConnectionLost = function(r){
+    setBadge("panelStatus", "PANEL OFFLINE", "err");
+    logMsg("Utracono połączenie z brokerem" + (r && r.errorMessage ? ": " + r.errorMessage : "") + ". Ponawiam za 5 s.", "err");
+    setTimeout(function(){ if (!client.isConnected()) connectPanel(); }, 5000);
+  };
+  client.onMessageArrived = onMessage;
+  setBadge("panelStatus", "ŁĄCZENIE...", "warn");
+
+  var opts = {
+    useSSL: true, timeout: 10, keepAliveInterval: 30, cleanSession: true,
+    onSuccess: function(){
+      setBadge("panelStatus", "PANEL ONLINE", "ok");
+      // tylko tematy tego urządzenia (bez globalnych aliasów ekotronik/lte/...)
+      client.subscribe(topic("telemetry"));
+      client.subscribe(topic("status"));
+      logMsg("Połączono z " + cfg.host + ". Urządzenie: " + cfg.deviceId, "ok");
+      sendCmd("PING");
+    },
+    onFailure: function(e){
+      setBadge("panelStatus", "BŁĄD MQTT", "err");
+      logMsg("Błąd połączenia MQTT: " + (e && e.errorMessage ? e.errorMessage : "?"), "err");
+    }
+  };
+  if (cfg.user){ opts.userName = cfg.user; opts.password = cfg.pass; }
+  client.connect(opts);
+}
+
+function sendCmd(cmd){
+  if (!client || !client.isConnected()){
+    setBadge("panelStatus", "BRAK MQTT", "err");
+    logMsg("Nie wysłano " + cmd + " — brak połączenia MQTT.", "err");
+    return false;
+  }
+  var payload = cfg.token ? cfg.token + ":" + cmd : cmd;
+  var m = new Paho.Message(payload);
+  m.destinationName = topic("cmd");   // jeden temat = jedno wykonanie
+  m.qos = 0; m.retained = false;
+  client.send(m);
+  logMsg("Wysłano: " + cmd);
+  return true;
+}
+function sendCmdFlash(cmd, b){
+  b.classList.add("active"); setTimeout(function(){ b.classList.remove("active"); }, 450);
+  sendCmd(cmd);
+}
+function toggleTest(b){
+  if (!lastJ){ logMsg("Najpierw poczekaj na dane z urządzenia.", "err"); return; }
+  sendCmdFlash(lastJ.mode === "TEST" ? "TEST_OFF" : "TEST_ON", b);
+}
+
+function safeParse(p){
+  return JSON.parse(p.replace(/:\s*-?nan\b/gi, ":null").replace(/:\s*-?inf(inity)?\b/gi, ":null"));
+}
+
+function onMessage(msg){
+  var p = (msg.payloadString || "").trim();
+  var t = msg.destinationName;
+  if (t === topic("status")){
+    var cls = /^(REJECT|FAULT|UNKNOWN)/.test(p) || p === "OFFLINE" ? "err" : (/^(ACK|PONG)/.test(p) || p === "ONLINE" ? "ok" : "");
+    if (p === "OFFLINE") setAlert("alarmLink", "URZĄDZENIE OFFLINE (wiadomość LWT brokera)", "err");
+    logMsg((msg.retained ? "STATUS (zapisany): " : "STATUS: ") + p, cls);
+    return;
+  }
+  if (t === topic("telemetry") && p.charAt(0) === "{") handleTelemetry(p, msg.retained);
+}
+
+function handleTelemetry(payload, retained){
+  var j;
+  try { j = safeParse(payload); } catch(e){ logMsg("Błąd JSON: " + e.message, "err"); return; }
+  if (j.device !== cfg.deviceId){ logMsg("Pominięto dane innego urządzenia: " + val(j.device), "err"); return; }
+
+  lastJ = j;
+  if (retained){
+    // wiadomość zapamiętana przez broker — może być stara
+    logMsg("Odebrano ostatni zapamiętany stan (może być nieaktualny).");
+    el("last").textContent = "zapamiętane (wiek nieznany)";
+  } else {
+    lastDataMs = Date.now(); staleLogged = false;
+    el("last").textContent = "teraz";
+    setBadge("panelStatus", "PANEL ONLINE", "ok");
+  }
+  render(j, retained);
+}
+
+function render(j, retained){
+  var v1 = !!j.fw;  // firmware >= v3.5 wysyła pole fw
+  el("voltage").textContent = num(j.voltage, 2);
+  el("current").textContent = num(j.current, 3);
+  el("power").textContent   = num(j.power, 1);
+  el("temp").textContent    = num(j.temp, 1);
+  el("tempSrc").textContent = isNum(j.temp) ? (v1 ? "czujnik " + val(j.temp_src) : "DS18B20 lub procesor (fw 3.4)") : "brak czujnika";
+  el("tempEsp").textContent = isNum(j.temp_esp) ? num(j.temp_esp, 1) + " °C" : "--";
+
+  el("lte").textContent = val(j.lte) + " / " + val(j.mqtt);
+  el("operator").textContent = val(j.operator);
+  el("rssi").textContent = isNum(j.rssi) ? j.rssi + " dBm (CSQ " + val(j.csq) + ")" : "--";
+  el("signalTxt").textContent = isNum(j.signal) ? j.signal + " %" : "--";
+  el("signalFill").style.width = Math.max(0, Math.min(100, Number(j.signal) || 0)) + "%";
+
+  el("ssr").textContent = val(j.ssr) + (j.ssr_out ? " / " + (j.ssr_out === "BLOCKED" ? "ZABLOKOWANE (TEST)" : j.ssr_out) : "");
+  el("auto").textContent = val(j.auto);
+  el("chargeTime").textContent = hms(j.charge_s);
+  el("lowTime").textContent = hms(j.low_current_s);
+  el("uptime").textContent = val(j.uptime);
+  el("fw").textContent = v1 ? "v" + j.fw : "v3.4 lub starszy";
+  el("counters").textContent = val(j.pub) + " / " + val(j.cmd) + (isNum(j.cmd_dup) && j.cmd_dup > 0 ? " (dupl. " + j.cmd_dup + ")" : "");
+
+  // tryb
+  if (j.mode === "TEST") setBadge("modeBadge", v1 ? "TEST: SSR ZABLOK." : "TEST (etykieta)", "warn");
+  else if (j.mode === "NORMAL") setBadge("modeBadge", "TRYB NORMALNY", "ok");
+  else setBadge("modeBadge", "TRYB: --", "");
+  el("btnTest").textContent = "TRYB TEST: " + (j.mode === "TEST" ? "WYŁĄCZ" : "WŁĄCZ");
+  el("btnTest").disabled = !v1;
+  el("btnReset").disabled = !v1;
+
+  // alarmy
+  var temp = isNum(j.temp) ? Number(j.temp) : null;
+  if (temp === null) setAlert("alarmTemp", "TEMP: BRAK CZUJNIKA — brak ochrony temperaturowej", "warn");
+  else if (temp >= 70 || j.over_temp === true) setAlert("alarmTemp", "TEMP: ALARM " + temp.toFixed(1) + " °C", "err");
+  else if (temp >= 55) setAlert("alarmTemp", "TEMP: UWAGA " + temp.toFixed(1) + " °C", "warn");
+  else setAlert("alarmTemp", "TEMP: OK " + temp.toFixed(1) + " °C", "ok");
+
+  if (j.ina_overrange === true) setAlert("alarmIna", "POMIAR V/I: POZA ZAKRESEM INA226 (>36 V)", "err");
+  else if (!isNum(j.voltage) || !isNum(j.current) || j.ina_ok === false) setAlert("alarmIna", "POMIAR V/I: BRAK (INA226 nie odpowiada)", "err");
+  else setAlert("alarmIna", "POMIAR V/I: OK", "ok");
+
+  if (j.lte === "ON" && j.mqtt === "ON") setAlert("alarmLink", retained ? "ŁĄCZNOŚĆ: dane zapamiętane — czekam na świeże" : "ŁĄCZNOŚĆ: OK", retained ? "warn" : "ok");
+  else setAlert("alarmLink", "ŁĄCZNOŚĆ: LTE " + val(j.lte) + " / MQTT " + val(j.mqtt), "err");
+
+  if (j.state === "FAULT") setAlert("alarmFault", "BŁĄD: " + val(j.fault), "err");
+  else if (v1) setAlert("alarmFault", "BŁĄD: brak", "ok");
+  else setAlert("alarmFault", "BŁĄD: brak informacji (fw 3.4)", "");
+
+  // stan
+  var cur = isNum(j.current) ? Number(j.current) : null;
+  var state, msg;
+  if (j.state === "FAULT"){ state = "BŁĄD — SSR WYŁĄCZONY"; msg = "Przyczyna: " + val(j.fault) + ". Usuń przyczynę i naciśnij KASUJ BŁĄD."; }
+  else if (j.state === "DONE"){ state = "ŁADOWANIE ZAKOŃCZONE"; msg = "Prąd spadł poniżej progu na 5 min. To nie zawsze oznacza 100 % (może to być BMS lub odpięcie)."; }
+  else if (j.ssr === "ON" && j.ssr_out === "BLOCKED"){ state = "TEST — WYJŚCIE ZABLOKOWANE"; msg = "SSR zadany ON, ale fizycznie wyłączony (tryb TEST)."; }
+  else if (j.ssr === "ON" && cur !== null && cur > 0.15){ state = "ŁADOWANIE"; msg = "Prąd " + cur.toFixed(2) + " A."; }
+  else if (j.ssr === "ON"){ state = "SSR ON / BRAK POBORU"; msg = cur === null ? "Brak pomiaru prądu." : "Prąd poniżej 0,15 A" + (j.auto === "ON" ? " — automat odliczy 5 min." : "."); }
+  else { state = "STOP"; msg = "Wyjście SSR wyłączone."; }
+  if (temp !== null && temp >= 70){ state = "ALARM TEMPERATURY"; msg = "Temperatura przekroczyła 70 °C."; }
+  el("chargerState").textContent = state;
+  el("message").textContent = msg + " Tryb: " + (j.auto === "ON" ? "AUTO" : "ręczny") + ".";
+  if (j.event) el("message").textContent += " Zdarzenie: " + j.event;
+}
+
+setInterval(function(){
+  if (lastDataMs > 0){
+    var sec = Math.round((Date.now() - lastDataMs) / 1000);
+    el("last").textContent = sec + " s temu";
+    if (sec > STALE_SEC){
+      setBadge("panelStatus", "BRAK DANYCH", "err");
+      setAlert("alarmLink", "ŁĄCZNOŚĆ: brak danych od " + sec + " s", "err");
+      if (!staleLogged){ logMsg("Brak nowych danych od " + STALE_SEC + " s — wartości na ekranie są nieaktualne.", "err"); staleLogged = true; }
+    }
+  }
+}, 1000);
+
+// ---------- PWA ----------
+(function(){
+  var deferred = null;
+  var isFile = location.protocol === "file:";
+  var secure = location.protocol === "https:" || location.hostname === "localhost";
+  window.addEventListener("beforeinstallprompt", function(e){
+    e.preventDefault(); deferred = e;
+    var b = el("installBtn"); b.style.display = "block";
+    b.onclick = function(){ deferred.prompt(); deferred.userChoice.then(function(){ deferred = null; b.style.display = "none"; }); };
+  });
+  window.addEventListener("load", function(){
+    if ("serviceWorker" in navigator && secure){
+      navigator.serviceWorker.register("service-worker.js").catch(function(){ el("pwaInfo").textContent = "Service worker nie wystartował."; });
+      if (/iphone|ipad/i.test(navigator.userAgent)) el("pwaInfo").textContent = "iPhone: Safari → Udostępnij → Do ekranu początkowego.";
+    } else if (isFile){
+      el("pwaInfo").textContent = "Otwarte jako plik — panel działa, ale instalacja jako aplikacja wymaga adresu HTTPS.";
+    }
+  });
+})();
+
+// ---------- start ----------
+if (typeof Paho === "undefined"){
+  // brak lokalnego vendor/ -> CDN
+  var s = document.createElement("script");
+  s.src = "https://unpkg.com/paho-mqtt@1.1.0/paho-mqtt-min.js";
+  s.onload = function(){ if (loadCfg()) connectPanel(); };
+  s.onerror = function(){ logMsg("Nie można pobrać biblioteki Paho MQTT.", "err"); };
+  document.head.appendChild(s);
+} else if (loadCfg()) {
+  connectPanel();
+}
+logMsg("Panel v2.1 uruchomiony.");
+</script>
+<script>/* symulacja: automatyczne połączenie z wirtualnym brokerem */
+setTimeout(function(){ if(!client) connectPanel(); }, 200);
+</script>
+</body>
+</html>
