@@ -7,7 +7,7 @@
   var HOST='https://ekotronik.goatcounter.com', KEY='eko_licznik_ost';
   var dbg=/[?&]licznik=test/.test(location.search);
   var ROOT=/^\/ecu-immo-elv(\/|$)/.test(location.pathname)?'/ecu-immo-elv':'';
-  var SCIEZKI=['','/ecu','/immobilizer','/elv-escl','/artykuly','/artykuly/prad-spoczynkowy.html','/artykuly/magistrala-can.html','/artykuly/kompresja-wzgledna.html','/artykuly/cegi-dryf-zera.html','/lab/asystent.html','/lab/ecu-bench-controler.html','/lab/prad-spoczynkowy.html','/lab/analizator-can.html','/lab/kompresja-wzgledna.html','/lab/kontrola-rozrzadu.html'].map(function(p){return ROOT+p||'/'});
+  var SCIEZKI=['','/ecu','/immobilizer','/elv-escl','/artykuly','/artykuly/prad-spoczynkowy.html','/artykuly/magistrala-can.html','/artykuly/kompresja-wzgledna.html','/artykuly/cegi-dryf-zera.html','/lab/asystent.html','/lab/ecu-bench-controler.html','/lab/prad-spoczynkowy.html','/lab/analizator-can.html','/lab/kompresja-wzgledna.html','/lab/kontrola-rozrzadu.html','/lab/ekotronik-charger.html'].map(function(p){return ROOT+p||'/'});
   var ZUKOS={'':1,'/ecu':1,'/immobilizer':1,'/elv-escl':1,'/artykuly':1};
   SCIEZKI=SCIEZKI.reduce(function(a,p){a.push(p);var b=p.replace(ROOT,'');if(ZUKOS[b]!==undefined&&p!=='/')a.push(p+'/');return a},[]);
   function pokaz(t,blad){
