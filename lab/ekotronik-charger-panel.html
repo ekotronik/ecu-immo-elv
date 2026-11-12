@@ -107,7 +107,7 @@ details summary{cursor:pointer;color:var(--muted);font-size:13px;margin-top:12px
         <button id="btnStatus" onclick="sendCmdFlash('STATUS',this)">ODŚWIEŻ</button>
       </div>
       <div class="small">AUTO załącza ładowarkę i wyłącza ją po 5 min prądu &lt; 0,15 A, przy 70 °C, nadprądzie, utracie czujnika lub po 10 h.
-        RĘCZNIE ON pomija auto-stop, ale ochrona temperatury nadal działa. TRYB TEST blokuje fizyczne wyjście SSR (firmware v3.5).</div>
+        RĘCZNIE ON pomija auto-stop, ale ochrona temperatury nadal działa. TRYB TEST blokuje fizyczne załączenie ładowarki.</div>
     </div>
 
     <div class="card wide">
@@ -134,7 +134,7 @@ details summary{cursor:pointer;color:var(--muted);font-size:13px;margin-top:12px
     <div class="card wide">
       <div class="label">Parametry urządzenia</div>
       <div class="info">
-        <div class="row"><span>SSR zadany / wyjście</span><strong id="ssr">--</strong></div>
+        <div class="row"><span>Przekaźnik: zadany / wyjście</span><strong id="ssr">--</strong></div>
         <div class="row"><span>AUTO</span><strong id="auto">--</strong></div>
         <div class="row"><span>Czas ładowania</span><strong id="chargeTime">--</strong></div>
         <div class="row"><span>Niski prąd od</span><strong id="lowTime">--</strong></div>
@@ -320,7 +320,7 @@ function render(j, retained){
   el("current").textContent = num(j.current, 3);
   el("power").textContent   = num(j.power, 1);
   el("temp").textContent    = num(j.temp, 1);
-  el("tempSrc").textContent = isNum(j.temp) ? (v1 ? "czujnik " + val(j.temp_src) : "DS18B20 lub procesor (fw 3.4)") : "brak czujnika";
+  el("tempSrc").textContent = isNum(j.temp) ? (v1 ? "czujnik obudowy" : "czujnik lub procesor (fw 3.4)") : "brak czujnika";
   el("tempEsp").textContent = isNum(j.temp_esp) ? num(j.temp_esp, 1) + " °C" : "--";
 
   el("lte").textContent = val(j.lte) + " / " + val(j.mqtt);
@@ -338,7 +338,7 @@ function render(j, retained){
   el("counters").textContent = val(j.pub) + " / " + val(j.cmd) + (isNum(j.cmd_dup) && j.cmd_dup > 0 ? " (dupl. " + j.cmd_dup + ")" : "");
 
   // tryb
-  if (j.mode === "TEST") setBadge("modeBadge", v1 ? "TEST: SSR ZABLOK." : "TEST (etykieta)", "warn");
+  if (j.mode === "TEST") setBadge("modeBadge", v1 ? "TEST: WYJŚCIE ZABLOK." : "TEST (etykieta)", "warn");
   else if (j.mode === "NORMAL") setBadge("modeBadge", "TRYB NORMALNY", "ok");
   else setBadge("modeBadge", "TRYB: --", "");
   el("btnTest").textContent = "TRYB TEST: " + (j.mode === "TEST" ? "WYŁĄCZ" : "WŁĄCZ");
@@ -352,8 +352,8 @@ function render(j, retained){
   else if (temp >= 55) setAlert("alarmTemp", "TEMP: UWAGA " + temp.toFixed(1) + " °C", "warn");
   else setAlert("alarmTemp", "TEMP: OK " + temp.toFixed(1) + " °C", "ok");
 
-  if (j.ina_overrange === true) setAlert("alarmIna", "POMIAR V/I: POZA ZAKRESEM INA226 (>36 V)", "err");
-  else if (!isNum(j.voltage) || !isNum(j.current) || j.ina_ok === false) setAlert("alarmIna", "POMIAR V/I: BRAK (INA226 nie odpowiada)", "err");
+  if (j.ina_overrange === true) setAlert("alarmIna", "POMIAR V/I: POZA ZAKRESEM CZUJNIKA", "err");
+  else if (!isNum(j.voltage) || !isNum(j.current) || j.ina_ok === false) setAlert("alarmIna", "POMIAR V/I: BRAK (czujnik nie odpowiada)", "err");
   else setAlert("alarmIna", "POMIAR V/I: OK", "ok");
 
   if (j.lte === "ON" && j.mqtt === "ON") setAlert("alarmLink", retained ? "ŁĄCZNOŚĆ: dane zapamiętane — czekam na świeże" : "ŁĄCZNOŚĆ: OK", retained ? "warn" : "ok");
@@ -366,12 +366,12 @@ function render(j, retained){
   // stan
   var cur = isNum(j.current) ? Number(j.current) : null;
   var state, msg;
-  if (j.state === "FAULT"){ state = "BŁĄD — SSR WYŁĄCZONY"; msg = "Przyczyna: " + val(j.fault) + ". Usuń przyczynę i naciśnij KASUJ BŁĄD."; }
+  if (j.state === "FAULT"){ state = "BŁĄD — ŁADOWARKA WYŁĄCZONA"; msg = "Przyczyna: " + val(j.fault) + ". Usuń przyczynę i naciśnij KASUJ BŁĄD."; }
   else if (j.state === "DONE"){ state = "ŁADOWANIE ZAKOŃCZONE"; msg = "Prąd spadł poniżej progu na 5 min. To nie zawsze oznacza 100 % (może to być BMS lub odpięcie)."; }
-  else if (j.ssr === "ON" && j.ssr_out === "BLOCKED"){ state = "TEST — WYJŚCIE ZABLOKOWANE"; msg = "SSR zadany ON, ale fizycznie wyłączony (tryb TEST)."; }
+  else if (j.ssr === "ON" && j.ssr_out === "BLOCKED"){ state = "TEST — WYJŚCIE ZABLOKOWANE"; msg = "Załączenie zadane, ale fizycznie zablokowane (tryb TEST)."; }
   else if (j.ssr === "ON" && cur !== null && cur > 0.15){ state = "ŁADOWANIE"; msg = "Prąd " + cur.toFixed(2) + " A."; }
-  else if (j.ssr === "ON"){ state = "SSR ON / BRAK POBORU"; msg = cur === null ? "Brak pomiaru prądu." : "Prąd poniżej 0,15 A" + (j.auto === "ON" ? " — automat odliczy 5 min." : "."); }
-  else { state = "STOP"; msg = "Wyjście SSR wyłączone."; }
+  else if (j.ssr === "ON"){ state = "WŁĄCZONA / BRAK POBORU"; msg = cur === null ? "Brak pomiaru prądu." : "Prąd poniżej 0,15 A" + (j.auto === "ON" ? " — automat odliczy 5 min." : "."); }
+  else { state = "STOP"; msg = "Ładowarka wyłączona."; }
   if (temp !== null && temp >= 70){ state = "ALARM TEMPERATURY"; msg = "Temperatura przekroczyła 70 °C."; }
   el("chargerState").textContent = state;
   el("message").textContent = msg + " Tryb: " + (j.auto === "ON" ? "AUTO" : "ręczny") + ".";
