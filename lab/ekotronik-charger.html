@@ -97,7 +97,7 @@ kbd{border:1px solid var(--border);border-radius:5px;padding:0 5px;font-size:.85
 
 <div class="panel"><div class="pt">EKOTRONIK CHARGER PRO</div>
   <p style="margin:8px 0 0;color:#d6dbe8">Moduł nadzoru fabrycznej ładowarki hulajnogi KuKirin G2. Mierzy napięcie, prąd i temperaturę, załącza ładowarkę i łączy się z telefonem przez sieć komórkową LTE. Poniżej działa jego symulacja: panel w telefonie, wyświetlacz z obudowy ładowarki i scenariusze testowe.</p>
-  <p class="small" style="margin:8px 0 0">Steruj z panelu w telefonie (przycisk <b>AUTO</b> startuje ładowanie). Zdarzenia w ładowarce wywołasz przyciskami „Wypróbuj”. Ładowanie trwa godzinami, więc przyspiesz czas (×60, ×600) albo uruchom gotowy scenariusz.</p>
+  <p class="small" style="margin:8px 0 0">Steruj z panelu w telefonie (przycisk <b>AUTO</b> startuje ładowanie). Zdarzenia w ładowarce wywołasz przyciskami „Test symulacja”. Ładowanie trwa godzinami, więc przyspiesz czas (×60, ×600) albo uruchom gotowy scenariusz.</p>
 </div>
 
 <div class="bench">
@@ -120,29 +120,6 @@ kbd{border:1px solid var(--border);border-radius:5px;padding:0 5px;font-size:.85
           <span class="led" id="ledMqtt"><i></i>SERWER</span>
           <span class="led" id="ledFlt"><i></i>BŁĄD</span>
         </div>
-      </div>
-    </div>
-
-    <div class="panel">
-      <div class="pt" style="font-size:1.05rem;color:var(--gold)">Wypróbuj</div>
-      <div class="speed" role="group" aria-label="Szybkość czasu" style="margin-top:8px">
-        <span class="lbl">Czas</span>
-        <button class="btn" type="button" data-sp="1" aria-pressed="true">×1</button>
-        <button class="btn" type="button" data-sp="60" aria-pressed="false">×60</button>
-        <button class="btn" type="button" data-sp="600" aria-pressed="false">×600</button>
-        <span class="clock" id="clock">czas pracy 00:00:00</span>
-      </div>
-      <div class="try">
-        <button class="btn gold" id="bPlug" type="button">Podłącz hulajnogę (25 %)</button>
-        <button class="btn" id="bUnplug" type="button">Odłącz hulajnogę</button>
-        <button class="btn" id="bHot" type="button" aria-pressed="false">Przegrzanie ładowarki</button>
-        <button class="btn" id="bOver" type="button" aria-pressed="false">Przeciążenie wyjścia 5,3 A</button>
-        <button class="btn" id="bDs" type="button" aria-pressed="false">Odłącz czujnik temperatury</button>
-        <button class="btn" id="bIna" type="button" aria-pressed="false">Odłącz pomiar prądu i napięcia</button>
-        <button class="btn" id="bLte" type="button" aria-pressed="false">Brak zasięgu LTE</button>
-        <button class="btn" id="bPath" type="button" aria-pressed="false">Obecny zakres pomiaru (do 36 V)</button>
-        <button class="btn" id="bRogue" type="button">Obcy klient wysyła „włącz”</button>
-        <button class="btn red" id="bReboot" type="button">Zanik zasilania modułu</button>
       </div>
     </div>
 
@@ -170,6 +147,29 @@ kbd{border:1px solid var(--border);border-radius:5px;padding:0 5px;font-size:.85
         <div class="tile"><span class="lbl">Temperatura</span><div class="v mono" id="rT">—</div><div class="s">obudowa</div></div>
       </div>
       <p class="small" style="margin:8px 0 0">Wartości rzeczywiste zna tylko symulacja. Moduł widzi je przez czujniki, więc po odłączeniu czujnika panel pokaże brak danych, a tu nadal widać prawdę.</p>
+    </div>
+
+    <div class="panel">
+      <div class="pt" style="font-size:1.05rem;color:var(--gold)">Test symulacja</div>
+      <div class="speed" role="group" aria-label="Szybkość czasu" style="margin-top:8px">
+        <span class="lbl">Czas</span>
+        <button class="btn" type="button" data-sp="1" aria-pressed="true">×1</button>
+        <button class="btn" type="button" data-sp="60" aria-pressed="false">×60</button>
+        <button class="btn" type="button" data-sp="600" aria-pressed="false">×600</button>
+        <span class="clock" id="clock">czas pracy 00:00:00</span>
+      </div>
+      <div class="try">
+        <button class="btn gold" id="bPlug" type="button">Podłącz hulajnogę (25 %)</button>
+        <button class="btn" id="bUnplug" type="button">Odłącz hulajnogę</button>
+        <button class="btn" id="bHot" type="button" aria-pressed="false">Przegrzanie ładowarki</button>
+        <button class="btn" id="bOver" type="button" aria-pressed="false">Przeciążenie wyjścia 5,3 A</button>
+        <button class="btn" id="bDs" type="button" aria-pressed="false">Odłącz czujnik temperatury</button>
+        <button class="btn" id="bIna" type="button" aria-pressed="false">Odłącz pomiar prądu i napięcia</button>
+        <button class="btn" id="bLte" type="button" aria-pressed="false">Brak zasięgu LTE</button>
+        <button class="btn" id="bPath" type="button" aria-pressed="false">Obecny zakres pomiaru (do 36 V)</button>
+        <button class="btn" id="bRogue" type="button">Obcy klient wysyła „włącz”</button>
+        <button class="btn red" id="bReboot" type="button">Zanik zasilania modułu</button>
+      </div>
     </div>
   </div>
 </div>
