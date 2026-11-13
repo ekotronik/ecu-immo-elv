@@ -1,15 +1,15 @@
 <!doctype html>
 <html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Analizator CAN (EKO-CAN) – symulacja | EKOTRONIK SYSTEM</title>
-<meta name="description" content="Analizator CAN EKO-CAN EKOTRONIK w trybie symulacji: A – sygnał (oscylogram, krawędź, oko, zakłócenia, wzorce usterek, test oporu, werdykt), B – dane (ramki, mapa bitów, sygnały, węzły, zdarzenia).">
+<meta name="description" content="Analizator CAN EKO-CAN EKOTRONIK w trybie symulacji: A – sygnał (oscylogram, zbocze, jakość bitów, zakłócenia, napięcia w czasie, wzorce usterek, test oporu, ocena stanu), B – komunikacja (ramki, mapa bitów, sygnały, węzły, zdarzenia).">
 <link rel="canonical" href="https://ekotronik.github.io/ecu-immo-elv/lab/analizator-can.html">
 <meta name="robots" content="index,follow">
 <link rel="icon" type="image/png" sizes="64x64" href="../assets_v8/favicon.png">
 <link rel="apple-touch-icon" href="../assets_v8/apple-touch-icon.png">
 <meta property="og:type" content="website"><meta property="og:locale" content="pl_PL"><meta property="og:site_name" content="EKOTRONIK SYSTEM">
-<meta property="og:url" content="https://ekotronik.github.io/ecu-immo-elv/lab/analizator-can.html"><meta property="og:title" content="Analizator CAN (EKO-CAN) – symulacja | EKOTRONIK SYSTEM"><meta property="og:description" content="Analizator CAN EKO-CAN EKOTRONIK w trybie symulacji: A – sygnał (oscylogram, krawędź, oko, zakłócenia, wzorce usterek, test oporu, werdykt), B – dane (ramki, mapa bitów, sygnały, węzły, zdarzenia).">
+<meta property="og:url" content="https://ekotronik.github.io/ecu-immo-elv/lab/analizator-can.html"><meta property="og:title" content="Analizator CAN (EKO-CAN) – symulacja | EKOTRONIK SYSTEM"><meta property="og:description" content="Analizator CAN EKO-CAN EKOTRONIK w trybie symulacji: A – sygnał (oscylogram, zbocze, jakość bitów, zakłócenia, napięcia w czasie, wzorce usterek, test oporu, ocena stanu), B – komunikacja (ramki, mapa bitów, sygnały, węzły, zdarzenia).">
 <meta property="og:image" content="https://ekotronik.github.io/ecu-immo-elv/assets_v8/og_ekotronik_system.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Logo EKOTRONIK SYSTEM">
-<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Analizator CAN (EKO-CAN) – symulacja | EKOTRONIK SYSTEM"><meta name="twitter:description" content="Analizator CAN EKO-CAN EKOTRONIK w trybie symulacji: A – sygnał (oscylogram, krawędź, oko, zakłócenia, wzorce usterek, test oporu, werdykt), B – dane (ramki, mapa bitów, sygnały, węzły, zdarzenia)."><meta name="twitter:image" content="https://ekotronik.github.io/ecu-immo-elv/assets_v8/og_ekotronik_system.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Analizator CAN (EKO-CAN) – symulacja | EKOTRONIK SYSTEM"><meta name="twitter:description" content="Analizator CAN EKO-CAN EKOTRONIK w trybie symulacji: A – sygnał (oscylogram, zbocze, jakość bitów, zakłócenia, napięcia w czasie, wzorce usterek, test oporu, ocena stanu), B – komunikacja (ramki, mapa bitów, sygnały, węzły, zdarzenia)."><meta name="twitter:image" content="https://ekotronik.github.io/ecu-immo-elv/assets_v8/og_ekotronik_system.png">
 <link rel="stylesheet" href="lab.css">
 <style>
 .status{display:flex;flex-wrap:wrap;gap:14px;align-items:center;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:8px 14px;margin:8px 0;font-size:.95rem}
@@ -30,61 +30,75 @@
 .bm .hd{color:var(--muted);background:none;padding:2px}
 .field{display:flex;justify-content:space-between;align-items:center;border:2px solid #4a5a70;border-radius:10px;padding:8px 12px;margin-bottom:8px;font-size:1rem}
 .field.licznik{border-color:var(--ok)}.field.sygnal{border-color:var(--cyan)}.field.bit,.field.crc{border-color:var(--gold)}
+.dd{position:relative;min-width:0}
+.ddb{width:100%;min-height:52px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 14px;border-radius:14px;border:2px solid var(--gold);background:var(--raised);color:var(--text);font:inherit;font-weight:700;text-align:left;cursor:pointer;color-scheme:dark}
+.ddb i{font-style:normal;color:var(--gold);flex:none}.ddb[aria-expanded=true]{border-color:var(--cyan)}
+.ddb:focus-visible,.ddo:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
+.ddl{position:absolute;z-index:50;left:0;right:0;top:calc(100% + 6px);max-height:min(62vh,520px);overflow-y:auto;background:#0a1626;border:2px solid var(--gold);border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.7);padding:4px}
+.ddl.hidden{display:none}
+.ddo{display:block;width:100%;min-height:48px;padding:8px 12px;border:0;border-radius:10px;background:transparent;color:var(--text);font:inherit;font-weight:600;text-align:left;cursor:pointer}
+.ddo+.ddo{border-top:1px solid rgba(107,90,51,.45)}
+.ddo:hover{background:#13304d;color:var(--gold-l)}
+.ddo.on{background:#3a331f;color:var(--gold-l);font-weight:800}
 .mono{font-family:ui-monospace,Menlo,Consolas,monospace}
 .hl{background:#f0b858;color:#111;border-radius:3px;padding:0 2px}
-</style><script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebPage", "name": "Analizator CAN (EKO-CAN) – symulacja | EKOTRONIK SYSTEM", "description": "Analizator CAN EKO-CAN EKOTRONIK w trybie symulacji: A – sygnał (oscylogram, krawędź, oko, zakłócenia, wzorce usterek, test oporu, werdykt), B – dane (ramki, mapa bitów, sygnały, węzły, zdarzenia).", "url": "https://ekotronik.github.io/ecu-immo-elv/lab/analizator-can.html", "inLanguage": "pl-PL", "isPartOf": {"@type": "WebSite", "name": "EKOTRONIK", "url": "https://ekotronik.github.io/ecu-immo-elv/"}}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Strona główna", "item": "https://ekotronik.github.io/ecu-immo-elv/"}, {"@type": "ListItem", "position": 2, "name": "Analizator CAN (EKO-CAN) – symulacja", "item": "https://ekotronik.github.io/ecu-immo-elv/lab/analizator-can.html"}]}]}</script></head><body><h1 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap">Analizator CAN (EKO-CAN) – symulacja</h1><div class="wrap">
+</style><script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebPage", "name": "Analizator CAN (EKO-CAN) – symulacja | EKOTRONIK SYSTEM", "description": "Analizator CAN EKO-CAN EKOTRONIK w trybie symulacji: A – sygnał (oscylogram, zbocze, jakość bitów, zakłócenia, napięcia w czasie, wzorce usterek, test oporu, ocena stanu), B – komunikacja (ramki, mapa bitów, sygnały, węzły, zdarzenia).", "url": "https://ekotronik.github.io/ecu-immo-elv/lab/analizator-can.html", "inLanguage": "pl-PL", "isPartOf": {"@type": "WebSite", "name": "EKOTRONIK", "url": "https://ekotronik.github.io/ecu-immo-elv/"}}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Strona główna", "item": "https://ekotronik.github.io/ecu-immo-elv/"}, {"@type": "ListItem", "position": 2, "name": "Analizator CAN (EKO-CAN) – symulacja", "item": "https://ekotronik.github.io/ecu-immo-elv/lab/analizator-can.html"}]}]}</script></head><body><h1 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap">Analizator CAN (EKO-CAN) – symulacja</h1><div class="wrap">
 <div class="hdr" id="hdr"></div><div class="crumb" id="crumb"></div>
-<div class="panel" style="padding:10px 14px"><div class="row" style="align-items:center;flex-wrap:wrap;gap:10px"><div class="pt" style="margin-right:6px">Analizator CAN</div><span class="lbl">Scenariusz (symulacja)</span><select class="sel" id="scn" aria-label="Scenariusz" style="flex:1 1 320px"></select></div><div class="psub" id="scd" style="margin:6px 0 0"></div></div>
+<div class="panel" style="padding:10px 14px"><div class="row" style="align-items:center;flex-wrap:wrap;gap:10px"><div class="pt" style="margin-right:6px">Analizator CAN</div><span class="lbl">Scenariusz (symulacja)</span><div class="dd" id="dd" style="flex:1 1 320px"><button type="button" class="ddb" id="ddb" aria-haspopup="listbox" aria-expanded="false"><span id="ddt"></span><i aria-hidden="true">▾</i></button><div class="ddl hidden" id="ddl" role="listbox" aria-label="Scenariusz"></div></div><select class="sel" id="scn" aria-label="Scenariusz" hidden></select></div><div class="psub" id="scd" style="margin:6px 0 0"></div></div>
 <div class="status" id="status"></div>
 <div class="vstrip" id="vs"><span class="lamp"></span><div><div class="vt" id="vsT">—</div><div class="dm" id="vsD"></div></div></div>
-<div class="grp"><div class="tabs" id="grp"><button class="btn grpbtn a on" data-g="A">A · SYGNAŁ (warstwa fizyczna)</button><button class="btn grpbtn b" data-g="B">B · DANE (ramki, identyfikacja)</button></div></div>
+<div class="grp"><div class="tabs" id="grp"><button class="btn grpbtn a on" data-g="A">A · SYGNAŁ ELEKTRYCZNY (napięcia, przebiegi)</button><button class="btn grpbtn b" data-g="B">B · KOMUNIKACJA (ramki, identyfikatory)</button></div></div>
 <div class="tabs small" id="tabsA"></div><div class="tabs small hidden" id="tabsB"></div>
 
 <div data-p="osc"><div class="two"><div><div class="cwrap"><canvas id="cOsc" aria-label="Oscylogram CAN-H, CAN-L i różnicowy"></canvas></div><div class="psub" style="margin-top:6px" id="oscInfo"></div></div>
  <div class="panel cur"><div class="pt" style="font-size:1.1rem;color:var(--gold)">KURSORY A – B</div>
-  <div class="r"><span>ΔT</span><b id="cDt">—</b></div><div class="r"><span>= bitów</span><b id="cBits">—</b></div><div class="r"><span>Vdom H–L</span><b id="cVd" class="ok">—</b></div><div class="r"><span>Vrec H–L</span><b id="cVr" class="ok">—</b></div><div class="r"><span>Symetria</span><b id="cSy">—</b></div><div class="r"><span>Czas narast.</span><b id="cRise">—</b></div><div class="r"><span>Przeregulow.</span><b id="cOv">—</b></div><div class="r"><span>Dzwonienie</span><b id="cRing">—</b></div>
+  <div class="r"><span>ΔT</span><b id="cDt">—</b></div><div class="r"><span>= bitów</span><b id="cBits">—</b></div><div class="r"><span>U aktywne H–L</span><b id="cVd" class="ok">—</b></div><div class="r"><span>U spoczynkowe H–L</span><b id="cVr" class="ok">—</b></div><div class="r"><span>Symetria</span><b id="cSy">—</b></div><div class="r"><span>Czas narast.</span><b id="cRise">—</b></div><div class="r"><span>Przerzut napięcia</span><b id="cOv">—</b></div><div class="r"><span>Drgania po zboczu</span><b id="cRing">—</b></div>
   <button class="btn cyan" id="bAutoCur" style="width:100%;margin-top:8px">AUTOMATYCZNIE</button><div class="note" style="margin-top:10px">Przeciągnij kursor A lub B na wykresie. STOP zamraża przebieg.</div></div></div>
- <div class="row" style="margin-top:10px"><button class="btn red" id="bFreeze">STOP</button><button class="btn cyan" id="bMode">TRYB: H+L / RÓŻN.</button><button class="btn gold" id="bSave">ZAPISZ</button></div></div>
+ <div class="row" style="margin-top:10px"><button class="btn red" id="bFreeze">STOP</button><button class="btn cyan" id="bMode">TRYB: H+L / RÓŻN.</button><button class="btn gold" id="bCsv">ZAPIS CSV</button><button class="btn gold" id="bPng">ZRZUT PNG</button><button class="btn gold" id="bRep">RAPORT TXT</button></div></div>
 
 <div data-p="edge" class="hidden"><div class="two"><div class="cwrap"><canvas id="cEdge" aria-label="Zbocze narastające"></canvas></div>
- <div class="panel cur"><div class="pt" style="font-size:1.1rem;color:var(--gold)">ZBOCZE</div><div class="r"><span>Czas narastania 10–90 %</span><b id="eRise">—</b></div><div class="r"><span>Przeregulowanie</span><b id="eOv">—</b></div><div class="r"><span>Dzwonienie (p-p)</span><b id="eRing">—</b></div><div class="r"><span>Czas ustalania</span><b id="eSet">—</b></div><div class="note" style="margin-top:10px">Biała linia to wzorzec zbocza (ISO 11898-2, ok. 2 V, bez dzwonienia). Przebieg odtworzony metodą próbkowania równoważnego.</div></div></div></div>
+ <div class="panel cur"><div class="pt" style="font-size:1.1rem;color:var(--gold)">ZBOCZE</div><div class="r"><span>Czas narastania 10–90 %</span><b id="eRise">—</b></div><div class="r"><span>Przerzut napięcia (przeregulowanie)</span><b id="eOv">—</b></div><div class="r"><span>Drgania po zboczu (dzwonienie)</span><b id="eRing">—</b></div><div class="r"><span>Czas ustalania</span><b id="eSet">—</b></div><div class="note" style="margin-top:10px">Biała linia to wzorzec zbocza (ISO 11898-2, ok. 2 V, bez dzwonienia). Przebieg odtworzony metodą próbkowania równoważnego.</div></div></div></div>
 
-<div data-p="eye" class="hidden"><div class="two"><div class="cwrap"><canvas id="cEye" aria-label="Oko różnicowe"></canvas></div><div class="panel cur"><div class="pt" style="font-size:1.1rem;color:var(--gold)">OKO RÓŻNICOWE</div>
- <div class="r"><span>Otwarcie oka (wys.)</span><b id="yH">—</b></div><div class="r"><span>Otwarcie oka (szer.)</span><b id="yW">—</b></div><div class="r"><span>Jitter (p-p)</span><b id="yJ">—</b></div><div class="r"><span>Maska (złoty romb)</span><b id="yM">—</b></div><div class="r"><span>Symetria H/L</span><b id="yS">—</b></div><div class="note" style="margin-top:10px">Maska to kształt orientacyjny, nie z normy.</div></div></div></div>
+<div data-p="eye" class="hidden"><div class="two"><div class="cwrap"><canvas id="cEye" aria-label="Jakość bitów: nałożone na siebie przebiegi różnicowe"></canvas></div><div class="panel cur"><div class="pt" style="font-size:1.1rem;color:var(--gold)">JAKOŚĆ BITÓW (nakładka przebiegów)</div>
+ <div class="r"><span>Prześwit – wysokość</span><b id="yH">—</b></div><div class="r"><span>Prześwit – szerokość</span><b id="yW">—</b></div><div class="r"><span>Drgania czasu zbocza (jitter)</span><b id="yJ">—</b></div><div class="r"><span>Pole kontrolne (złote romby)</span><b id="yM">—</b></div><div class="r"><span>Symetria CAN-H / CAN-L</span><b id="yS">—</b></div><div class="note" style="margin-top:10px">Na wykresie nałożono wiele kolejnych bitów. Im czystszy i szerszy „prześwit” pośrodku, tym wyraźniej widać poziomy 0 i 1. Zamykający się prześwit oznacza zakłócenia lub zniekształcone zbocza. Złote romby (na środku bitów, między poziomem 0 i 1) to orientacyjne pole kontrolne: przebieg nie powinien do nich wchodzić. Liczba w polu „Pole kontrolne” to ile z nałożonych przebiegów je narusza (to nie jest wymóg normy).</div></div></div></div>
 
-<div data-p="noise" class="hidden"><div class="two"><div class="cwrap"><canvas id="cNoise" aria-label="Szum na poziomie recesywnym"></canvas></div><div class="panel cur"><div class="pt" style="font-size:1.1rem;color:var(--gold)">ZAKŁÓCENIA</div><div class="r"><span>Szum RMS (recesywny)</span><b id="nR">—</b></div><div class="r"><span>Impulsy / s</span><b id="nI">—</b></div><div class="r"><span>Amplituda impulsów</span><b id="nA">—</b></div><div class="r"><span>Ocena</span><b id="nO">—</b></div><div class="note" id="nT" style="margin-top:10px"></div></div></div></div>
+<div data-p="noise" class="hidden"><div class="two"><div class="cwrap"><canvas id="cNoise" aria-label="Szum na poziomie spoczynkowym"></canvas></div><div class="panel cur"><div class="pt" style="font-size:1.1rem;color:var(--gold)">ZAKŁÓCENIA</div><div class="r"><span>Szum RMS (poziom spoczynkowy)</span><b id="nR">—</b></div><div class="r"><span>Impulsy / s</span><b id="nI">—</b></div><div class="r"><span>Amplituda impulsów</span><b id="nA">—</b></div><div class="r"><span>Ocena</span><b id="nO">—</b></div><div class="note" id="nT" style="margin-top:10px"></div></div></div></div>
 
-<div data-p="pat" class="hidden"><div class="three" id="patGrid"></div><div class="note" style="margin-top:8px">Wzorce to typowe kształty. W aplikacji są porównywane z pomiarem, a wynik potwierdza test oporu przy wyłączonej sieci.</div></div>
+<div data-p="volt" class="hidden"><div class="two"><div><div class="cwrap"><canvas id="cVolt" aria-label="Napięcia CAN-H i CAN-L w czasie, ostatnie 60 sekund"></canvas></div><div class="psub" style="margin-top:6px">Pomarańczowy: CAN-H, niebieski: CAN-L. Linia = średnia z pół sekundy, jasny pas = od minimum do maksimum. Przerywana linia: 2,5 V (napięcie spoczynkowe).</div></div>
+ <div class="panel cur"><div class="pt" style="font-size:1.1rem;color:var(--gold)">NAPIĘCIA W CZASIE (60 s)</div><div class="r"><span>CAN-H teraz (średnie)</span><b id="vH">—</b></div><div class="r"><span>CAN-L teraz (średnie)</span><b id="vL">—</b></div><div class="r"><span>Napięcie wspólne (H+L)/2</span><b id="vC">—</b></div><div class="r"><span>CAN-H min…maks.</span><b id="vHm">—</b></div><div class="r"><span>CAN-L min…maks.</span><b id="vLm">—</b></div><div class="r"><span>Ocena</span><b id="vO">—</b></div><div class="note" id="vT" style="margin-top:10px"></div></div></div></div>
+
+<div data-p="pat" class="hidden"><div class="three" id="patGrid"></div><div class="note" style="margin-top:8px">Wzorce to typowe kształty przebiegu przy znanych usterkach. Analizator porównuje z nimi pomiar; wynik warto potwierdzić testem oporu przy wyłączonej sieci.</div></div>
 
 <div data-p="ohm" class="hidden"><div class="panel"><div class="pt"><i>●</i>Test oporu terminacji</div><div class="psub">Pomiar rezystancji H–L przy wyłączonej sieci. Dwa terminatory 120 Ω równolegle dają 60 Ω.</div>
  <div class="kpis"><div class="tile"><span class="lbl">Zmierzony opór H–L</span><div class="v" id="oR">—</div></div><div class="tile"><span class="lbl">Wzorzec</span><div class="v">ok. 60 Ω (50–70)</div></div><div class="tile"><span class="lbl">Wniosek</span><div class="v" id="oC" style="font-size:1.1rem">—</div></div></div>
- <div class="note" style="margin:6px 0 10px">Progi (aplikacja 0.7.91): &lt; 10 Ω zwarcie · &lt; 45 Ω za mały (dodatkowy terminator) · ok. 60 Ω dobrze · ok. 120 Ω jeden rezystor · &gt; 1,2 kΩ brak terminatorów · wynik skaczący = podejrzenie zamienionych H/L.</div>
+ <div class="note" style="margin:6px 0 10px">Progi oceny: &lt; 10 Ω zwarcie · &lt; 45 Ω za mały (dodatkowy terminator) · ok. 60 Ω dobrze · ok. 120 Ω jeden rezystor · &gt; 1,2 kΩ brak terminatorów · wynik skaczący = podejrzenie zamienionych H/L.</div>
  <button class="btn gold" id="bOhm">MIERZ OPÓR (seria 4 odczytów)</button><div class="psub" id="oSer" style="margin-top:8px">Odczyty: —</div><div class="note" id="oT" style="margin-top:12px">Naciśnij MIERZ OPÓR. W symulacji pomiar wykonuje model głowicy.</div></div></div>
 
-<div data-p="verd" class="hidden"><div class="two" style="grid-template-columns:1fr 1fr"><div class="panel box" id="vbS"><div class="row" style="justify-content:space-between;flex-wrap:nowrap"><div class="lbl" style="font-size:1rem">SYGNAŁ (warstwa fizyczna)</div><div class="bt" id="vbSt">—</div></div><ul class="ev" id="vbSl" style="font-size:1.05rem"></ul></div>
- <div class="panel box" id="vbD"><div class="row" style="justify-content:space-between;flex-wrap:nowrap"><div class="lbl" style="font-size:1rem">DANE CYFROWE (ramki)</div><div class="bt" id="vbDt">—</div></div><ul class="ev" id="vbDl" style="font-size:1.05rem"></ul></div></div>
- <div class="panel box" id="vbC" style="margin-top:12px"><div class="row" style="justify-content:space-between;flex-wrap:nowrap"><div class="lbl" style="font-size:1rem">WNIOSEK</div><div class="bt" id="vbCt">—</div></div><p id="vbCx" style="margin:6px 0"></p></div>
- <div class="note" style="margin-top:8px">P = pomiar głowicy · K = licznik kontrolera CAN · W = wniosek · — = wymaga dodatkowego modułu. Wartości z SYMULACJI.</div></div>
+<div data-p="verd" class="hidden"><div class="two" style="grid-template-columns:1fr 1fr"><div class="panel box" id="vbS"><div class="row" style="justify-content:space-between;flex-wrap:nowrap"><div class="lbl" style="font-size:1rem">SYGNAŁ ELEKTRYCZNY (przewody, napięcia)</div><div class="bt" id="vbSt">—</div></div><ul class="ev" id="vbSl" style="font-size:1.05rem"></ul></div>
+ <div class="panel box" id="vbD"><div class="row" style="justify-content:space-between;flex-wrap:nowrap"><div class="lbl" style="font-size:1rem">KOMUNIKACJA (ramki danych)</div><div class="bt" id="vbDt">—</div></div><ul class="ev" id="vbDl" style="font-size:1.05rem"></ul></div></div>
+ <div class="panel box" id="vbC" style="margin-top:12px"><div class="row" style="justify-content:space-between;flex-wrap:nowrap"><div class="lbl" style="font-size:1rem">PODSUMOWANIE</div><div class="bt" id="vbCt">—</div></div><p id="vbCx" style="margin:6px 0"></p></div>
+ <div class="note" style="margin-top:8px">Oznaczenia: P – pomiar napięcia lub oporu przez głowicę · K – licznik kontrolera CAN (ramki, błędy) · W – wartość wyliczona · — – wymaga dodatkowego modułu. Wartości pochodzą z symulacji.</div></div>
 
-<div data-p="fr" class="hidden"><div class="panel"><div class="pt"><i>●</i>Ramki</div><div class="psub">tablica ID liczona na bieżąco · dane zmienione podświetlone</div><table><thead><tr><th>ID</th><th>Węzeł</th><th>Hz</th><th>okres min…max</th><th>jitter</th><th>DANE</th></tr></thead><tbody id="frT"></tbody></table></div></div>
-<div data-p="bits" class="hidden"><div class="two"><div class="panel"><div class="row" id="bmIds" style="margin-bottom:8px"></div><div class="note" id="bmRap" style="margin:0 0 8px;color:var(--text);font-size:.95rem"></div><div class="row" style="margin-bottom:8px"><button class="btn gold" id="bTrc">ZAPIS .trc (PCAN Trace 1.1)</button></div><div class="pt" style="font-size:1.1rem;color:var(--gold)" id="bmH"></div><div class="psub">% = jak często bit zmienia się; – = stały</div><div class="bm" id="bmG"></div><div class="psub" style="margin-top:8px" id="bmC"></div></div>
+<div data-p="fr" class="hidden"><div class="panel"><div class="pt"><i>●</i>Ramki</div><div class="psub">tablica ID liczona na bieżąco · dane zmienione podświetlone · czerwony wiersz = ramki błędu zgłoszone przez kontroler</div><div class="row" style="margin:8px 0"><button class="btn red" id="bRst">WYZERUJ LISTĘ I KONTROLER</button><span class="psub" style="margin:0">Użyj po naprawie, aby sprawdzić, czy błędy wracają.</span></div><table><thead><tr><th>ID</th><th>Węzeł</th><th>Licznik</th><th>Hz</th><th>okres min…maks. [ms]</th><th>odstęp ostatni [ms]</th><th>jitter [ms]</th><th>DANE (bajty)</th></tr></thead><tbody id="frT"></tbody></table></div></div>
+<div data-p="bits" class="hidden"><div class="two"><div class="panel"><div class="row" id="bmIds" style="margin-bottom:8px"></div><div class="note" id="bmRap" style="margin:0 0 8px;color:var(--text);font-size:.95rem"></div><div class="row" style="margin-bottom:8px"><button class="btn gold" id="bTrc">ZAPIS .trc (format śladu CAN)</button></div><div class="pt" style="font-size:1.1rem;color:var(--gold)" id="bmH"></div><div class="psub">% = jak często bit zmienia się; – = stały</div><div class="bm" id="bmG"></div><div class="psub" style="margin-top:8px" id="bmC"></div></div>
  <div><div class="panel" style="margin-bottom:10px"><div class="pt" style="font-size:1.1rem;color:var(--muted)">ROZPOZNANIE (pola)</div><div id="bmF" style="margin-top:8px"></div></div><div class="panel"><div class="pt" style="font-size:1.1rem;color:var(--muted)">KORELACJA</div><div id="bmK" style="margin-top:6px"></div></div></div></div></div>
-<div data-p="sig" class="hidden"><div class="panel"><div class="pt"><i>●</i>Sygnały (DBC demonstracyjny, wymyślone ID)</div><div class="three" id="sgG" style="margin-top:10px"></div><div class="note" style="margin-top:10px">Uczenie: hipotezy do weryfikacji. Poprawna komunikacja nie oznacza poprawnych wartości sygnałów.</div></div></div>
+<div data-p="sig" class="hidden"><div class="panel"><div class="pt"><i>●</i>Sygnały (opis DBC pokazowy, wymyślone identyfikatory)</div><div class="three" id="sgG" style="margin-top:10px"></div><div class="note" style="margin-top:10px">Uczenie: hipotezy do weryfikacji. Poprawna komunikacja nie oznacza poprawnych wartości sygnałów.</div></div></div>
 <div data-p="nodes" class="hidden"><div class="panel"><div class="pt"><i>●</i>Węzły</div><table><thead><tr><th>Węzeł</th><th>ID</th><th>Okres</th><th>Stan</th><th>ACK</th></tr></thead><tbody id="ndT"></tbody></table></div></div>
 <div data-p="evt" class="hidden"><div class="two" style="grid-template-columns:1fr">
  <div class="panel"><div class="pt"><i>●</i>Obciążenie magistrali i błędy</div><div class="psub">Słupki = średnia z sekundy, linia = maksimum. Skala dobiera się sama (min. 10 %), 100 % to pełna magistrala. Dolny wykres: błędy na sekundę.</div>
   <div class="r" style="display:flex;justify-content:space-between"><span>Teraz</span><b id="ldNow">—</b></div><div class="r" style="display:flex;justify-content:space-between"><span>Maksimum w oknie</span><b id="ldMax">—</b></div><div class="r" style="display:flex;justify-content:space-between"><span>Błędy / s (teraz, maks.)</span><b id="ldErr">—</b></div>
   <div class="cwrap" style="margin-top:8px"><canvas id="cLoad" aria-label="Obciążenie magistrali: średnia i maksimum, błędy na sekundę"></canvas></div></div><div class="panel"><div class="pt"><i>●</i>Zdarzenia</div><ul class="ev" id="evL"></ul></div></div></div>
 
-<div class="about"><section class="panel about"><h2>Cel projektu</h2><p>Jednoznacznie odpowiedzieć na pytanie „czy magistrala CAN jest w porządku, a jeśli nie, to dlaczego”. Analizator rozdziela warstwę fizyczną (A: poziomy, zbocza, oko, zakłócenia, opór terminacji) od warstwy danych (B: ramki, bity, sygnały, węzły), bo od tego zależy, gdzie szukać usterki. Werdykt OK / UWAGA / BŁĄD jest zawsze na górze.</p></section>
-<section class="panel about"><h2>Co tu widzisz</h2><ul><li>Ten sam układ co w aplikacji EKOTRONIK (makiety v2.1–v2.3): zakładki A i B, kursory A–B na oscylogramie, oko z maską, wzorce usterek z podobieństwem, werdykt z oznaczeniami P / K / W.</li><li>Scenariusze to te same przypadki co emulator magistrali w aplikacji: jazda, uśpienie i wybudzenie, zakłócenia, 250 kb/s, stół bez drugiego terminatora, brak ACK, zwarcie H–L, cisza (oraz trzy wzorce z makiety). Dodane scenariusze: za dużo terminatorów oraz zamienione H/L (skaczący opór).</li><li>Aktualizacja zgodna z aplikacją 0.7.91: progi oceny terminacji, wykres obciążenia (średnia i maks.) z błędami na sekundę, raport ramki z zapisem .trc i stan wykrywania prędkości (SZUKAM / WYKRYTA / RĘCZNA / NIE USTALONA). To symulacja: sprzęt, tablet i plik .trc w PCAN-Explorer nie były sprawdzane.</li></ul>
-<p class="note">To SYMULACJA. Przebiegi i ramki generuje model, nie magistrala pojazdu. Oscylogram w prawdziwym urządzeniu wymaga opcji szybkiego pomiaru, która nie została jeszcze sprawdzona na sprzęcie. Wymyślone ID i DBC demonstracyjne.</p></section></div>
+<div class="about"><section class="panel about"><h2>Cel projektu</h2><p>Jednoznacznie odpowiedzieć na pytanie „czy magistrala CAN jest w porządku, a jeśli nie, to dlaczego”. Analizator rozdziela sygnał elektryczny (A: napięcia, zbocza, jakość bitów, zakłócenia, opór terminatorów) od komunikacji (B: ramki, bity, sygnały, węzły), bo od tego zależy, gdzie szukać usterki. Ocena OK / UWAGA / BŁĄD z krótką przyczyną jest zawsze na górze ekranu.</p></section>
+<section class="panel about"><h2>Co tu widzisz</h2><ul><li><b>Wybór sytuacji.</b> Z listy u góry wybierasz scenariusz: sprawna magistrala, zakłócenia, brak terminatora, zwarcie CAN-H z CAN-L, cisza i inne. Scenariusz „Własny” ma suwaki do samodzielnego zaburzania sygnału.</li><li><b>Grupa A – sygnał elektryczny.</b> Oscylogram CAN-H i CAN-L z kursorami A–B (przeciągnij je palcem, STOP zatrzymuje przebieg; przebieg można zapisać do CSV, zrzutu PNG i raportu tekstowego), zbocze narastające, jakość bitów (nałożone na siebie bity: im szerszy i czystszy prześwit, tym lepszy sygnał), zakłócenia, wykres napięć CAN-H i CAN-L z ostatnich 60 sekund (wyłapuje rzadkie zaniki i spadki), wzorce typowych usterek, test oporu terminacji oraz ocena stanu.</li><li><b>Grupa B – komunikacja.</b> Lista ramek z licznikiem i odstępem między ramkami (przycisk WYZERUJ czyści listę i kontroler po naprawie), mapa bitów z rozpoznaniem pól (licznik, sygnał, suma kontrolna) i zapisem .trc (format śladu CAN, z zapisem zmian stanu kontrolera), sygnały, węzły, obciążenie magistrali i błędy oraz dziennik zdarzeń.</li><li><b>Jak czytać wynik.</b> Znaczniki P, K, W przy każdej wartości pokazują jej źródło: pomiar głowicy, licznik kontrolera CAN albo wartość wyliczona. Prędkość magistrali jest rozpoznawana automatycznie (AUTO) lub ustawiana ręcznie.</li></ul>
+<p class="note">To SYMULACJA. Przebiegi i ramki generuje model, nie magistrala pojazdu; identyfikatory i opis sygnałów są wymyślone, tylko do pokazu. Pomiar na prawdziwej magistrali wymaga szybkiego pomiaru napięcia, a głowica EKO i analizator nie były jeszcze sprawdzane na sprzęcie ani w pojeździe.</p></section></div>
 </div>
 <script src="lab.js"></script>
 <script>
 (function(){
 LAB.header({icon:'can',sym:'ANALIZATOR CAN',symd:'CAN-H / CAN-L · EKO-CAN',title:'Analizator CAN (EKO-CAN)'});
 /* ---------- scenariusze ---------- */
+const f2=x=>{let r=Math.round(x*100)/100;if(r===0)r=0;return r.toFixed(2).replace('.',',')};
 const BASE={br:500,a:1.0,tau:.06,ring:0,noise:.012,spikes:0,j:.8,R:60,Hf:null,Lf:null};
 const mk=o=>Object.assign({},BASE,o);
 const SC=[
@@ -93,29 +107,37 @@ const SC=[
  {id:'zakl',n:'Zakłócenia (seria błędów)',d:'seria zakłóceń: błędy, rośnie REC, sygnał z impulsami',p:mk({noise:.05,spikes:1,j:3.5}),dat:{act:'on',err:'burst'}},
  {id:'pred250',n:'Magistrala 250 kb/s',d:'auto-prędkość znajduje 250 kb/s; ręczne 500 dawałoby same błędy',p:mk({br:250}),dat:{act:'on',err:0}},
  {id:'term',n:'Stół: brak drugiego terminatora',d:'tylko jeden rezystor 120 Ω: dzwonienie, błędy sporadyczne',p:mk({ring:.7,R:120,j:2.2,a:1.05}),dat:{act:'on',err:'low'}},
- {id:'term3',n:'Stół: za dużo terminatorów (3 × 120 Ω)',d:'dodatkowy rezystor: opór ok. 40 Ω, poniżej progu 45 Ω (nowe w 0.7.91)',p:mk({R:40,a:.9}),dat:{act:'on',err:'low'}},
- {id:'hlzam',n:'Zamienione CAN-H / CAN-L lub luźny styk',d:'kolejne odczyty oporu skaczą (rozrzut > 20 %): podejrzenie zamiany linii H/L albo luźnego styku (nowe w 0.7.91)',p:mk({R:60,Rj:38,j:2.5}),dat:{act:'on',err:'low'}},
- {id:'sam',n:'Sam na magistrali (brak ACK)',d:'jedyny węzeł: TEC rośnie do 128 i stoi (error passive), bez bus-off',p:mk({}),dat:{act:'on',err:0,noack:true}},
- {id:'zwarcie',n:'Zwarcie CAN-H z CAN-L',d:'bus-off, brak różnicy sygnałów, opór ≈ 0 Ω',p:mk({a:0,R:2,noise:.008}),dat:{act:'off',err:'bus'}},
+ {id:'term3',n:'Stół: za dużo terminatorów (3 × 120 Ω)',d:'dodatkowy rezystor: obniżone napięcie H–L, a TEST OPORU pokazuje ok. 40 Ω (poniżej progu 45 Ω)',p:mk({R:40,a:.9}),dat:{act:'on',err:'low'}},
+ {id:'hlzam',n:'Zamienione CAN-H / CAN-L lub luźny styk',d:'sygnał wygląda poprawnie, błędy sporadyczne; dopiero TEST OPORU pokazuje skaczące odczyty (rozrzut > 20 %): podejrzenie zamiany linii H/L albo luźnego styku',p:mk({R:60,Rj:38,j:2.5}),dat:{act:'on',err:'low'}},
+ {id:'sam',n:'Sam na magistrali (brak ACK)',d:'jedyny węzeł: licznik błędów nadawania (TEC) rośnie do 128 i stoi (tryb pasywny), bez odcięcia od magistrali (bus-off)',p:mk({}),dat:{act:'on',err:0,noack:true}},
+ {id:'zwarcie',n:'Zwarcie CAN-H z CAN-L',d:'odcięcie od magistrali (bus-off), brak różnicy sygnałów, opór ≈ 0 Ω',p:mk({a:0,R:2,noise:.008}),dat:{act:'off',err:'bus'}},
  {id:'cisza',n:'Cisza: auto uśpione lub przewód odłączony',d:'brak ramek; nie rozstrzyga przyczyny',p:mk({a:0,noise:.008}),dat:{act:'off',err:0}},
- {id:'lgnd',n:'CAN-L zwarte do masy (wzorzec)',d:'CAN-L stale 0 V, słaba amplituda',p:mk({Lf:0.02,aH:.4,R:60}),dat:{act:'off',err:'bus'}},
+ {id:'lgnd',n:'CAN-L zwarte do masy (wzorzec)',d:'CAN-L stoi na ok. 0 V, CAN-H prawie się nie zmienia: różnica wygląda jak stały bit 0, magistrala nie przenosi danych',p:mk({Lf:0.02,aH:.4,R:60}),dat:{act:'off',err:'bus'}},
  {id:'h12',n:'H/L do +12 V (wzorzec)',d:'napięcie wspólne > 4 V, ograniczone',p:mk({Hf:5.0,Lh:3.2,Ld:4.2,R:60}),dat:{act:'off',err:'bus'}},
- {id:'xcvr',n:'Uszkodzony transceiver (wzorzec)',d:'niska amplituda dominująca, wolne krawędzie',p:mk({a:.5,tau:.24,j:4}),dat:{act:'on',err:'low'}}
+ {id:'xcvr',n:'Uszkodzony transceiver (wzorzec)',d:'niskie napięcie H–L, wolne zbocza',p:mk({a:.5,tau:.24,j:4}),dat:{act:'on',err:'low'}}
 ];
 let sc=SC[0],R_known=null,frozen=false,mode=0,tabG='A',curA=.3,curB=.65,autoCur=true,clock=0,saveN=0;
 const CUS={id:'wlasny',n:'★ Własny – suwaki na żywo',d:'Ustawiasz sam: amplitudę, szum, dzwonienie, jitter i opór terminacji. Wskaźnik pokazuje, jak daleko jesteś od progu UWAGA. Suwaki pod przyciskiem SUWAKI, także na ekranie pomiaru.',p:mk({}),dat:{act:'on',err:0}};
 const SCU=SC.concat([CUS]);
 const FF=()=>{try{return F}catch(e){return null}};
-const LV=LAB.live({title:'CAN – scenariusz własny',sub:'Zmiany od razu widać na oscylogramie, oku i w werdykcie. Opór wpływa na wynik po naciśnięciu MIERZ OPÓR.',
+const LV=LAB.live({title:'CAN – scenariusz własny',sub:'Zmiany od razu widać na oscylogramie, w jakości bitów i w ocenie stanu. Opór wpływa na wynik po naciśnięciu MIERZ OPÓR.',
  defs:[
-  {id:'a',label:'Amplituda sygnału',min:.3,max:1.2,step:.05,val:1,unit:'×',dec:2,hint:v=>'dominant '+(FF()?LAB.f1(FF().dom,2):'—')+' V · norma 1,5–3,0 V'},
+  {id:'a',label:'Amplituda sygnału',min:.3,max:1.2,step:.05,val:1,unit:'×',dec:2,hint:v=>'napięcie H–L (bit 0) '+(FF()?LAB.f1(FF().dom,2):'—')+' V · norma 1,5–3,0 V'},
   {id:'noise',label:'Szum na magistrali',min:5,max:120,step:1,val:12,unit:'mV',dec:0,hint:v=>v>50?'powyżej progu UWAGA (50 mV)':'zapas do progu UWAGA 50 mV: '+Math.round(50-v)+' mV'},
-  {id:'ring',label:'Dzwonienie zboczy',min:0,max:1,step:.05,val:0,dec:2,hint:v=>'dzwonienie '+(FF()?Math.round(FF().ring):'—')+' mV · próg UWAGA 150 mV'},
-  {id:'j',label:'Jitter krawędzi',min:.5,max:8,step:.1,val:.8,unit:'%',hint:v=>v>=5?'powyżej normy (5 %)':'norma poniżej 5 %, zapas '+LAB.f1(5-v)+' %'},
+  {id:'ring',label:'Drgania po zboczu (dzwonienie)',min:0,max:1,step:.05,val:0,dec:2,hint:v=>'drgania '+(FF()?Math.round(FF().ring):'—')+' mV · próg UWAGA 150 mV'},
+  {id:'j',label:'Drgania czasu zbocza (jitter)',min:.5,max:8,step:.1,val:.8,unit:'%',hint:v=>v>=5?'powyżej normy (5 %)':'norma poniżej 5 %, zapas '+LAB.f1(5-v)+' %'},
   {id:'R',label:'Opór H–L (test oporu)',min:5,max:160,step:1,val:60,unit:'Ω',dec:0,hint:v=>oporOcena(v)[1]}],
  presets:[{n:'Sprawna',v:{a:1,noise:12,ring:0,j:.8,R:60}},{n:'Tuż przy progu szumu',v:{noise:48}},{n:'Tuż przy dzwonieniu',v:{ring:.35}},{n:'Brak terminatora',v:{R:120,ring:.7}}],
  onChange:(v,fin)=>{if(sc!==CUS)return;Object.assign(CUS.p,{a:v.a,noise:v.noise/1000,ring:v.ring,R:v.R,j:v.j});regen(1);edge();if(R_known!==null){R_known=CUS.p.R;R_ser=[R_known];LAB.set('oR',Math.round(R_known)+' Ω')}if(fin)buildEye();updateVerdict();redraw()}});
 const sel=document.getElementById('scn');sel.innerHTML=SCU.map((s,i)=>'<option value="'+i+'">'+(i+1)+'. '+s.n+'</option>').join('');
+const ddb=document.getElementById('ddb'),ddl=document.getElementById('ddl'),ddt=document.getElementById('ddt');
+ddl.innerHTML=SCU.map((s,i)=>'<button type="button" class="ddo" role="option" data-i="'+i+'">'+(i+1)+'. '+s.n+'</button>').join('');
+function ddOpen(o){ddl.classList.toggle('hidden',!o);ddb.setAttribute('aria-expanded',o?'true':'false');if(o){const a=ddl.querySelector('.on');if(a)a.scrollIntoView({block:'nearest'})}}
+ddb.addEventListener('click',e=>{e.stopPropagation();ddOpen(ddl.classList.contains('hidden'))});
+ddl.addEventListener('click',e=>{const b=e.target.closest('.ddo');if(!b)return;ddOpen(false);setScn(+b.dataset.i);ddb.focus()});
+document.addEventListener('click',e=>{if(!e.target.closest('#dd'))ddOpen(false)});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){ddOpen(false)}});
+function ddSync(i){ddt.textContent=(i+1)+'. '+SCU[i].n;ddl.querySelectorAll('.ddo').forEach((b,k)=>{const on=k===i;b.classList.toggle('on',on);b.setAttribute('aria-selected',on?'true':'false')})}
 /* ---------- generator sygnału ---------- */
 const SPB=64,NB=24;
 function trace(p,seed,nb,idle){
@@ -147,8 +169,9 @@ function features(p,tr){
  return {dom,rec,hd:dn?hd/dn:2.5,ld:dn?ld/dn:2.5,lr:rn?lr/rn:2.5,cm:dn?cm/dn:2.5,noise,over:Math.max(0,mx-dom),under:Math.max(0,rec-mn),riseNs:p.tau*2.2*(1e3/p.br*2/ (p.br===250?1:1))*0.5*(500/p.br)*.5*2,ring:Math.max(0,mx-dom)*1000};
 }
 let tr,F;
-function regen(seed){tr=trace(sc.p,seed,NB,sc.p.a===0&&sc.p.aH===undefined&&sc.p.Hf==null&&sc.p.Lf==null);F=features(sc.p,tr)}
-/* ---------- ocena oporu terminacji (progi aplikacji 0.7.91, wg wskazówek PCAN) ---------- */
+function regen(seed){tr=trace(sc.p,seed,NB,(sc.p.a===0&&sc.p.aH===undefined&&sc.p.Hf==null&&sc.p.Lf==null)||sleepIdle());F=features(sc.p,tr)}
+function sleepIdle(){return sc.dat.act==='sleep'&&typeof activity==='function'&&!activity()}
+/* ---------- ocena oporu terminacji ---------- */
 let R_ser=[];
 function oporOcena(o){
  if(o<10)return['fail','zwarcie CAN-H z CAN-L (< 10 Ω)'];
@@ -164,23 +187,25 @@ function oporSeria(){if(!R_ser.length)return null;if(oporSkacze(R_ser))return['w
 /* ---------- klasyfikacja i werdykt ---------- */
 function sigClass(){
  const p=sc.p,f=F,fl=[];
+ if(sleepIdle())return{l:'ok',t:'OK: SIEĆ UŚPIONA, SYGNAŁ W SPOCZYNKU',c:'Obie linie na ok. 2,5 V, brak ruchu: to prawidłowy stan uśpionej sieci. Obudzi ją ramka zapłonu.',id:'sen'};
  const flat=Math.abs(f.dom)<.3&&Math.abs(f.hd-2.5)<.2;
  if(f.ld<.5&&!flat)return{l:'fail',t:'BŁĄD: CAN-L ZWARTY DO MASY',c:'CAN-L stoi stale na ok. 0 V przy słabej amplitudzie. Sprawdź przewód CAN-L i jego izolację.',id:'lgnd'};
  if(f.hd>4.5)return{l:'fail',t:'BŁĄD: NAPIĘCIE WSPÓLNE POWYŻEJ 4 V',c:'Linia H stoi na ok. 5 V, L przy 3–4 V. Podejrzewaj zwarcie do plusa zasilania na jednej z linii.',id:'h12'};
  if(flat){
   if(R_known===null)return{l:'warn',t:'UWAGA: BRAK RÓŻNICY SYGNAŁÓW',c:'H i L na ok. 2,5 V, brak aktywności. To cisza albo zwarcie H–L. Wykonaj TEST OPORU: 0 Ω = zwarcie, 60 Ω = magistrala cicha.',id:'flat'};
   if(R_known<10)return{l:'fail',t:'BŁĄD: ZWARCIE CAN-H Z CAN-L',c:'Opór H–L ≈ '+Math.round(R_known)+' Ω, brak różnicy sygnałów. Szukaj zwarcia w wiązce (odłącz węzły po kolei).',id:'zw'};
-  return{l:'warn',t:'CISZA: AUTO UŚPIONE LUB PRZEWÓD ODŁĄCZONY',c:'Poziomy recesywne, opór 60 Ω prawidłowy. Nie rozstrzygam przyczyny ciszy (uśpienie sieci, brak zasilania węzłów, przerwa).',id:'cisza'};}
- if(f.dom<1.2&&sc.p.tau>.15)return{l:'warn',t:'UWAGA: NISKA AMPLITUDA, WOLNE KRAWĘDZIE',c:'Amplituda dominująca '+f.dom.toFixed(2).replace('.',',')+' V (norma 1,5–3,0 V) i wolne zbocza: podejrzewaj uszkodzony transceiver w jednym z węzłów.',id:'xcvr'};
+  return{l:'warn',t:'CISZA: AUTO UŚPIONE LUB PRZEWÓD ODŁĄCZONY',c:'Napięcia spoczynkowe prawidłowe, opór 60 Ω prawidłowy. Nie rozstrzygam przyczyny ciszy (uśpienie sieci, brak zasilania węzłów, przerwa).',id:'cisza'};}
+ if(f.dom<1.2&&sc.p.tau>.15)return{l:'warn',t:'UWAGA: NISKA AMPLITUDA, WOLNE KRAWĘDZIE',c:'Napięcie między H i L '+f2(f.dom)+' V (norma 1,5–3,0 V) i wolne zbocza: podejrzewaj uszkodzony transceiver w jednym z węzłów.',id:'xcvr'};
+ if(R_known===null&&f.dom>=1.2&&f.dom<1.9&&f.ring<=150&&sc.p.tau<=.15)return{l:'warn',t:'UWAGA: OBNIŻONE NAPIĘCIE H–L',c:'Napięcie między H i L '+f2(f.dom)+' V przy bicie 0 (norma 1,5–3,0 V, typowo 2 V). Magistrala jest zbyt obciążona: możliwy dodatkowy terminator lub zwarty węzeł. Wykonaj TEST OPORU przy wyłączonej sieci.',id:'term3'};
  if(oporSkacze(R_ser))return{l:'warn',t:'UWAGA: WYNIK OPORU SKACZE',c:'Odczyty '+Math.round(Math.min(...R_ser))+'–'+Math.round(Math.max(...R_ser))+' Ω (rozrzut > 20 % średniej). Podejrzenie zamienionych CAN-H / CAN-L albo luźnego styku; sprawdź złącze i kolejność przewodów.',id:'skok'};
  if(R_known!==null&&R_known>=10&&R_known<45)return{l:'fail',t:'BŁĄD: ZA MAŁY OPÓR TERMINACJI',c:'Opór H–L ≈ '+Math.round(R_known)+' Ω (poniżej 45 Ω). Dodatkowy terminator na stole lub zwarty węzeł; zasilanie wyłączone, sprawdź rezystory 120 Ω.',id:'term'};
  if(R_known!==null&&R_known>=1200)return{l:'fail',t:'BŁĄD: BRAK TERMINATORÓW',c:'Opór H–L > 1,2 kΩ: brak obu rezystorów 120 Ω albo przerwa w wiązce.',id:'term'};
  if(R_known!==null&&R_known>=140&&R_known<1200)return{l:'warn',t:'UWAGA: OPÓR NIETYPOWO DUŻY',c:'Opór H–L ≈ '+Math.round(R_known)+' Ω (140 Ω – 1,2 kΩ): przerwa lub słaby terminator.',id:'term'};
  if(R_known!==null&&R_known>100)return{l:'warn',t:'UWAGA: BRAK JEDNEGO TERMINATORA',c:'Opór H–L ≈ '+Math.round(R_known)+' Ω zamiast 60 Ω, dzwonienie '+Math.round(f.ring)+' mV. Sprawdź rezystor 120 Ω na końcach magistrali (zasilanie wyłączone).',id:'term'};
- if(f.ring>150&&R_known===null)return{l:'warn',t:'UWAGA: DZWONIENIE ZBOCZY',c:'Dzwonienie '+Math.round(f.ring)+' mV sugeruje brak terminatora. Potwierdź TESTEM OPORU (powinno być 60 Ω).',id:'term'};
- if(f.ring>150)return{l:'warn',t:'UWAGA: DZWONIENIE ZBOCZY',c:'Dzwonienie '+Math.round(f.ring)+' mV przy prawidłowym oporze: sprawdź długość odgałęzień i jakość połączeń.',id:'term'};
+ if(f.ring>150&&R_known===null)return{l:'warn',t:'UWAGA: DRGANIA PO ZBOCZU (DZWONIENIE)',c:'Dzwonienie '+Math.round(f.ring)+' mV sugeruje brak terminatora. Potwierdź TESTEM OPORU (powinno być 60 Ω).',id:'term'};
+ if(f.ring>150)return{l:'warn',t:'UWAGA: DRGANIA PO ZBOCZU (DZWONIENIE)',c:'Dzwonienie '+Math.round(f.ring)+' mV przy prawidłowym oporze: sprawdź długość odgałęzień i jakość połączeń.',id:'term'};
  if(f.noise>.05||sc.p.spikes)return{l:'warn',t:'UWAGA: ZAKŁÓCENIA NA MAGISTRALI',c:'Szum '+Math.round(f.noise*1000)+' mV RMS i impulsy. Sprawdź ekranowanie, masy i sąsiedztwo wiązki zapłonu lub zasilania.',id:'noise'};
- return{l:'ok',t:'OK: SYGNAŁ PRAWIDŁOWY',c:'Dominant '+f.dom.toFixed(2).replace('.',',')+' V, recesywny '+f.rec.toFixed(2).replace('.',',')+' V, symetria prawidłowa, szum '+Math.round(f.noise*1000)+' mV.',id:'ok'};
+ return{l:'ok',t:'OK: SYGNAŁ PRAWIDŁOWY',c:'Napięcie między CAN-H i CAN-L: '+f2(f.dom)+' V przy bicie 0 (norma 1,5–3,0 V) i '+f2(f.rec)+' V przy bicie 1 (norma ok. 0 V). Symetria prawidłowa, szum '+Math.round(f.noise*1000)+' mV.',id:'ok'};
 }
 /* ---------- symulacja danych (B) ---------- */
 const IDS=[
@@ -217,7 +242,7 @@ function stepData(dt){
  if(!D.det&&!spdMan&&s.act!=='off'&&detected()){D.det=true;logEv('prędkość wykryta: '+sc.p.br+' kb/s (min. 3 poprawne ramki, bez ACK)','ok')}
  // błędy i liczniki
  let eps=0;
- if(s.err==='burst'){const k=clock%20;eps=(k>8&&k<9.2)?60:0}else if(s.err==='low'){eps=act?.6:0}else if(s.err==='bus'){eps=60}
+ if(s.err==='burst'){const k=clock%20;eps=(k>8&&k<9.2)?60:0;const nb=eps>0;if(nb&&!D.inBurst)logEv('seria błędów: ok. 60 ramek błędu na sekundę, rośnie REC','fail');if(!nb&&D.inBurst)logEv('koniec serii błędów','ok');D.inBurst=nb}else if(s.err==='low'){eps=act?.6:0}else if(s.err==='bus'){eps=60}
  if(s.noack&&act){D.tec=Math.min(128,D.tec+dt*8*3);eps=0;D.errs+=0}
  if(eps>0){D.errs+=eps*dt;if(s.err==='bus')D.tec=Math.min(256,D.tec+8*eps*dt);else if(s.err==='burst'){D.rec=Math.min(120,D.rec+eps*dt*.5)}else{D.rec=Math.min(60,D.rec+eps*dt*.5)}}
  else if(!s.noack){D.tec=Math.max(0,D.tec-dt*2);D.rec=Math.max(0,D.rec-dt*1.5)}
@@ -233,11 +258,11 @@ function datClass(){
  if(!spdMan&&spState()==='SZUKAM')return{l:'warn',t:'SZUKAM PRĘDKOŚCI',c:'Głowica sprawdza 500, 250, 125 i 1000 kb/s wyłącznie w trybie słuchania: nie nadaje, nie potwierdza ramek (brak ACK) i nie zakłóca magistrali.',k:['Stan prędkości: SZUKAM','Brak ACK podczas szukania','Błędy 0']};
  if(spdMan&&spdMan!==sc.p.br)return{l:'warn',t:'UWAGA: PRĘDKOŚĆ RĘCZNA NIEZGODNA',c:'Ustawiono ręcznie '+spdMan+' kb/s, a magistrala pracuje inaczej: brak poprawnych ramek. Wróć do AUTO.',k:['Stan prędkości: RĘCZNA '+spdMan+' kb/s','Brak poprawnych ramek','Wróć do trybu AUTO']};
  const nIds=IDS.filter(x=>x.hz).length;
- if(D.state==='BUS-OFF')return{l:'fail',t:'BŁĄD: BUS-OFF',c:'Kontroler odłączył się od magistrali (TEC > 255). Przyczyna fizyczna: zwarcie lub brak różnicy sygnałów.',k:['BUS-OFF: TEC '+Math.round(D.tec)+' / REC '+Math.round(D.rec),'Brak poprawnych ramek','Błędy magistrali: ciągłe']};
+ if(D.state==='BUS-OFF')return{l:'fail',t:'BŁĄD: BUS-OFF',c:'Kontroler odłączył się od magistrali (bus-off, licznik błędów TEC > 255). Przyczyna fizyczna: zwarcie lub brak różnicy sygnałów.',k:['BUS-OFF: TEC '+Math.round(D.tec)+' / REC '+Math.round(D.rec),'Brak poprawnych ramek','Błędy magistrali: ciągłe']};
  if(!act&&s.act==='sleep')return{l:'warn',t:'SIEĆ UŚPIONA',c:'Ruch ustał (uśpienie sieci). Wybudzi się ramką zapłonu.',k:['Brak ramek (cisza)','Błędy 0','Stan: '+D.state]};
  if(!act)return{l:'warn',t:'BRAK RAMEK',c:'Brak ruchu na magistrali. '+(!spdMan&&spState()==='NIE USTALONA'?'Prędkość NIE USTALONA: brak poprawnych ramek (sieć uśpiona, zła terminacja lub nietypowa prędkość); głowica nic nie nadawała, ustaw prędkość ręcznie. ':'')+'Nie rozstrzygam przyczyny (auto uśpione, przewód odłączony, brak zasilania węzłów).',k:['0 ramek / s','Błędy 0','Stan: '+D.state]};
  const rate=D.errs>0?D.errs/Math.max(1,clock):0;
- if(s.noack)return{l:'warn',t:'UWAGA: BRAK ACK',c:'Nikt nie potwierdza ramek: jedyny węzeł na magistrali. TEC rośnie do 128 i stoi (error passive), bus-off nie wystąpi.',k:[nIds+' ID nadaje, brak potwierdzeń (ACK)','TEC / REC = '+Math.round(D.tec)+' / '+Math.round(D.rec),'Stan: '+D.state]};
+ if(s.noack)return{l:'warn',t:'UWAGA: BRAK ACK',c:'Nikt nie potwierdza ramek: jedyny węzeł na magistrali. licznik błędów nadawania (TEC) rośnie do 128 i stoi (tryb pasywny), odcięcie od magistrali (bus-off) nie wystąpi.',k:[nIds+' ID nadaje, brak potwierdzeń (ACK)','TEC / REC = '+Math.round(D.tec)+' / '+Math.round(D.rec),'Stan: '+D.state]};
  if(s.err==='burst'&&(clock%20>8&&clock%20<9.5))return{l:'fail',t:'BŁĄD: SERIA BŁĘDÓW',c:'Seria ramek błędów podczas zakłóceń.',k:['Błędy magistrali: '+Math.round(60)+' / s w serii','TEC / REC = '+Math.round(D.tec)+' / '+Math.round(D.rec)]};
  if(s.err==='burst'||s.err==='low')return{l:'warn',t:'UWAGA: POJEDYNCZE BŁĘDY',c:'Błędy magistrali: '+D.errs.toFixed(0)+' od startu. Powtarzają się, więc to nie jest przypadek.',k:[nIds+' ID nadaje, okresy w tolerancji','Błędy magistrali: '+D.errs.toFixed(0)+' (REC '+Math.round(D.rec)+')','ACK działa, obciążenie '+D.load.toFixed(0)+' %']};
  return{l:'ok',t:'OK: KOMUNIKACJA PRAWIDŁOWA',c:'Wszystkie '+nIds+' ID nadają, okresy i jitter w tolerancji, 0 błędów.',k:['Wszystkie '+nIds+' ID nadają, okresy w normie','Błędy magistrali 0 / s, bus-off 0','ACK działa, obciążenie '+D.load.toFixed(0)+' %, '+sc.p.br+' kb/s ustalone automatycznie']};
@@ -255,16 +280,33 @@ function updateVerdict(){
  const tag=(t,x)=>'<li><span class="mono" style="border:1px solid #6b7a90;border-radius:5px;padding:0 6px;margin-right:8px;font-size:.85rem">'+t+'</span>'+x+'</li>';
  const f=F;LAB.html('vbSl',[
   tag('P','Terminacja '+(R_known===null?'— (wymaga testu oporu)':Math.round(R_known)+' Ω: '+(oporSeria()||oporOcena(R_known))[1])),
-  tag('P','Poziomy recesywne '+f.lr.toFixed(2).replace('.',',')+' V'+(Math.abs(f.lr-2.5)<.2?': OK':'')),
-  tag('P','Amplituda dominująca '+f.dom.toFixed(2).replace('.',',')+' V (norma 1,5–3,0 V)'),
-  tag('P','Szum '+Math.round(f.noise*1000)+' mV RMS, jitter krawędzi '+sc.p.j.toFixed(1).replace('.',',')+' % (norma < 5 %)')].join(''));
+  tag('P','Napięcie spoczynkowe linii '+f.lr.toFixed(2).replace('.',',')+' V (norma ok. 2,5 V)'+(Math.abs(f.lr-2.5)<.2?': OK':'')),
+  tag('P','Napięcie między H i L przy bicie 0: '+f2(f.dom)+' V (norma 1,5–3,0 V)'),
+  tag('P','Szum '+Math.round(f.noise*1000)+' mV RMS, drgania czasu zbocza (jitter) '+sc.p.j.toFixed(1).replace('.',',')+' % (norma < 5 %)')].join(''));
  LAB.html('vbDl',d.k.map(x=>tag('K',x)).join(''));
  LAB.set('vbCt',(s.l==='ok'&&d.l==='ok')?'OK: magistrala sprawna':RANK[s.l]>=RANK[d.l]?s.t:d.t);
- LAB.set('vbCx',(RANK[s.l]>=RANK[d.l]?s.c:d.c)+' To wskazanie przyczyny najbardziej prawdopodobnej, nie wyrok.');
- LAB.html('status','<b class="ok">● SŁUCHAM</b><span class="pill" style="padding:0 8px"><b>SYMULACJA</b></span><button class="btn" id="bSpd" style="padding:2px 10px;min-height:0" title="AUTO → 500 → 250 → 125 → AUTO">PRĘDKOŚĆ: '+(spdMan?'RĘCZNA':'AUTO')+'</button><span class="pill" style="padding:0 8px"><b class="'+({'WYKRYTA':'ok','RĘCZNA':'ok','SZUKAM':'warn','NIE USTALONA':'fail'}[spState()])+'">'+spState()+'</b></span><span>'+(spState()==='SZUKAM'||spState()==='NIE USTALONA'?'— kb/s':sc.p.br+' kb/s')+'</span><span>'+D.load.toFixed(0)+' %</span><span>'+Math.round(D.fps)+' fr/s</span><span>ID '+IDS.filter(x=>x.hz&&D.fps>0).length+'</span><span>TEC/REC '+Math.round(D.tec)+'/'+Math.round(D.rec)+'</span><span class="'+(D.state==='AKTYWNY'?'ok':D.state==='PASYWNY'?'warn':'fail')+'">'+D.state+'</span>');
+ LAB.set('vbCx',(RANK[s.l]>=RANK[d.l]?s.c:d.c)+' Potwierdź to pomiarem na pojeździe.');
+ LAB.html('status','<b class="ok">● SŁUCHAM</b><span class="pill" style="padding:0 8px"><b>SYMULACJA</b></span><button class="btn" id="bSpd" style="padding:2px 10px;min-height:0" title="AUTO → 500 → 250 → 125 → AUTO">PRĘDKOŚĆ: '+(spdMan?'RĘCZNA':'AUTO')+'</button><span class="pill" style="padding:0 8px"><b class="'+({'WYKRYTA':'ok','RĘCZNA':'ok','SZUKAM':'warn','NIE USTALONA':'fail'}[spState()])+'">'+spState()+'</b></span><span>'+(spState()==='SZUKAM'||spState()==='NIE USTALONA'?'— kb/s':sc.p.br+' kb/s')+'</span><span>'+D.load.toFixed(0)+' %</span><span>'+Math.round(D.fps)+' fr/s</span><span>ID '+IDS.filter(x=>x.hz&&D.fps>0).length+'</span><span>Liczniki błędów TEC/REC '+Math.round(D.tec)+'/'+Math.round(D.rec)+'</span><span class="'+(D.state==='AKTYWNY'?'ok':D.state==='PASYWNY'?'warn':'fail')+'">'+D.state+'</span>');
  return{s,d};
 }
 /* ---------- rysowanie ---------- */
+const cVolt=LAB.canvas(document.getElementById('cVolt'),w=>w>700?.45:.65);
+const VH=[];
+function pushVolt(){let sh=0,sl=0,hx=-9,hn=9,lx=-9,ln=9;for(let i=0;i<tr.n;i++){sh+=tr.H[i];sl+=tr.L[i];hx=Math.max(hx,tr.H[i]);hn=Math.min(hn,tr.H[i]);lx=Math.max(lx,tr.L[i]);ln=Math.min(ln,tr.L[i])}VH.push({h:sh/tr.n,l:sl/tr.n,hx,hn,lx,ln});if(VH.length>120)VH.shift()}
+function drawVolt(){
+ const o=cVolt,g=grid(o,-.5,5.5,'ostatnie 60 s (pół sekundy na punkt)',1),c=g.c,d=g.d,N=120,n=VH.length;if(!n)return;
+ c.setLineDash([7*d,5*d]);c.strokeStyle='rgba(255,255,255,.45)';c.lineWidth=1.5*d;c.beginPath();c.moveTo(g.L,g.Y(2.5));c.lineTo(g.L+g.pw,g.Y(2.5));c.stroke();c.setLineDash([]);
+ const X=i=>g.X((N-n+i)/(N-1)),cl=v=>Math.min(5.5,Math.max(-.5,v));
+ const band=(mx,mn,col)=>{c.fillStyle=col;c.beginPath();VH.forEach((q,i)=>{const x=X(i),y=g.Y(cl(q[mx]));i?c.lineTo(x,y):c.moveTo(x,y)});for(let i=n-1;i>=0;i--)c.lineTo(X(i),g.Y(cl(VH[i][mn])));c.closePath();c.fill()};
+ band('hx','hn','rgba(255,179,71,.22)');band('lx','ln','rgba(79,209,255,.22)');
+ const ln2=(k,col)=>{c.strokeStyle=col;c.lineWidth=2.4*d;c.beginPath();VH.forEach((q,i)=>{const x=X(i),y=g.Y(cl(q[k]));i?c.lineTo(x,y):c.moveTo(x,y)});c.stroke()};ln2('h','#ffb347');ln2('l','#4fd1ff');
+ const q=VH[n-1],mm=k=>VH.reduce((a,b)=>Math.min(a,b[k]),9),MM=k=>VH.reduce((a,b)=>Math.max(a,b[k]),-9);
+ const v2=x=>f2(x)+' V';setM('vH',v2(q.h),'ok');setM('vL',v2(q.l),'ok');setM('vC',v2((q.h+q.l)/2),Math.abs((q.h+q.l)/2-2.5)<.3?'ok':'warn');setM('vHm',f2(mm('hn'))+' … '+v2(MM('hx')),'');setM('vLm',f2(mm('ln'))+' … '+v2(MM('lx')),'');
+ const cm2=(q.h+q.l)/2,hi=MM('hx'),lo=mm('ln');const bad=hi>4.5||lo<-0.3||Math.abs(cm2-2.5)>.8;const mid=Math.abs(cm2-2.5)>.3||hi>4||lo<0;
+ const quiet=(q.hx-q.hn)<.15&&(q.lx-q.ln)<.15&&Math.abs(cm2-2.5)<.3;
+ if(quiet){setM('vO',sc.dat.act==='sleep'?'OK':'UWAGA',sc.dat.act==='sleep'?'ok':'warn');LAB.set('vT',sc.dat.act==='sleep'?'Obie linie stoją na ok. 2,5 V, bez przebiegów: sieć uśpiona, prawidłowy stan spoczynkowy.':'Obie linie stoją na ok. 2,5 V i nic się na nich nie dzieje: cisza (auto uśpione, przewód odłączony) albo zwarcie CAN-H z CAN-L. Rozstrzygnie TEST OPORU.');return}
+ setM('vO',bad?'BŁĄD':mid?'UWAGA':'OK',bad?'fail':mid?'warn':'ok');LAB.set('vT',bad?'Napięcia poza zakresem magistrali: podejrzewaj zwarcie jednej linii do masy lub do plusa zasilania.':mid?'Napięcie wspólne odbiega od 2,5 V albo linie wychodzą poza normalny zakres: sprawdź połączenia i masy.':'Obie linie mieszczą się w normie: napięcie spoczynkowe ok. 2,5 V, bit 0 rozchyla linie do ok. 3,5 V (H) i 1,5 V (L). Wykres służy do wyłapania rzadkich zaników, spadków i dryfu napięcia, których nie widać na pojedynczym oscylogramie.');
+}
 const cOsc=LAB.canvas(document.getElementById('cOsc'),w=>w>700?.5:.7),cEdge=LAB.canvas(document.getElementById('cEdge'),w=>w>700?.5:.7),cEye=LAB.canvas(document.getElementById('cEye'),w=>w>700?.5:.7),cNoise=LAB.canvas(document.getElementById('cNoise'),w=>w>700?.5:.7),cLoad=LAB.canvas(document.getElementById("cLoad"),w=>w>700?.3:.5);
 function grid(o,vmin,vmax,xlab,tick){
  const c=o.ctx,d=o.dpr,W=o.W,H=o.H,L=48*d,R=10*d,T=10*d,B=26*d,pw=W-L-R,ph=H-T-B;
@@ -304,7 +346,7 @@ function drawOsc(){
  // pomiary kursorów
  const dt=Math.abs(curB-curA)*dur;LAB.set('cDt',dt.toFixed(1).replace('.',',')+' µs');LAB.set('cBits',(dt/(1000/sc.p.br)).toFixed(1).replace('.',','));
  const sT=(x,y)=>{x.textContent=y};
- setM('cVd',F.dom.toFixed(2).replace('.',',')+' V',F.dom>=1.5&&F.dom<=3?'ok':'fail');setM('cVr',F.rec.toFixed(2).replace('.',',')+' V',Math.abs(F.rec)<.2?'ok':'fail');
+ setM('cVd',f2(F.dom)+' V',F.dom>=1.5&&F.dom<=3?'ok':'fail');setM('cVr',f2(F.rec)+' V',Math.abs(F.rec)<.2?'ok':'fail');
  const sym=(F.hd-2.5)+(F.ld-2.5);setM('cSy',(sym>=0?'±':'±')+Math.abs((F.hd-F.ld)/2).toFixed(2).replace('.',',')+' V',Math.abs(sym)<.15?'ok':'warn');
  setM('cRise',E.rise.toFixed(0)+' ns',E.rise<100?'ok':'warn');setM('cOv',E.ov.toFixed(0)+' %',E.ov<15?'ok':'warn');setM('cRing',Math.round(F.ring)+' mV',F.ring<150?'ok':'warn');
 }
@@ -325,7 +367,8 @@ function drawEdge(){
  setM('eRise',Math.round(E.rise)+' ns',E.rise<100?'ok':'warn');setM('eOv',Math.round(E.ov)+' %',E.ov<15?'ok':'warn');setM('eRing',E.ring+' mV',E.ring<250?'ok':'warn');setM('eSet',Math.round(E.set)+' ns',E.set<500?'ok':'warn');
 }
 /* oko */
-let eyeSeg=[],EY={h:2,w:78,j:3,mask:true};
+const MASKU=[.25,.75],MASKV=1.0,MASKH=.5,MASKW=.07;
+let eyeSeg=[],EY={h:2,w:78,j:3,mask:true,viol:0};
 function buildEye(){
  eyeSeg=[];const p=sc.p;let hMin=9,rMax=-9,okCols=0,crossT=[];
  for(let k=0;k<110;k++){const t=trace(p,900+k,8,sc.p.a===0&&sc.p.aH===undefined&&p.Hf==null&&p.Lf==null);const D=new Float32Array(t.n);for(let i=0;i<t.n;i++)D[i]=t.H[i]-t.L[i];eyeSeg.push({D,bits:t.bits,jit:Math.round(LAB.gauss(LAB.rng(k+7))*sc.p.j/100*SPB*.9)})}
@@ -336,17 +379,19 @@ function buildEye(){
  // szerokość: część bitu, w której min(dom) > 1.0 i max(rec) < 0.5
  let w=0;for(let u=0;u<SPB;u++){let mn=9,mxr=-9;for(const s of eyeSeg)for(let b=1;b<7;b++){const v=s.D[b*SPB+u];if(s.bits[b])mn=Math.min(mn,v);else mxr=Math.max(mxr,v)}if(mn>1&&mxr<.5)w++}
  EY.w=w/SPB*100;EY.j=sc.p.j;
- const flat=Math.abs(F.dom)<.3;EY.mask=!flat&&EY.dmin>1.5&&EY.rmax<.5;
+ const flat=Math.abs(F.dom)<.3;let nv=0;
+ for(const sg of eyeSeg){let bad=false;for(let i=SPB;i<3*SPB&&!bad;i++){const u=(i-SPB)/(2*SPB),v=sg.D[Math.max(0,Math.min(sg.D.length-1,i+sg.jit))];for(const uc of MASKU){if(Math.abs(u-uc)/MASKW+Math.abs(v-MASKV)/MASKH<1){bad=true;break}}}if(bad)nv++}
+ EY.viol=nv;EY.n=eyeSeg.length;EY.mask=!flat&&nv===0&&EY.dmin>1.5&&EY.rmax<.5;
 }
 function drawEye(){
- const o=cEye,g=grid(o,-.5,3,'czas: 2 bity',.5),c=g.c,d=g.d;c.lineWidth=1.4*d;
+ const o=cEye,g=grid(o,-.5,3,'czas: 2 bity (nakładka)',.5),c=g.c,d=g.d;c.lineWidth=1.4*d;
  for(const s of eyeSeg){c.strokeStyle='rgba(118,240,155,.15)';c.beginPath();for(let i=SPB;i<3*SPB;i++){const x=g.X((i-SPB)/(2*SPB)),v=s.D[Math.max(0,Math.min(s.D.length-1,i+s.jit))],y=g.Y(Math.max(-.5,Math.min(3,v)));i>SPB?c.lineTo(x,y):c.moveTo(x,y)}c.stroke()}
- c.strokeStyle='#f4a62a';c.setLineDash([8*d,5*d]);c.lineWidth=2.5*d;[[1.85,.6],[.55,.6]].forEach(([vc,hw])=>{const cx=g.X(.5),h=.32*(g.Y(0)-g.Y(1));c.beginPath();c.moveTo(cx-hw*g.pw*.12,g.Y(vc));c.lineTo(cx,g.Y(vc)-h);c.lineTo(cx+hw*g.pw*.12,g.Y(vc));c.lineTo(cx,g.Y(vc)+h);c.closePath();c.stroke()});c.setLineDash([]);
+ c.strokeStyle='#f4a62a';c.setLineDash([8*d,5*d]);c.lineWidth=2.5*d;MASKU.forEach(uc=>{const cx=g.X(uc),hh=MASKH*(g.Y(0)-g.Y(1)),hw=MASKW*g.pw;c.beginPath();c.moveTo(cx-hw,g.Y(MASKV));c.lineTo(cx,g.Y(MASKV)-hh);c.lineTo(cx+hw,g.Y(MASKV));c.lineTo(cx,g.Y(MASKV)+hh);c.closePath();c.stroke()});c.setLineDash([]);
  c.strokeStyle='#ffb347';c.lineWidth=2*d;c.beginPath();c.moveTo(g.X(.875),g.T);c.lineTo(g.X(.875),g.T+g.ph);c.stroke();c.fillStyle='#ffb347';c.fillText('punkt próbk. 87,5 %',g.X(.875)-130*d,g.T+g.ph-6*d);
- setM('yH',EY.h.toFixed(2).replace('.',',')+' V',EY.h>1.5?'ok':EY.h>.8?'warn':'fail');setM('yW',Math.round(EY.w)+' %',EY.w>60?'ok':EY.w>30?'warn':'fail');setM('yJ',EY.j.toFixed(1).replace('.',',')+' %',EY.j<5?'ok':'fail');setM('yM',EY.mask?'przechodzi':'NIE przechodzi',EY.mask?'ok':'fail');
+ setM('yH',EY.h.toFixed(2).replace('.',',')+' V',EY.h>1.5?'ok':EY.h>.8?'warn':'fail');setM('yW',Math.round(EY.w)+' %',EY.w>60?'ok':EY.w>30?'warn':'fail');setM('yJ',EY.j.toFixed(1).replace('.',',')+' %',EY.j<5?'ok':'fail');setM('yM',Math.abs(F.dom)<.3?'brak sygnału':EY.mask?'bez naruszeń':EY.viol>0?'NARUSZONE ('+EY.viol+' z '+EY.n+')':'poziomy poza normą',EY.mask?'ok':'fail');
  const sy=(F.hd-F.ld)/2-(F.dom/2);setM('yS',Math.abs((F.hd-2.5)-(2.5-F.ld)).toFixed(2).replace('.',',')+' V różnicy',Math.abs((F.hd-2.5)-(2.5-F.ld))<.15?'ok':'warn');
 }
-/* obciążenie magistrali (aplikacja 0.7.91, etap 2) */
+/* obciążenie magistrali */
 function zakresObc(m){return [10,20,50,100].find(v=>v>=m)}
 function drawLoad(){
  const o=cLoad,c=o.ctx,d=o.dpr,W=o.W,H=o.H;c.fillStyle='#030a14';c.fillRect(0,0,W,H);
@@ -370,7 +415,7 @@ function drawNoise(){
  for(let i=0;i<N;i++){let v=LAB.gauss(rr)*sc.p.noise*.9;if(sc.p.spikes&&rr()<.01){v+=(rr()<.5?1:-1)*(.4+rr()*.5);sp++;spA=Math.max(spA,Math.abs(v))}vals.push(v)}
  const T=14*d,B=28*d,L=50*d,R=10*d,pw=W-L-R,ph=H-T-B,top=ph*.5;
  const lim=Math.max(.2,sc.p.spikes?1.0:.15);
- c.strokeStyle='rgba(60,120,200,.3)';c.lineWidth=d;c.strokeRect(L,T,pw,top);c.fillStyle='#a3b0c2';c.font=(13*d)+'px Roboto,sans-serif';c.fillText('szum na poziomie recesywnym [V]',L+6*d,T+16*d);
+ c.strokeStyle='rgba(60,120,200,.3)';c.lineWidth=d;c.strokeRect(L,T,pw,top);c.fillStyle='#a3b0c2';c.font=(13*d)+'px Roboto,sans-serif';c.fillText('szum na poziomie spoczynkowym [V]',L+6*d,T+16*d);
  c.strokeStyle='#76f09b';c.lineWidth=1.4*d;c.beginPath();vals.forEach((v,i)=>{const x=L+i/N*pw,y=T+top/2-v/lim*top/2;i?c.lineTo(x,y):c.moveTo(x,y)});c.stroke();
  // histogram
  const bins=40,h=new Array(bins).fill(0);vals.forEach(v=>{const b=Math.max(0,Math.min(bins-1,Math.floor((v/lim+1)/2*bins)));h[b]++});const mh=Math.max(...h),y0=T+top+24*d,hh=ph-top-24*d;
@@ -386,7 +431,7 @@ const PAT=[
  ['ZWARCIE H–L',mk({a:0,noise:.008}),'brak różnicy, 0 Ω, magistrala martwa',{dom:0,cm:2.5,ring:0,noise:.008,slow:.06}],
  ['L ZWARTE DO MASY',mk({Lf:.02,aH:.4}),'CAN-L stale 0 V, słaba amplituda',{dom:.4,cm:1.3,ring:0,noise:.012,slow:.06}],
  ['H/L DO +12 V',mk({Hf:5,Lh:3.2,Ld:4.2}),'napięcie wspólne > 4 V, ograniczone',{dom:1,cm:4.2,ring:0,noise:.012,slow:.06}],
- ['USZKODZONY TRANSCEIVER',mk({a:.5,tau:.24}),'niska amplituda dominująca, wolne krawędzie',{dom:1,cm:2.5,ring:0,noise:.012,slow:.24}]];
+ ['USZKODZONY TRANSCEIVER',mk({a:.5,tau:.24}),'niskie napięcie H–L, wolne zbocza',{dom:1,cm:2.5,ring:0,noise:.012,slow:.24}]];
 let patDone=false;
 function buildPat(){
  document.getElementById('patGrid').innerHTML=PAT.map((p,i)=>'<div class="pat" id="pt'+i+'"><div class="h"><span>'+p[0]+'</span><span id="ptl'+i+'"></span></div><canvas id="ptc'+i+'" height="130"></canvas><div class="dm" style="font-size:.9rem">'+p[2]+'</div><div class="row" style="align-items:center;flex-wrap:nowrap;margin-top:4px"><span class="lbl" style="flex:none">podobieństwo</span><div style="flex:1;height:14px;border:1px solid #2f7bff;border-radius:7px;overflow:hidden"><div id="ptb'+i+'" style="height:100%;width:0"></div></div><b id="pts'+i+'">0 %</b></div></div>').join('');
@@ -403,9 +448,12 @@ let selId=0x3B0;
 function tableFrames(){
  const rows=IDS.map(x=>{const fr=D.frames[x.id],act=D.fps>0&&x.hz;const ch=fr.prev&&fr.data.map((b,i)=>b!==fr.prev[i]);fr.prev=fr.data.slice();
   const hex=fr.data.map((b,i)=>{const h=b.toString(16).toUpperCase().padStart(2,'0');return ch&&ch[i]?'<span class="hl">'+h+'</span>':h}).join(' ');
-  return '<tr><td class="mono">0x'+x.id.toString(16).toUpperCase().padStart(3,'0')+'</td><td>'+x.n+'</td><td>'+(x.hz?(act?x.hz:'—'):'—')+'</td><td>'+(x.hz&&act?(1000/x.hz*.99).toFixed(0)+'…'+(1000/x.hz*1.01).toFixed(0):'—')+'</td><td>'+(x.hz&&act?(sc.p.j*.04).toFixed(2):'—')+'</td><td class="mono">'+(act?hex:'—')+'</td></tr>'}).join('');
- LAB.html('frT',rows);
+  const per=x.hz?1000/x.hz:0;
+  return '<tr><td class="mono">0x'+x.id.toString(16).toUpperCase().padStart(3,'0')+'</td><td>'+x.n+'</td><td class="mono">'+(x.hz&&act?fr.n:'—')+'</td><td>'+(x.hz?(act?x.hz:'—'):'—')+'</td><td>'+(x.hz&&act?(per*.99).toFixed(0)+'…'+(per*1.01).toFixed(0):'—')+'</td><td>'+(x.hz&&act?(per*(1+(Math.random()-.5)*sc.p.j*.004)).toFixed(1).replace('.',','):'—')+'</td><td>'+(x.hz&&act?(sc.p.j*.04).toFixed(2).replace('.',','):'—')+'</td><td class="mono">'+(act?hex:'—')+'</td></tr>'}).join('');
+  const er=Math.round(D.errs),errRow=er>0?'<tr style="background:rgba(239,83,80,.18);color:#ff8a80"><td class="mono">ERR</td><td>Ramki błędu (kontroler CAN)</td><td class="mono">'+er+'</td><td colspan="5">TEC '+Math.round(D.tec)+' · REC '+Math.round(D.rec)+' · '+D.state+'</td></tr>':'';
+ LAB.html('frT',rows+errRow);
 }
+function resetLista(){IDS.forEach(x=>{const fr=D.frames[x.id];fr.n=0;fr.min=1e9;fr.max=0;fr.acc=0;fr.prev=null});D.errs=0;D.tec=0;D.rec=0;D.es=0;logEv('wyzerowano listę ramek i kontroler','gd');updateVerdict();redraw()}
 function crc15(bits){let c=0;for(const b of bits){const nx=((c>>14)&1)^b;c=(c<<1)&0x7FFF;if(nx)c^=0x4599}return c}
 function raportRamki(x,dat){
  const raw=[0];for(let i=10;i>=0;i--)raw.push((x.id>>i)&1);raw.push(0,0,0);for(let i=3;i>=0;i--)raw.push((8>>i)&1);
@@ -417,14 +465,15 @@ function raportRamki(x,dat){
 }
 function renderRap(x){
  const fr=D.frames[x.id],dat=(fr&&fr.n>0)?fr.data:frameData(x,1),r=raportRamki(x,dat),per=x.hz?1000/x.hz:0;
- LAB.html('bmRap','<b>RAPORT RAMKI 0x'+x.id.toString(16).toUpperCase()+':</b> '+r.n+' bitów: '+r.dom+' dominujących, '+r.rec+' recesywnych, '+r.st+' wypełniających · '+Math.round(r.us)+' µs przy '+sc.p.br+' kb/s · CRC 0x'+r.crc.toString(16).toUpperCase().padStart(4,'0')+(per?' · ta ramka sama daje '+(r.us/(per*10)).toFixed(1).replace('.',',')+' % obciążenia':'')+'<br><span class="dm">Punkt próbkowania: nie mierzony (głowica nie ma szybkiego toru E3); nominalnie 75–87,5 % bitu. Liczby z rekonstrukcji ramki (W, wniosek).</span>');
+ LAB.html('bmRap','<b>RAPORT RAMKI 0x'+x.id.toString(16).toUpperCase()+':</b> '+r.n+' bitów, w tym '+r.dom+' bitów 0, '+r.rec+' bitów 1, '+r.st+' bitów wypełniających · '+Math.round(r.us)+' µs przy '+sc.p.br+' kb/s · CRC 0x'+r.crc.toString(16).toUpperCase().padStart(4,'0')+(per?' · ta ramka sama daje '+(r.us/(per*10)).toFixed(1).replace('.',',')+' % obciążenia':'')+'<br><span class="dm">Punkt próbkowania bitu nie jest tu mierzony (wymaga szybkiego pomiaru napięcia); zwykle leży w 75–87,5 % czasu bitu. Liczby wyliczone z budowy ramki (W).</span>');
 }
+function stanyTrc(){const st=D.evs.filter(e=>/stan kontrolera/.test(e.txt)).reverse();let o=';   Stan kontrolera na początku zapisu: '+D.state+' (TEC '+Math.round(D.tec)+', REC '+Math.round(D.rec)+')\n';if(!st.length)return o+';   Zmian stanu kontrolera (ostrzeżenie, tryb pasywny, bus-off) w tej sesji nie było\n';st.forEach(e=>{o+=';   Zmiana stanu kontrolera ('+LAB.mmss(e.t/60)+'): '+e.txt.replace('stan kontrolera: ','')+'\n'});return o}
 function zapisTrc(){
  const T=5,L=[];IDS.forEach((x,ix)=>{if(!x.hz)return;const n=Math.floor(x.hz*T);for(let i=0;i<n;i++)L.push({t:(i+.3+ix*.07)*1000/x.hz,id:x.id,d:frameData(x,i),e:0})});
  if(sc.dat.err==='low'||sc.dat.err==='burst')for(let t=700;t<T*1000;t+=1700)L.push({t,id:0,d:[],e:1});
  L.sort((a,b)=>a.t-b.t);
  const days=(Date.now()/86400000+25569).toFixed(10);
- let o=';$FILEVERSION=1.1\n;$STARTTIME='+days+'\n;\n;   EKO-CAN, symulacja strony LAB: '+sc.n+' (EMULATOR)\n;   Czas względny w ms od pierwszej ramki zapisu\n;---+--   ----+----  --+--  ----+---  +  -+ -- -- -- -- -- -- --\n';
+ let o=';$FILEVERSION=1.1\n;$STARTTIME='+days+'\n;\n;   EKO-CAN, symulacja strony LAB: '+sc.n+' (EMULATOR)\n;   Czas względny w ms od pierwszej ramki zapisu\n'+stanyTrc()+';---+--   ----+----  --+--  ----+---  +  -+ -- -- -- -- -- -- --\n';
  L.forEach((f,i)=>{const t0=L[0].t,tt=(f.t-t0).toFixed(3);o+=String(i+1).padStart(6)+') '+tt.padStart(13)+'  '+(f.e?'Er':'Rx')+'  '+(f.e?'0000':f.id.toString(16).toUpperCase().padStart(4,'0'))+'  '+(f.e?0:f.d.length)+'  '+(f.e?'':f.d.map(b=>b.toString(16).toUpperCase().padStart(2,'0')).join(' '))+'\n'});
  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([o],{type:'text/plain'}));a.download='ekocan_symulacja_'+sc.id+'.trc';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);
  logEv('zapis .trc: '+L.length+' ramek z '+T+' s (symulacja)','gd');
@@ -450,7 +499,7 @@ function nodes(){
  const act=D.fps>0;const rows=IDS.map(x=>{const ok=act&&x.hz,ack=!sc.dat.noack&&ok;return '<tr><td>'+x.n+'</td><td class="mono">0x'+x.id.toString(16).toUpperCase().padStart(3,'0')+'</td><td>'+(x.hz?(1000/x.hz)+' ms':'zdarzeniowy')+'</td><td class="'+(ok?'ok':x.hz?'warn':'dm')+'">'+(ok?'nadaje':x.hz?'cichy':'oczekuje')+'</td><td class="'+(ack?'ok':'warn')+'">'+(ack?'TAK':ok?'brak':'—')+'</td></tr>'}).join('');LAB.html('ndT',rows)}
 function events(){LAB.html('evL',D.evs.map(e=>'<li><time>'+LAB.mmss(e.t/60)+'</time><span class="'+e.cls+'">'+e.txt+'</span></li>').join('')||'<li class="dm">brak zdarzeń</li>')}
 /* ---------- zakładki ---------- */
-const TA=[['osc','OSCYLOGRAM'],['edge','KRAWĘDŹ'],['eye','OKO'],['noise','ZAKŁÓCENIA'],['pat','WZORCE USTEREK'],['ohm','TEST OPORU'],['verd','WERDYKT']];
+const TA=[['osc','OSCYLOGRAM'],['edge','ZBOCZE'],['eye','JAKOŚĆ BITÓW'],['noise','ZAKŁÓCENIA'],['volt','NAPIĘCIA W CZASIE'],['pat','WZORCE USTEREK'],['ohm','TEST OPORU'],['verd','OCENA STANU']];
 const TB=[['fr','RAMKI'],['bits','MAPA BITÓW'],['sig','SYGNAŁY'],['nodes','WĘZŁY'],['evt','ZDARZENIA']];
 let tab='osc';
 function renderTabs(){
@@ -458,17 +507,21 @@ function renderTabs(){
  document.getElementById('tabsB').innerHTML=TB.map(t=>'<button class="btn" data-t="'+t[0]+'">'+t[1]+'</button>').join('');
 }
 function showTab(t){tab=t;document.querySelectorAll('[data-p]').forEach(p=>p.classList.toggle('hidden',p.dataset.p!==t));document.querySelectorAll('#tabsA .btn,#tabsB .btn').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
- [cOsc,cEdge,cEye,cNoise,cLoad].forEach(o=>o.fit());if(t==='pat'&&!patDone){buildPat();patDone=true}if(t==='bits')bitMap();redraw()}
+ [cOsc,cEdge,cEye,cNoise,cLoad,cVolt].forEach(o=>o.fit());if(t==='pat'&&!patDone){buildPat();patDone=true}if(t==='bits')bitMap();redraw()}
 function showGroup(g){tabG=g;document.querySelectorAll('.grpbtn').forEach(b=>b.classList.toggle('on',b.dataset.g===g));document.getElementById('tabsA').classList.toggle('hidden',g!=='A');document.getElementById('tabsB').classList.toggle('hidden',g!=='B');showTab(g==='A'?(TA.some(x=>x[0]===tab)?tab:'osc'):(TB.some(x=>x[0]===tab)?tab:'fr'))}
-function redraw(){if(tab==='osc')drawOsc();if(tab==='edge')drawEdge();if(tab==='eye')drawEye();if(tab==='noise')drawNoise();if(tab==='pat')updatePat();if(tab==='fr')tableFrames();if(tab==='sig')signals();if(tab==='nodes')nodes();if(tab==='evt'){events();drawLoad()}}
-function setScn(i){sc=SCU[i];LV.show(sc===CUS);if(sc===CUS)LV.open();sel.value=i;LAB.set('scd',sc.d);R_known=null;R_ser=[];LAB.set('oSer','Odczyty: —');LAB.set('oR','—');LAB.set('oC','—');LAB.set('oT','Naciśnij MIERZ OPÓR. W symulacji pomiar wykonuje model głowicy.');regen(1);edge();buildEye();resetData();document.getElementById('bmIds').innerHTML=IDS.filter(x=>x.hz).map(x=>'<button class="btn '+(x.id===selId?'sel':'')+'" data-id="'+x.id+'" style="flex:1 1 90px">0x'+x.id.toString(16).toUpperCase()+'</button>').join('');updateVerdict();redraw()}
+function redraw(){if(tab==='osc')drawOsc();if(tab==='edge')drawEdge();if(tab==='eye')drawEye();if(tab==='noise')drawNoise();if(tab==='volt')drawVolt();if(tab==='pat')updatePat();if(tab==='fr')tableFrames();if(tab==='sig')signals();if(tab==='nodes')nodes();if(tab==='evt'){events();drawLoad()}}
+function setScn(i){sc=SCU[i];LV.show(sc===CUS);if(sc===CUS)LV.open();sel.value=i;ddSync(i);LAB.set('scd',sc.d);R_known=null;R_ser=[];LAB.set('oSer','Odczyty: —');LAB.set('oR','—');LAB.set('oC','—');LAB.set('oT','Naciśnij MIERZ OPÓR. W symulacji pomiar wykonuje model głowicy.');VH.length=0;for(let k=118;k>=1;k--){regen(k+1);pushVolt()}regen(1);pushVolt();edge();buildEye();resetData();document.getElementById('bmIds').innerHTML=IDS.filter(x=>x.hz).map(x=>'<button class="btn '+(x.id===selId?'sel':'')+'" data-id="'+x.id+'" style="flex:1 1 90px">0x'+x.id.toString(16).toUpperCase()+'</button>').join('');updateVerdict();redraw()}
 sel.onchange=()=>setScn(+sel.value);
 document.getElementById('grp').addEventListener('click',e=>{const b=e.target.closest('[data-g]');if(b)showGroup(b.dataset.g)});
 document.querySelector('.wrap').addEventListener('click',e=>{const b=e.target.closest('#tabsA [data-t],#tabsB [data-t]');if(b)showTab(b.dataset.t);const id=e.target.closest('[data-id]');if(id){selId=+id.dataset.id;document.querySelectorAll('#bmIds .btn').forEach(x=>x.classList.toggle('sel',x===id));bitMap()}});
 document.getElementById('bFreeze').onclick=e=>{frozen=!frozen;e.target.textContent=frozen?'WZNÓW':'STOP';e.target.classList.toggle('gold',frozen)};
 document.getElementById('bMode').onclick=()=>{mode=(mode+1)%3;document.getElementById('bMode').textContent=['TRYB: H+L / RÓŻN.','TRYB: tylko CAN-H','TRYB: tylko CAN-L'][mode]};
-document.getElementById('bSave').onclick=()=>{saveN++;logEv('zapisano przebieg nr '+saveN+' ('+sc.n+')','gd');updateVerdict()};
-document.getElementById('bTrc').onclick=zapisTrc;
+function dl(name,blob){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+const cm=x=>x.toFixed(4).replace('.',',');
+document.getElementById('bCsv').onclick=()=>{saveN++;const dt=1000/sc.p.br/SPB;let o='sep=;\nczas_us;CAN_H_V;CAN_L_V;H_minus_L_V\n';for(let i=0;i<tr.n;i++)o+=(i*dt).toFixed(3).replace('.',',')+';'+cm(tr.H[i])+';'+cm(tr.L[i])+';'+cm(tr.H[i]-tr.L[i])+'\n';dl('ekocan_przebieg_'+sc.id+'_'+saveN+'.csv',new Blob(['\ufeff'+o],{type:'text/csv'}));logEv('zapis CSV: '+tr.n+' próbek przebiegu nr '+saveN+' (symulacja)','gd');updateVerdict()};
+document.getElementById('bPng').onclick=()=>{saveN++;document.getElementById('cOsc').toBlob(b=>{if(b){dl('ekocan_oscylogram_'+sc.id+'_'+saveN+'.png',b);logEv('zrzut ekranu oscylogramu nr '+saveN+' (symulacja)','gd')}})};
+document.getElementById('bRep').onclick=()=>{saveN++;const v=updateVerdict(),f=F,L=[];L.push('EKO-CAN – raport (SYMULACJA, nie pomiar pojazdu)','Scenariusz: '+sc.n,'Prędkość: '+sc.p.br+' kb/s','');L.push('OCENA: '+(RANK[v.s.l]>=RANK[v.d.l]?v.s.t:v.d.t),'Sygnał elektryczny: '+v.s.t+' – '+v.s.c,'Komunikacja: '+v.d.t+' – '+v.d.c,'');L.push('Napięcie między H i L przy bicie 0: '+f2(f.dom)+' V','Napięcie między H i L przy bicie 1: '+f2(f.rec)+' V','Szum: '+Math.round(f.noise*1000)+' mV RMS','Drgania czasu zbocza (jitter): '+sc.p.j.toFixed(1).replace('.',',')+' %','Opór H–L: '+(R_known===null?'nie mierzono':Math.round(R_known)+' Ω'),'Liczniki błędów TEC/REC: '+Math.round(D.tec)+'/'+Math.round(D.rec),'Obciążenie magistrali: '+D.load.toFixed(0)+' %','');L.push('Zdarzenia:');D.evs.slice().reverse().forEach(e=>L.push('  '+LAB.mmss(e.t/60)+'  '+e.txt));dl('ekocan_raport_'+sc.id+'_'+saveN+'.txt',new Blob(['\ufeff'+L.join('\r\n')],{type:'text/plain'}));logEv('zapis raportu tekstowego nr '+saveN,'gd')};
+document.getElementById('bTrc').onclick=zapisTrc;document.getElementById('bRst').onclick=resetLista;
 document.getElementById('bAutoCur').onclick=()=>{curA=.3;curB=.65;autoCur=true};
 document.getElementById('bOhm').onclick=()=>{R_ser=[];const rr=LAB.rng(77+saveN),n=4;let k=0;const one=()=>{const j=(rr()-.5)*2*(sc.p.Rj||sc.p.R*.015);R_ser.push(Math.max(1,sc.p.R+j));R_known=R_ser[R_ser.length-1];LAB.set('oSer','Odczyty: '+R_ser.map(x=>Math.round(x)+' Ω').join(' · '));LAB.set('oR',(R_known>=1200?'>1,2 kΩ':Math.round(R_known)+' Ω'));const o=oporSeria();LAB.set('oC',o[0]==='ok'?'OK':o[0]==='warn'?'UWAGA':'BŁĄD');LAB.set('oT',o[1].charAt(0).toUpperCase()+o[1].slice(1)+'.');if(++k<n)setTimeout(one,350);else{logEv('test oporu: '+(R_ser.length>2&&oporSkacze(R_ser)?'skacze '+Math.round(Math.min(...R_ser))+'–'+Math.round(Math.max(...R_ser)):Math.round(R_known))+' Ω','gd')}updateVerdict()};one()};
 document.getElementById('status').addEventListener('click',e=>{if(!e.target.closest('#bSpd'))return;const cyc=[0,500,250,125];spdMan=cyc[(cyc.indexOf(spdMan)+1)%cyc.length];D.det=false;logEv(spdMan?'prędkość ustawiona ręcznie: '+spdMan+' kb/s':'prędkość: AUTO, szukam od początku','gd');if(!spdMan){clock=0}updateVerdict()});
@@ -476,8 +529,8 @@ document.getElementById('status').addEventListener('click',e=>{if(!e.target.clos
 (function(){const el=document.getElementById('cOsc');let drag=null;const u=e=>{const r=el.getBoundingClientRect(),g=cOsc.geo;if(!g)return 0;const x=(e.clientX-r.left)*cOsc.dpr;return Math.max(0,Math.min(1,(x-g.L)/g.pw))};
  el.addEventListener('pointerdown',e=>{const x=u(e);drag=Math.abs(x-curA)<Math.abs(x-curB)?'A':'B';if(drag==='A')curA=x;else curB=x;autoCur=false;el.setPointerCapture(e.pointerId)});el.addEventListener('pointermove',e=>{if(!drag)return;const x=u(e);if(drag==='A')curA=x;else curB=x});el.addEventListener('pointerup',()=>drag=null)})();
 let tReg=0,tUi=0;
-LAB.loop(dt=>{stepData(dt);tReg+=dt;if(tReg>.5){tReg=0;if(!frozen){regen(Math.floor(clock*2)+1)}}tUi+=dt;if(tUi>.25){tUi=0;updateVerdict()}redraw()});
-window.addEventListener('resize',()=>{[cOsc,cEdge,cEye,cNoise,cLoad].forEach(o=>o.fit())});
+LAB.loop(dt=>{stepData(dt);tReg+=dt;if(tReg>.5){tReg=0;if(!frozen){regen(Math.floor(clock*2)+1);pushVolt()}}tUi+=dt;if(tUi>.25){tUi=0;updateVerdict()}redraw()});
+window.addEventListener('resize',()=>{[cOsc,cEdge,cEye,cNoise,cLoad,cVolt].forEach(o=>o.fit())});
 renderTabs();setScn(0);showGroup('A');
 window.__sim={setScn,sigClass,datClass,get F(){return F},get D(){return D},step:s=>{for(let i=0;i<s*20;i++)stepData(.05)},ohm:()=>document.getElementById('bOhm').click(),SC,showTab,showGroup,get EY(){return EY},get E(){return E}};
 })();
