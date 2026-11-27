@@ -1,0 +1,1091 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TESTER ELEKTROZAWORÓW PWM – symulacja | EKOTRONIK SYSTEM</title>
+<meta name="description" content="TESTER ELEKTROZAWORÓW PWM: projekt LAB testera sprawności elektrozaworów sterowanych PWM. Interaktywna symulacja ekranu testera i scenariusze usterek.">
+<meta property="og:title" content="TESTER ELEKTROZAWORÓW PWM">
+<meta property="og:description" content="Tester elektrozaworów PWM. Interaktywna symulacja ekranu i scenariusze usterek.">
+<link rel="canonical" href="https://ekotronik.github.io/ecu-immo-elv/lab/tester-elektrozaworow-pwm.html">
+<meta name="robots" content="index,follow">
+<link rel="icon" type="image/png" sizes="64x64" href="../assets_v8/favicon.png">
+<link rel="apple-touch-icon" href="../assets_v8/apple-touch-icon.png">
+<meta property="og:type" content="website"><meta property="og:locale" content="pl_PL"><meta property="og:site_name" content="EKOTRONIK SYSTEM">
+<meta property="og:url" content="https://ekotronik.github.io/ecu-immo-elv/lab/tester-elektrozaworow-pwm.html">
+<meta property="og:image" content="https://ekotronik.github.io/ecu-immo-elv/assets_v8/og_ekotronik_system.png">
+<link rel="stylesheet" href="lab.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap">
+<style>
+[hidden]{display:none!important}
+.wrap{padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px))}
+.bench{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:12px;align-items:start;margin-top:12px}
+@media(max-width:960px){.bench{grid-template-columns:minmax(0,1fr)}}
+.bezel{background:#050608;border:1px solid var(--border);border-radius:16px;padding:14px 14px 12px;display:flex;flex-direction:column;gap:12px}
+.bezel canvas{width:100%;max-width:640px;aspect-ratio:4/3;display:block;margin:0 auto;border-radius:3px;background:#000;cursor:pointer;touch-action:manipulation}
+.bezel .cap{font-size:.8rem;color:var(--muted);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.bezel .cap b{color:var(--gold)}
+.rings{display:flex;justify-content:center;gap:22px;padding-top:4px;flex-wrap:wrap}
+.ring{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:.72rem;color:var(--muted)}
+.ring button{width:58px;height:58px;border-radius:50%;border:5px solid #333;background:radial-gradient(circle at 40% 35%,#3a4048,#1d2126 70%);cursor:pointer;touch-action:manipulation}
+.ring button:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}
+.ring button:active{transform:translateY(1px)}
+.ring.go button{border-color:#20d468;box-shadow:0 0 12px #20d468}
+.ring.st button{border-color:#ff3b30;box-shadow:0 0 12px #ff3b30}
+.ring.nav button{border-color:#d6a852;box-shadow:0 0 8px rgba(214,168,82,.6)}
+.side{display:flex;flex-direction:column;gap:12px;min-width:0}
+.try{display:flex;flex-direction:column;gap:8px}
+.try .btn{min-height:46px;font-size:.95rem;justify-content:flex-start;text-align:left;padding:6px 14px;width:100%;gap:10px}
+.try .btn[aria-pressed="true"]{background:#3a331f;border-color:var(--gold-l);color:var(--gold-l)}
+.try .btn i{width:10px;height:10px;border-radius:50%;flex:none}
+.i0{background:var(--ok)}.i1{background:var(--warn)}.i2{background:var(--fail)}
+.speed{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.speed .btn{min-height:42px;padding:0 14px;font-size:.92rem}
+.speed .btn[aria-pressed="true"]{background:#d6a852;color:#0e0c08;border-color:var(--gold-l)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.row2 .btn{min-height:48px;font-size:.92rem;padding:0 10px}
+.box p{margin:6px 0 0;color:#d6dbe8;font-size:.95rem}
+.box .lbl{display:block;margin-top:10px}
+.box .watch{color:var(--muted);font-size:.9rem;border-top:1px dashed var(--border);padding-top:8px;margin-top:10px}
+.box .watch b{color:var(--gold-l)}
+.narr{font-size:.95rem}
+.narr .ph{color:var(--gold);font-weight:800;letter-spacing:.04em;text-transform:uppercase;font-size:.85rem}
+.narr p{margin:4px 0 0;color:#d6dbe8}
+.sum{font-weight:800;font-size:1.05rem;margin:0}
+.bad{color:var(--fail)}.run{color:var(--cyan)}
+.selrow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:6px 0 10px}
+.selrow select.sel{flex:1 1 320px}
+.logbox{overflow-x:auto;margin-top:10px}
+.logbox table{min-width:620px}
+#log td:first-child{color:var(--muted);width:44px}
+#log td:last-child{font-weight:800;width:70px}
+#log tr.hd td{color:var(--gold);font-weight:800;background:rgba(255,255,255,.03)}
+.small{font-size:.86rem;color:var(--muted)}
+.mono{font-family:"Roboto Mono",ui-monospace,Consolas,monospace}
+.about>*{min-width:0}
+.about .tw{overflow-x:auto}
+.about table{min-width:560px}
+.sw{display:inline-block;width:28px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.swb{display:inline-block;width:14px;height:14px;vertical-align:middle;margin-right:6px;opacity:.6}
+kbd{border:1px solid var(--border);border-radius:5px;padding:0 5px;font-size:.85em}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="hdr">
+  <a class="brand" href="../index.html#galeria" aria-label="EKOTRONIK SYSTEM – wróć do LAB"><img src="img/logo-emblem.png" alt="Logo EKOTRONIK SYSTEM"><div><div class="w1">EKOTRONIK</div><div class="w2">SYSTEM</div></div></a>
+  <div class="symbox" role="img" aria-label="Symbol: TESTER ELEKTROZAWORÓW PWM"><svg viewBox="0 0 54 44" fill="none" stroke="#d6a852" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="14" height="26" rx="2"/><path d="M9 10h8M9 15h8M9 20h8M9 25h8"/><path d="M13 30v8"/><path d="M26 34h4l3-14 3 14h3l2-8h9" stroke="#5adce8"/></svg><div><div class="st">TESTER PWM</div><div class="sd">elektrozawory · prąd · ruch tłoczka</div></div></div>
+  <div class="pill"><b>● SYMULACJA · firmware v1</b><br><span>Sprzęt: niesprawdzony</span></div>
+</div>
+<div class="crumb"><a class="btn back" href="../index.html#galeria">← Powrót do LAB</a><div class="path">LAB › <b>TESTER ELEKTROZAWORÓW PWM</b></div></div>
+
+<div class="panel"><div class="pt">TESTER ELEKTROZAWORÓW PWM</div>
+  <p style="margin:8px 0 0;color:#d6dbe8">Tester sprawności elektrozaworów sterowanych PWM (VVT, ciśnienie oleju, paliwo benzyna i diesel). Steruje cewką, mierzy prąd i napięcie, a z kształtu prądu odczytuje ruch tłoczka w całym zakresie regulacji, od spoczynku do maksimum. Projekt LAB w budowie, poniżej działa jego symulacja z wbudowanymi usterkami.</p>
+  <p class="small" style="margin:8px 0 0">Wybierz usterkę w panelu <b>Wypróbuj</b>, a potem dotknij <b>START</b> na ekranie albo wciśnij pierścień <b>S1</b>. Ekran działa jak dotykowy: dotknięcie wykresu otwiera go na pełnym ekranie. Pełny test trwa 3–5 minut, więc przyspiesz czas (×10, ×25).</p>
+</div>
+
+<div class="bench">
+  <div style="display:flex;flex-direction:column;gap:12px;min-width:0">
+    <div class="bezel">
+      <canvas id="scr" width="640" height="480" aria-label="Symulacja ekranu dotykowego testera 320x240"></canvas>
+      <div class="cap"><span><b>Ekran testera</b> · TFT SPI 320×240 · dotyk</span><span id="ledTxt">stan: gotowy</span></div>
+      <div class="rings">
+        <div class="ring go"><button id="kS1" type="button" aria-label="S1 START"></button><span>S1 START</span></div>
+        <div class="ring st"><button id="kS2" type="button" aria-label="S2 STOP"></button><span>S2 STOP</span></div>
+        <div class="ring nav"><button id="kS3" type="button" aria-label="S3 poprzedni"></button><span>S3 ◀</span></div>
+        <div class="ring nav"><button id="kS4" type="button" aria-label="S4 następny"></button><span>S4 ▶</span></div>
+      </div>
+    </div>
+    <div class="panel narr" aria-live="polite"><div class="ph" id="narrPh">Gotowy</div><p id="narrTx">Ekran wyboru zaworu.</p></div>
+  </div>
+
+  <div class="side">
+    <div class="panel try">
+      <div class="pt" style="font-size:1.1rem;color:var(--gold)">Wypróbuj</div>
+      <div class="small">Usterka zaworu podłączonego do testera</div>
+      <div id="scList" class="try" role="group" aria-label="Usterka zaworu"></div>
+    </div>
+    <div class="box" id="scCard">
+      <div class="bt" id="scName">Sprawny</div>
+      <div class="small" id="scBadge">SPRAWNY</div>
+      <span class="lbl">Co się psuje mechanicznie</span><p id="scMech"></p>
+      <span class="lbl">Jak to widać w prądzie</span><p id="scCur"></p>
+      <span class="lbl">Werdykt testera</span><p id="scVer"></p>
+      <div class="watch" id="scWatch"></div>
+    </div>
+    <div class="panel">
+      <div class="pt" style="font-size:1.05rem">Test symulacja</div>
+      <div class="row2" style="margin:10px 0">
+        <button class="btn gold" id="bFull" type="button">PEŁNY TEST</button>
+        <button class="btn cyan" id="bSweep" type="button">PRZEMIATANIE</button>
+      </div>
+      <div class="speed" id="speedSeg" role="group" aria-label="Szybkość czasu">
+        <span class="lbl">Czas</span>
+        <button class="btn" type="button" data-s="1" aria-pressed="false">×1</button><button class="btn" type="button" data-s="5" aria-pressed="false">×5</button><button class="btn" type="button" data-s="10" aria-pressed="true">×10</button><button class="btn" type="button" data-s="25" aria-pressed="false">×25</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="panel" id="scen" style="margin-top:12px">
+  <div class="pt">Scenariusze testowe</div>
+  <div class="selrow">
+    <span class="lbl">Scenariusz (symulacja)</span>
+    <select class="sel" id="scSel" aria-label="Wybierz scenariusz testowy"></select>
+    <button class="btn gold" id="scRun" type="button">URUCHOM</button>
+    <button class="btn cyan" id="runAll" type="button">URUCHOM WSZYSTKIE</button>
+  </div>
+  <p class="sum" id="scSum">Wynik: —</p>
+  <div class="logbox"><table><thead><tr><th>#</th><th>Krok</th><th>Oczekiwane</th><th>Stan</th><th>Wynik</th></tr></thead><tbody id="log"><tr><td></td><td colspan="4" class="small">Wybierz scenariusz i uruchom go. Scenariusz ustawia usterkę, przeprowadza pełny test na ekranie i sprawdza, czy tester ją rozpoznał.</td></tr></tbody></table></div>
+</div>
+
+<div class="about">
+  <div class="panel">
+    <h2>Jak to działa</h2>
+    <p>Zawór jest wymontowany i podłączony do mostka mocy IBT-2. Tester zasila cewkę napięciem 13,5 V (lub 27 V) przez PWM o częstotliwości typowej dla danego zaworu i mierzy prąd. Ruch tłoczka zmienia indukcyjność cewki, więc z tętnień prądu tester liczy względną indukcyjność L/L0, czyli w praktyce położenie tłoczka. Każdy pomiar porównuje z modelem sprawnego zaworu w tej samej temperaturze cewki.</p>
+    <p>Symulacja wykonuje tę samą logikę co firmware testera w trybie demonstracyjnym: ten sam model zaworu, te same fazy i progi oceny. Ekran to wierne odwzorowanie interfejsu 320×240 z urządzenia.</p>
+  </div>
+  <div class="panel">
+    <h2>Fazy testu</h2>
+    <ul>
+      <li><b>1. Identyfikacja</b> (ok. 2 s): krótki impuls mierzy rezystancję R i stałą czasową τ = L/R, czyli sprawdza, czy podłączony zawór pasuje do wybranego typu.</li>
+      <li><b>2. Test statyczny</b> (ok. 3 s): R20 sprowadzona do 20 °C i przebieg prądu w okresie PWM. Za niska R oznacza zwarcie zwojów, za wysoka przerwę lub złe styki.</li>
+      <li><b>3. Skok 13,5 V / 9 V</b> (10 + 5 impulsów): pełne napięcie na 26 ms. Dołek w narastaniu prądu to chwila dojścia tłoczka do końca (t_on). Przy 9 V sprawdzany jest zapas siły.</li>
+      <li><b>4. Charakterystyka I(D)</b> (wolno ×3, średnio ×3, szybko ×5): przemiatanie wypełnienia 0→100→0 %. Krzywe nakładają się, a odchyłki od wzorca są od razu zaznaczane jako strefy.</li>
+      <li><b>5. Cykle dynamiczne</b> (120 cykli): tester liczy zawieszenia tłoczka i rozrzut t_on.</li>
+      <li><b>6. Rozgrzanie</b> (do +40 K): cewka grzeje się przy D = 90 %. Temperaturę uzwojenia tester liczy z przyrostu rezystancji miedzi, bez czujnika IR.</li>
+      <li><b>7. Powtórka na gorąco</b> (5 skoków + 1 przemiatanie): zacieranie suwaka lub mięknący lakier ujawniają się dopiero tutaj.</li>
+    </ul>
+  </div>
+  <div class="panel">
+    <h2>Ekran testera i wykresy</h2>
+    <ul>
+      <li><b>WYBÓR ZAWORU</b>: typ zaworu, napięcie 12/24 V, test pełny lub szybki. Pasek „Wykryto cewkę” pokazuje R i τ zmierzone po podłączeniu. Przycisk USTERKA przełącza symulowaną usterkę (to samo co panel Wypróbuj).</li>
+      <li><b>TEST W TOKU</b>: pasek siedmiu faz, wykres bieżącej fazy i odczyty R20, t_on, I_pick, temperatura uzwojenia.</li>
+      <li><b>PRZEMIATANIE</b>: na górze prąd średni I(D), na dole położenie tłoczka L/L0, bursztynowy kursor to bieżące D. Gdy pojawi się odchyłka, po prawej zapala się ramka <b>STREFA!</b> z zakresem D.</li>
+      <li><b>WYNIK TESTU</b>: wynik 0–100, werdykt, lista ustaleń i zalecenie. „potw. 3/3” w nagłówku mówi, w ilu z trzech wolnych przemiatań usterka wyszła w tym samym miejscu.</li>
+    </ul>
+    <div class="tw"><table>
+      <thead><tr><th>Znak na wykresie</th><th>Znaczenie</th></tr></thead>
+      <tbody>
+        <tr><td><span class="sw" style="background:#46e0f2"></span>turkus</td><td>prąd i położenie, przemiatanie wolne, impulsy skoku na zimno</td></tr>
+        <tr><td><span class="sw" style="background:#b89cff"></span>fiolet</td><td>przemiatanie średnie (ok. 6 s), w skoku impulsy przy 9 V</td></tr>
+        <tr><td><span class="sw" style="background:#ffffff"></span>biały</td><td>przemiatanie szybkie (ok. 1 s)</td></tr>
+        <tr><td><span class="sw" style="background:#ff8a3d"></span>pomarańcz</td><td>pomiary na gorąco (faza 7)</td></tr>
+        <tr><td><span class="sw" style="background:#5c7086;height:5px"></span>szary, szerszy</td><td>wzorzec sprawnego zaworu w tej samej temperaturze</td></tr>
+        <tr><td><span class="sw" style="background:repeating-linear-gradient(90deg,#ffb22e 0 4px,transparent 4px 7px)"></span>bursztyn przerywany</td><td>znacznik pomiaru: t_on albo bieżące D</td></tr>
+        <tr><td><span class="sw" style="background:#ff5048"></span>czerwony ślad</td><td>impuls, w którym tłoczek się zawiesił (brak dołka)</td></tr>
+        <tr><td><span class="swb" style="background:#ffd03a"></span>żółte pole</td><td>strefa ostrzegawcza: odchyłka położenia powyżej 12 % skoku</td></tr>
+        <tr><td><span class="swb" style="background:#ff5048"></span>czerwone pole</td><td>strefa usterki: odchyłka położenia powyżej 22 % skoku</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+  <div class="panel">
+    <h2>Jak czytać wykresy</h2>
+    <ul>
+      <li><b>I(D)</b>, prąd średni od wypełnienia: prawie prosta, nachylenie zależy od rezystancji cewki. Wyżej od wzorca: zwarcie zwojów. Niżej lub z zapadami do zera: przerwa albo zły styk.</li>
+      <li><b>L/L0</b>, położenie tłoczka: rośnie, gdy tłoczek się wsuwa. Krzywa w górę i w dół tworzy pętlę histerezy, czyli tarcie. Schodek lub płaski odcinek to zacinanie w tej strefie, płaska linia na całej szerokości to blokada.</li>
+      <li><b>Skok</b>, prąd po załączeniu: narastanie z dołkiem. Dołek to koniec ruchu tłoczka (t_on). Brak dołka oznacza brak ruchu albo zawieszenie.</li>
+      <li><b>t_on</b>, histogram czasów zadziałania: wąski słupek przy wzorcu to zawór powtarzalny. Szeroki rozrzut to nierówne tarcie, a czerwony licznik to zawieszenia.</li>
+    </ul>
+  </div>
+  <div class="panel">
+    <h2>Werdykt</h2>
+    <div class="tw"><table>
+      <thead><tr><th>Werdykt</th><th>Wynik</th><th>Znaczenie</th></tr></thead>
+      <tbody>
+        <tr><td class="ok"><b>SPRAWNY</b></td><td>70–100</td><td>Wszystkie pomiary w granicach wzorca w całym zakresie regulacji, na zimno i na gorąco.</td></tr>
+        <tr><td class="warn"><b>UWAGA</b></td><td>36–69</td><td>Zawór pracuje, ale coś odbiega od normy. Zalecane powtórzenie testu.</td></tr>
+        <tr><td class="fail"><b>USZKODZONY</b></td><td>0–35</td><td>Usterka potwierdzona. Tester podaje przyczynę i zalecenie.</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+  <div class="panel">
+    <h2>Usterki w symulacji</h2>
+    <div class="tw"><table>
+      <thead><tr><th>Usterka</th><th>Przyczyna mechaniczna</th><th>Ślad w pomiarze</th><th>Werdykt</th></tr></thead>
+      <tbody id="scTable"></tbody>
+    </table></div>
+  </div>
+  <div class="panel">
+    <h2>Założenia i ograniczenia symulacji</h2>
+    <ul>
+      <li>Zawór to model fizyczny: cewka z indukcyjnością zależną od położenia tłoczka, tłoczek ze sprężyną, tłumieniem i tarciem oraz model cieplny uzwojenia. Parametry czterech typów zaworów są przykładowe, nie są pomiarami konkretnych części.</li>
+      <li>Progi oceny (R ±5 / ±10 %, τ, t_on, rozrzut, histereza, strefy) są takie jak w firmware testera.</li>
+      <li>Rozgrzewanie jest w symulacji przyspieszone, żeby faza 6 nie trwała kilku minut.</li>
+      <li>Test hydrauliczny zaworu zamontowanego w pracującym podzespole (np. pompa wtryskowa) to kolejny etap projektu i nie jest tu symulowany.</li>
+      <li>Firmware testera został sprawdzony na komputerze, ale nie był jeszcze uruchomiony w prawdziwym urządzeniu.</li>
+    </ul>
+  </div>
+</div>
+
+<p class="note" style="margin-top:14px">To SYMULACJA. Pomiary są wynikiem modelu, a nie odczytem z urządzenia. © 2026 EKOTRONIK</p>
+</div>
+
+<script>
+"use strict";
+/* =====================================================================
+   DANE: zawory i scenariusze
+   ===================================================================== */
+const VALVES=[
+ {cat:"FAZA ROZRZĄDU",name:"VVT / OCV",R20:7.94,tau:3.1,f:250,ds:.18,de:.74,icon:0},
+ {cat:"CIŚNIENIE OLEJU",name:"Pompa oleju",R20:7.20,tau:3.6,f:200,ds:.22,de:.80,icon:1},
+ {cat:"PALIWO BENZYNA",name:"Zawór HP",R20:2.10,tau:1.6,f:500,ds:.14,de:.62,icon:2},
+ {cat:"PALIWO DIESEL",name:"MPROP / IMV",R20:2.90,tau:2.2,f:185,ds:.16,de:.66,icon:3}];
+
+const SCEN=[
+ {id:"ok",name:"Sprawny",sev:0,verdict:"SPRAWNY",p:{},
+  mech:"Tłoczek i suwak przesuwają się płynnie, sprężyna ma właściwą siłę, prowadzenie jest czyste.",
+  cur:"Prąd I(D) leży na wzorcu. Krzywa L/L0 tworzy wąską pętlę. W skoku dołek prądu pojawia się zawsze w tym samym czasie, także przy 9 V i na gorąco.",
+  ver:"SPRAWNY, wynik 85–99 / 100. Brak stref na wykresach.",
+  watch:"Porównaj z innymi scenariuszami: <b>wąska pętla L/L0</b> i <b>jeden wąski słupek t_on</b>."},
+ {id:"stick",name:"Zacinanie w strefie",sev:2,verdict:"USZKODZONY",
+  p:{zone:{lo:.42,hi:.60,F:.24},stickProb:.12},
+  mech:"Wytarty rowek lub zadzior na suwaku w środku skoku. W tym miejscu tarcie rośnie skokowo i tłoczek się zatrzymuje, a po zebraniu siły przeskakuje dalej.",
+  cur:"Na L/L0 widać płaski odcinek i schodek w środku zakresu wypełnienia, za każdym razem w tym samym miejscu. W skoku część impulsów nie ma dołka, bo tłoczek staje w połowie drogi.",
+  ver:"USZKODZONY: strefa zacinania, zawieszenia tłoczka w cyklach dynamicznych, potwierdzenie 3/3.",
+  watch:"W trakcie przemiatania patrz na <b>czerwone pole w środku zakresu D</b> na wykresie L/L0."},
+ {id:"wear",name:"Zużycie / słaba sprężyna",sev:2,verdict:"USZKODZONY",
+  p:{spring:.72,preload:.65,fsk:3,fck:3.5},
+  mech:"Sprężyna powrotna straciła siłę wstępną i sztywność, a zużyte prowadzenie zwiększa tarcie i luz.",
+  cur:"Tłoczek rusza i dochodzi do końca przy mniejszym wypełnieniu, więc krzywa L/L0 jest przesunięta w lewo względem wzorca. Pętla histerezy jest szersza. Prąd I(D) pozostaje prawidłowy, bo cewka jest sprawna.",
+  ver:"USZKODZONY: przesunięta charakterystyka (punkt pracy kilkanaście punktów D niżej), szeroka strefa odchyłki położenia. Czas zadziałania jest nieco krótszy, bo słabsza sprężyna mniej hamuje tłoczek.",
+  watch:"Zwróć uwagę, że <b>I(D) jest dobre</b>, a usterkę zdradza dopiero <b>L/L0</b>. Sam pomiar rezystancji jej nie wykryje."},
+ {id:"block",name:"Blokada tłoczka",sev:2,verdict:"USZKODZONY",p:{block:true},
+  mech:"Tłoczek zakleszczony: zapieczony osad, wżer korozyjny lub odkształcona tuleja. Tłoczek nie rusza przy żadnym wypełnieniu.",
+  cur:"Prąd jest prawidłowy, cewka działa. L/L0 to płaska linia na całym zakresie. W skoku prąd narasta gładko bez dołka.",
+  ver:"USZKODZONY: brak ruchu tłoczka w zakresie 0–100 %, zalecana wymiana.",
+  watch:"<b>Płaski L/L0</b> i <b>brak dołka</b> w skoku, przy dobrym R."},
+ {id:"short",name:"Zwarcie zwojów",sev:2,verdict:"USZKODZONY",p:{Rk:.84,Lk:.72,L1k:.72,kf:.84},
+  mech:"Przegrzana izolacja lakierowa zwarła część zwojów. Mechanika jest sprawna, ale cewka ma mniej czynnych zwojów.",
+  cur:"Rezystancja spada o około 16 %, a stała czasowa jest krótsza. Prąd I(D) idzie wyraźnie nad wzorcem. Siła magnetyczna prawie się nie zmienia, bo mniej zwojów niesie większy prąd.",
+  ver:"USZKODZONY: rezystancja za niska, prąd za duży, stała czasowa mała. Uszkodzona cewka.",
+  watch:"<b>I(D) nad szarym wzorcem</b> na całym zakresie, L/L0 bez zmian."},
+ {id:"open",name:"Przerywany styk",sev:2,verdict:"USZKODZONY",p:{Rk:1.22,dropP:.14},
+  mech:"Pęknięty lut wyprowadzenia cewki albo skorodowany styk w złączu. Połączenie co chwilę się rozłącza, zwłaszcza przy drganiach.",
+  cur:"Rezystancja jest wyższa od normy, a prąd I(D) leży pod wzorcem. Na wykresach pojawiają się krótkie zapady do zera, w skoku prąd nagle opada w połowie narastania.",
+  ver:"USZKODZONY: rezystancja za wysoka i przerwy prądu. Sprawdzić złącze, przewody i wyprowadzenia cewki.",
+  watch:"Szukaj <b>pionowych zapadów</b> na I(D) i <b>uciętych impulsów</b> w skoku."},
+ {id:"dirt",name:"Zanieczyszczenie (opiłki)",sev:2,verdict:"USZKODZONY",p:{stickProb:.15,dirt:true},
+  mech:"Opiłki i nagar w oleju dostają się między suwak a tuleję. Tłoczek zawiesza się losowo, za każdym razem w innym miejscu.",
+  cur:"Pojedyncze schodki na L/L0 pojawiają się w różnych miejscach w kolejnych przemiataniach, więc strefa zwykle się nie potwierdza. Za to w cyklach dynamicznych jest dużo zawieszeń i szeroki rozrzut t_on.",
+  ver:"USZKODZONY: zawieszenia tłoczka i rozrzut t_on. Zalecenie: wymiana zaworu, sprawdzenie oleju i filtra.",
+  watch:"Porównaj z „Zacinaniem w strefie”: tu <b>strefy skaczą</b> między cyklami, a <b>histogram t_on</b> jest rozmyty."},
+ {id:"hot",name:"Zacieranie na gorąco",sev:2,verdict:"USZKODZONY",p:{hotK:6,hotStick:.35},
+  mech:"Za mały luz suwaka w tulei albo odkształcony korpus. Po nagrzaniu elementy rozszerzają się i tarcie gwałtownie rośnie.",
+  cur:"Na zimno wszystko wygląda dobrze. Po rozgrzaniu, w ostatniej fazie, ślady skoku są wyraźnie wolniejsze, część zawiesza się, a pomarańczowa pętla L/L0 jest dużo szersza.",
+  ver:"USZKODZONY: na gorąco gorzej, zawieszenia po rozgrzaniu. Typowy zawór, który „wariuje” dopiero na ciepłym silniku.",
+  watch:"Obserwuj fazę 7: <b>pomarańczowe ślady</b> odstają od turkusowych z fazy zimnej."},
+ {id:"stiff",name:"Duże tarcie / lakier",sev:2,verdict:"USZKODZONY",p:{fsk:7,fck:7,dck:1.8},
+  mech:"Lakier olejowy i osad na całej długości suwaka. Tłoczek porusza się, ale potrzebuje dużo większej siły, by ruszyć.",
+  cur:"Szeroka pętla histerezy L/L0 na całym zakresie, punkt pracy przesunięty w prawo. Przy 9 V tłoczek w ogóle nie rusza, a przy 13,5 V dołek pojawia się później.",
+  ver:"USZKODZONY: nie zadziałał przy 9 V, duża histereza, przesunięta charakterystyka.",
+  watch:"Najlepiej widać to w <b>skoku 9 V</b> (brak dołka) i w <b>szerokiej pętli</b> L/L0."},
+ {id:"weak",name:"Lekkie zużycie (granica)",sev:1,verdict:"UWAGA",p:{spring:.9,preload:.88,fsk:2.2,fck:2.4},
+  mech:"Zawór po dużym przebiegu: sprężyna trochę osłabła, prowadzenie lekko wytarte. Jeszcze działa poprawnie.",
+  cur:"Pętla L/L0 jest nieco szersza od wzorca, a punkt pracy przesuwa się o kilka punktów D w lewo. Prąd i skok są w normie.",
+  ver:"UWAGA: zawór na granicy. Zalecane powtórzenie testu i obserwacja.",
+  watch:"Wynik w środkowym przedziale skali, <b>żółte</b> wpisy na liście."}
+];
+
+/* =====================================================================
+   NARZĘDZIA
+   ===================================================================== */
+let seed=(Date.now()&0xffffffff)>>>0;
+function rand(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+const fmt=(v,d=1)=>(isFinite(v)?v:0).toFixed(d).replace(".",",").replace("-","−");
+const median=a=>{if(!a.length)return 0;const t=[...a].sort((x,y)=>x-y),n=t.length;return n&1?t[n>>1]:(t[n/2-1]+t[n/2])/2};
+const mean=a=>a.length?a.reduce((s,x)=>s+x,0)/a.length:0;
+const sd=a=>{if(a.length<2)return 0;const m=mean(a);return Math.sqrt(a.reduce((s,x)=>s+(x-m)*(x-m),0)/(a.length-1))};
+
+/* =====================================================================
+   MODEL ZAWORU (jak w oprogramowaniu testera)
+   Elektryka:  U·D = R·i + L(x)·di/dt + i·L1·v
+   Mechanika:  m·a = kf·i·(1+GX·x) − k·(x+x0) − b·v − tarcie
+   ===================================================================== */
+const ALPHA=0.00393,GX=0.6,NOM=13.5,KF_STEP=1.35,BINS=51;
+class Valve{
+  constructor(vt,p,U){
+    this.vt=vt;this.p=p;this.U=U;
+    this.R20=vt.R20*(p.Rk||1);
+    const Lt=vt.tau*1e-3*vt.R20;
+    this.L0=Lt*(p.Lk||1);this.L1=.5*Lt*(p.L1k||1);
+    const iS=vt.ds*NOM/vt.R20,iE=vt.de*NOM/vt.R20;
+    this.kf=p.kf||1;
+    this.k=iE*(1+GX)-iS;this.x0=iS/this.k;
+    const w=2*Math.PI*260;this.m=this.k/(w*w);this.b=2*.12*Math.sqrt(this.k*this.m);
+    this.dcSt=Math.max(0,.55*NOM/vt.R20-iS)*(p.dck||1);
+    if(p.spring){const pre=this.k*this.x0;this.k*=p.spring;this.x0=pre*(p.preload||1)/this.k}
+    const kb=iE*(1+GX)-iS;           // tarcie liczone od sztywności nominalnej
+    this.fs=.015*kb*(p.fsk||1);this.fc=.008*kb*(p.fck||1);
+    this.kb=kb;
+    this.zone=p.zone||null;this.stickProb=p.stickProb||0;this.hotK=p.hotK||0;this.hotStick=p.hotStick||0;
+    this.block=!!p.block;this.dropP=p.dropP||0;this.dirt=!!p.dirt;this.dirtZone=null;
+    this.rth=60/(NOM*NOM/vt.R20);this.tauTh=60;this.amb=22;this.T=22;
+    this.x=0;this.dropT=0;
+  }
+  R(){return this.R20*(1+ALPHA*(this.T-20))}
+  hotF(){return this.hotK?1+this.hotK*Math.max(0,this.T-38)/10:1}
+  fsAt(x){let f=this.fs*this.hotF();const z=this.zone;if(z&&x>=z.lo&&x<=z.hi)f+=z.F*this.kb;const d=this.dirtZone;if(d&&Math.abs(x-d.c)<d.w)f+=d.F*this.kb;return f}
+  fcAt(x){let f=this.fc*this.hotF();const z=this.zone;if(z&&x>=z.lo&&x<=z.hi)f+=z.F*this.kb*.35;const d=this.dirtZone;if(d&&Math.abs(x-d.c)<d.w)f+=d.F*this.kb*.3;return f}
+  heat(P,dt){const tg=this.amb+P*this.rth;this.T+=(tg-this.T)*(1-Math.exp(-dt/this.tauTh))}
+  Lnow(){return this.L0+this.L1*this.x}
+  /* praca ciągła PWM: stan quasi-statyczny (dither PWM zmniejsza tarcie statyczne) */
+  pwm(D,dt,rate){
+    const R=this.R();let i=D*this.U/R;let drop=false;
+    if(this.dropP&&this.dropT<=0&&D>.05&&rand()<this.dropP*dt){this.dropT=.04+.12*rand()}
+    if(this.dropT>0){this.dropT-=dt;drop=true;i=0}
+    const xo=this.x;
+    if(!this.block){
+      const F=this.kf*i,den=this.k-GX*F,push=F-this.k*this.x0,visc=.03*this.kb*Math.abs(rate);
+      const fS=this.fsAt(xo)+visc,lo=(push-fS)/den,hi=(push+fS)/den;
+      let xn=xo;
+      if(xo<lo){let fK=this.fcAt(xo)+visc;xn=(push-fK)/den;fK=this.fcAt(xn)+visc;xn=Math.max(lo,(push-fK)/den)}
+      else if(xo>hi){let fK=this.fcAt(xo)+visc;xn=(push+fK)/den;fK=this.fcAt(xn)+visc;xn=Math.min(hi,(push+fK)/den)}
+      this.x=clamp(xn,0,1);
+    }
+    const v=(this.x-xo)/dt;
+    if(!drop)i=D*this.U/(R+this.L1*Math.max(-50,Math.min(50,v)));
+    this.heat(i*i*R,dt);
+    return{i,drop};
+  }
+  /* odpowiedź na skok napięcia: pełna symulacja dynamiczna, 20 kHz, 40 ms */
+  step(scale,onMs=26,fs=20000,n=800,jitter=true){
+    const R=this.R(),sub=5,h=1/fs/sub,U=this.U*scale;
+    const kf=KF_STEP*this.kf*(jitter?1+.035*(rand()-.5):1);
+    let i=0,x=0,v=0,stuckAt=1,reached=false,ton=0,tIdx=-1;
+    let pStick=this.stickProb;if(this.hotStick&&this.T>45)pStick+=this.hotStick;
+    if(jitter&&pStick&&rand()<pStick)stuckAt=.25+.3*rand();
+    let dropAt=-1;if(jitter&&this.dropP&&rand()<.3)dropAt=3+rand()*16;
+    const tr=new Float32Array(n);
+    for(let kk=0;kk<n;kk++){
+      for(let s=0;s<sub;s++){
+        const t=(kk*sub+s)*h*1000;
+        let u=t<onMs?U:(i>0?-.8:0);
+        if(dropAt>=0&&t>=dropAt&&t<dropAt+2.5)u=i>0?-.8:0;
+        const L=this.L0+this.L1*x;
+        i+=(u-R*i-i*this.L1*v)/L*h;if(i<0)i=0;
+        if(this.block)continue;
+        const F=kf*i*(1+GX*x)-this.k*(x+this.x0)-this.b*v;
+        if(Math.abs(v)<1e-3&&Math.abs(F)<=this.fsAt(x)+(x<.002?this.dcSt:0)){v=0;continue} // zerwanie z gniazda bez ditheru PWM
+        const dir=Math.abs(v)>=1e-3?(v>0?1:-1):(F>0?1:-1);
+        const a=(F-this.fcAt(x)*dir)/this.m;const vn=v+a*h;
+        v=(v!==0&&(vn>0)!==(v>0))?0:vn;x+=v*h;
+        if(x<0){x=0;if(v<0)v=0}
+        if(x>stuckAt){x=stuckAt;if(v>0)v=0}
+        if(x>=.985&&!reached&&t<onMs){reached=true;ton=t;tIdx=kk}
+      }
+      tr[kk]=i;
+    }
+    let ipick=0;if(tIdx>0){for(let k=0;k<=tIdx;k++)ipick=Math.max(ipick,tr[k])}
+    return{tr,reached,ton,ipick,tIdx,drop:dropAt>=0};
+  }
+}
+
+/* =====================================================================
+   SILNIK TESTU: fazy, przemiatanie, analiza, werdykt
+   ===================================================================== */
+const PHASES=["IDENTYFIKACJA","TEST STATYCZNY","SKOK 13,5 V / 9 V","CHARAKTERYSTYKA I(D)","CYKLE DYNAMICZNE","ROZGRZANIE","POWTÓRKA NA GORĄCO"];
+const SPEED={slow:{name:"WOLNO",dur:30,col:"#46e0f2"},med:{name:"ŚREDNIO",dur:6,col:"#b89cff"},fast:{name:"SZYBKO",dur:1,col:"#ffffff"},hot:{name:"NA GORĄCO",dur:15,col:"#ff8a3d"}};
+const NARR=[
+ "Krótki impuls rozpoznaje cewkę. Tester mierzy rezystancję i stałą czasową τ = L/R, czyli sprawdza, czy podłączony zawór pasuje do wybranego typu.",
+ "Pomiar rezystancji R20 przy małym wypełnieniu. Na wykresie przebieg prądu w kolejnych okresach PWM: narastanie przy załączeniu i opadanie przez diodę.",
+ "Pełne napięcie na 26 ms. Dołek w narastaniu prądu to chwila, gdy tłoczek dochodzi do końca (t_on). Ostatnie impulsy idą przy 9 V, żeby sprawdzić zapas siły.",
+ "Przemiatanie wypełnienia 0→100→0 %. Górny wykres to prąd średni, dolny to położenie tłoczka L/L0. Szary pas to wzorzec. Odchyłki są od razu zaznaczane jako strefy.",
+ "Seria szybkich załączeń. Tester mierzy t_on w każdym cyklu i liczy zawieszenia, gdy tłoczek nie dojdzie do końca.",
+ "Cewka grzeje się przy D = 90 %. Temperaturę uzwojenia tester liczy z przyrostu rezystancji miedzi (0,393 %/K).",
+ "Te same pomiary na gorącym zaworze. Pomarańczowe ślady porównuje z zimnymi z fazy 3 i 4."];
+
+class Engine{
+  constructor(){this.reset()}
+  reset(){this.st=null;this.running=false;this.finished=false}
+  start(valveIdx,scen,U,mode){ // mode: full | quick | sweep
+    const vt=VALVES[valveIdx];
+    this.vt=vt;this.scen=scen;this.U=U;this.mode=mode;
+    this.v=new Valve(vt,scen.p,U);
+    this.twin=new Valve(vt,{},U);           // wzorzec sprawnego zaworu
+    const quick=mode==="quick";
+    const S={phase:0,cycle:0,cycleTarget:0,progress:0,D:0,I:0,T:22,R:0,f:vt.f,
+      tonLast:0,ipickLast:0,stalls:0,steps:[],stepsHot:[],refStep:null,sweeps:[],live:null,
+      tons:[],tonsDyn:[],tons9:[],fail9:0,tonsHot:[],refTons:[],refTonsHot:[],stuckCold:0,stuckHot:0,
+      heatLog:[],drops:0,wave:null,probe:null,R20:0,tauMs:0,Lid:0,result:null,quick,sweepOnly:mode==="sweep",
+      sweepLabel:"",phaseT:0};
+    this.st=S;this.running=true;this.finished=false;this.t=0;
+    const tasks=[];
+    if(mode!=="sweep"){
+      tasks.push({ph:0,kind:"identify",dur:2});
+      tasks.push({ph:1,kind:"static",dur:3});
+      tasks.push({ph:2,kind:"steps",n13:quick?5:10,n9:quick?3:5,gap:.35});
+    }else{tasks.push({ph:0,kind:"identify",dur:1.2})}
+    const sw=mode==="sweep"?["slow","slow","slow","med","med","fast","fast"]:quick?["slow","slow","fast","fast"]:["slow","slow","slow","med","med","med","fast","fast","fast","fast","fast"];
+    tasks.push({ph:3,kind:"sweeps",list:sw});
+    if(mode!=="sweep"){
+      tasks.push({ph:4,kind:"dynamic",n:quick?40:120,gap:.05});
+      tasks.push({ph:5,kind:"heat",rise:quick?25:40,max:90});
+      tasks.push({ph:6,kind:"hot",n:quick?3:5,gap:.35,sweep:!quick});
+    }
+    this.tasks=tasks;this.ti=-1;this.next();
+    // waga faz do paska postępu (wg czasu)
+    this.w=tasks.map(t=>t.kind==="sweeps"?t.list.reduce((s,k)=>s+SPEED[k].dur*(k==="slow"&&quick?.4:1),0):t.kind==="steps"?(t.n13+t.n9)*t.gap:t.kind==="dynamic"?t.n*t.gap:t.kind==="heat"?25:t.kind==="hot"?t.n*t.gap+(t.sweep?15:0):t.dur);
+    this.wsum=this.w.reduce((a,b)=>a+b,0);
+  }
+  next(){
+    this.ti++;const S=this.st;
+    if(this.ti>=this.tasks.length){this.finish();return}
+    const t=this.task=this.tasks[this.ti];S.phase=t.ph;S.phaseT=0;t.el=0;t.i=0;S.cycle=0;
+    if(t.kind==="sweeps"){t.si=-1;this.nextSweep()}
+    if(t.kind==="heat"){S.T0=this.v.T;S.heatLog=[]}
+    if(t.kind==="dynamic"){S.cycleTarget=t.n}
+    if(t.kind==="steps"){S.cycleTarget=t.n13+t.n9}
+    if(t.kind==="hot"){S.cycleTarget=t.n;t.sweepDone=!t.sweep}
+  }
+  nextSweep(){
+    const t=this.task,S=this.st;t.si++;
+    if(t.si>=t.list.length){S.live=null;this.next();return}
+    const sp=t.list[t.si];const dur=SPEED[sp].dur*(sp==="slow"&&S.quick?.4:1);
+    this.beginSweep(sp,dur);S.cycle=t.si+1;S.cycleTarget=t.list.length;
+  }
+  beginSweep(sp,dur){
+    const S=this.st,mk=()=>new Float32Array(BINS);
+    const c={speed:sp,dur,iUp:mk(),iDn:mk(),lUp:mk(),lDn:mk(),okUp:new Uint8Array(BINS),okDn:new Uint8Array(BINS),
+      rUp:mk(),rDn:mk(),riUp:mk(),riDn:mk(),drop:new Uint8Array(BINS*2),el:0,acc:null,bin:-1,up:true};
+    if(this.v.dirt)this.v.dirtZone=rand()<.75?{c:.15+.7*rand(),w:.06,F:.3}:null;
+    this.v.x=0;this.twin.x=0;
+    S.live=c;S.sweepLabel=SPEED[sp].name;
+  }
+  tick(dtReal,speed){
+    if(!this.running)return;
+    let rem=dtReal*speed;
+    let guard=0;
+    while(rem>0&&this.running&&guard++<4000){
+      const used=this.stepTask(Math.min(rem,.05));rem-=used;
+    }
+  }
+  prog(frac){const S=this.st;let a=0;for(let k=0;k<this.ti;k++)a+=this.w[k];S.progress=clamp((a+this.w[this.ti]*clamp(frac,0,1))/this.wsum,0,1)}
+  stepTask(dt){
+    const t=this.task,S=this.st,v=this.v;
+    S.phaseT+=dt;
+    switch(t.kind){
+      case"identify":{t.el+=dt;S.D=.5;this.idle(dt,.5);
+        if(!S.probe){const Rm=v.R()*(1+.003*(rand()-.5));S.probe={R:Rm,tau:v.L0/Rm*1000};S.Lid=v.L0}
+        S.R=S.probe.R;this.prog(t.el/t.dur);if(t.el>=t.dur)this.next();return dt}
+      case"static":{t.el+=dt;S.D=.3;this.idle(dt,.3);
+        if(!S.R20){const Rm=v.R()*(1+.003*(rand()-.5));S.R20=Rm/(1+ALPHA*(v.T-20));S.tauMs=v.L0/v.R()*1000}
+        S.R=S.R20*(1+ALPHA*(v.T-20));this.prog(t.el/t.dur);if(t.el>=t.dur)this.next();return dt}
+      case"steps":case"hot":{
+        if(t.kind==="hot"&&t.i>=t.n){ // przemiatanie na gorąco
+          if(!t.sweepDone){
+            if(!S.live){this.beginSweep("hot",15);S.cycle=1;S.cycleTarget=1}
+            const u=this.sweepRun(dt);
+            this.prog((t.n*t.gap+S.live.el)/(t.n*t.gap+15));
+            if(S.live.el>=S.live.dur){this.endSweep();t.sweepDone=true}
+            return u;
+          }
+          this.next();return 0;
+        }
+        t.el+=dt;S.D=0;this.idle(dt,0);
+        if(t.el>=t.gap){t.el=0;this.doStep(t);}
+        const tot=t.kind==="steps"?t.n13+t.n9:t.n+(t.sweep?1:0);
+        this.prog(t.kind==="steps"?t.i/tot:(t.i*t.gap)/(t.n*t.gap+(t.sweep?15:0)));
+        if(t.kind==="steps"&&t.i>=tot)this.next();
+        return dt}
+      case"sweeps":{const u=this.sweepRun(dt);
+        const c=S.live;if(!c)return u;
+        const total=this.w[this.ti];let done=0;for(let k=0;k<t.si;k++){const sp=t.list[k];done+=SPEED[sp].dur*(sp==="slow"&&S.quick?.4:1)}
+        this.prog((done+c.el)/total);
+        if(c.el>=c.dur){this.endSweep();this.nextSweep()}
+        return u}
+      case"dynamic":{t.el+=dt;S.D=0;this.idle(dt,0);
+        while(t.el>=t.gap&&t.i<t.n){t.el-=t.gap;t.i++;
+          const r=v.step(1);S.cycle=t.i;
+          if(r.reached){S.tonsDyn.push(r.ton);S.tonLast=r.ton;S.ipickLast=r.ipick}else{S.stalls++}
+          if(r.drop)S.dropsStep=(S.dropsStep||0)+1;
+          if(t.i%10===0||!r.reached){S.steps.unshift({tr:r.tr,stuck:!r.reached,ton:r.ton,tIdx:r.tIdx,scale:1,dyn:true});S.steps.length=Math.min(S.steps.length,8)}
+        }
+        this.prog(t.i/t.n);if(t.i>=t.n)this.next();return dt}
+      case"heat":{t.el+=dt;S.D=.9;
+        // rozgrzewanie: model cieplny przyspieszony 4×, żeby faza trwała ok. 25 s
+        const r=v.pwm(.9,dt,0);v.heat(r.i*r.i*v.R(),dt*3);S.I=r.i;S.T=v.T;S.R=S.R20*(1+ALPHA*(v.T-20));
+        if(!S.heatLog.length||t.el-S.heatLog[S.heatLog.length-1].t>.25)S.heatLog.push({t:t.el,T:v.T});
+        const rise=v.T-S.T0;this.prog(rise/t.rise);
+        if(rise>=t.rise||t.el>t.max)this.next();return dt}
+    }
+    return dt;
+  }
+  idle(dt,D){const r=this.v.pwm(D,dt,0);this.st.I=r.i;this.st.T=this.v.T;this.twin.T=this.v.T;
+    if(D>0){this.st.R=this.st.R20?this.st.R20*(1+ALPHA*(this.v.T-20)):this.v.R()}}
+  doStep(t){
+    const S=this.st,v=this.v;
+    let scale=1,hot=t.kind==="hot";
+    if(t.kind==="steps"&&t.i>=t.n13)scale=9/13.5;
+    const r=v.step(scale);this.twin.T=v.T;const rr=this.twin.step(scale,26,20000,800,false);
+    t.i++;S.cycle=t.i;
+    if(!S.refStep||(hot&&!S.refStepHot)){if(hot)S.refStepHot=rr.tr;else S.refStep=rr.tr}
+    const rec={tr:r.tr,stuck:!r.reached,ton:r.ton,tIdx:r.tIdx,scale,hot};
+    if(hot){S.stepsHot.unshift(rec);if(r.reached){S.tonsHot.push(r.ton);S.refTonsHot.push(rr.ton)}else S.stuckHot++}
+    else{S.steps.unshift(rec);
+      if(scale<1){if(r.reached)S.tons9.push(r.ton);else S.fail9++}
+      else{if(r.reached){S.tons.push(r.ton);S.refTons.push(rr.ton)}else S.stuckCold++}}
+    S.steps.length=Math.min(S.steps.length,8);S.stepsHot.length=Math.min(S.stepsHot.length,8);
+    if(r.reached){S.tonLast=r.ton;S.ipickLast=r.ipick}
+    if(r.drop)S.dropsStep=(S.dropsStep||0)+1;
+  }
+  sweepRun(dt){
+    const S=this.st,c=S.live,v=this.v,tw=this.twin;
+    const h=Math.min(dt,c.dur/400);
+    c.el+=h;const half=c.dur/2;const up=c.el<half;
+    const D=up?clamp(c.el/half,0,1):clamp(1-(c.el-half)/half,0,1);
+    const rate=2/c.dur;
+    const r=v.pwm(D,h,rate);tw.T=v.T;const rt=tw.pwm(D,h,rate);
+    S.D=D;S.I=r.i;S.T=v.T;S.R=D>.3&&r.i>.02?D*this.U/r.i:S.R;
+    const b=Math.round(D*(BINS-1));
+    const Lm=r.drop?0:v.Lnow()/S.Lid*(1+.004*(rand()-.5));const Lr=tw.Lnow()/tw.L0;
+    if(b!==c.bin||up!==c.up){this.flushBin(c);c.bin=b;c.up=up;c.acc={i:0,l:0,ri:0,rl:0,n:0,drop:0}}
+    const a=c.acc;a.i+=r.i;a.l+=Lm;a.ri+=rt.i;a.rl+=Lr;a.n++;if(r.drop)a.drop=1;
+    return h;
+  }
+  flushBin(c){
+    const a=c.acc;if(!a||!a.n||c.bin<0)return;const b=c.bin;
+    const iv=a.i/a.n,lv=a.l/a.n,ri=a.ri/a.n,rl=a.rl/a.n,ok=(b/(BINS-1))>=.04&&!a.drop?1:0;
+    if(c.up){c.iUp[b]=iv;c.lUp[b]=lv;c.okUp[b]=ok;c.rUp[b]=rl;c.riUp[b]=ri}
+    else{c.iDn[b]=iv;c.lDn[b]=lv;c.okDn[b]=ok;c.rDn[b]=rl;c.riDn[b]=ri}
+    if(a.drop){c.drop[b+(c.up?0:BINS)]=1;this.st.drops++}
+  }
+  endSweep(){const S=this.st,c=S.live;this.flushBin(c);c.acc=null;S.sweeps.push(c);S.live=null;this.v.dirtZone=null}
+  finish(){this.running=false;this.finished=true;this.st.progress=1;this.st.D=0;this.st.result=analyze(this.st,this.vt,this.scen)}
+  stop(){this.running=false;this.finished=false;if(this.st)this.st.aborted=true}
+}
+
+/* ---------- analiza i werdykt (progi jak w oprogramowaniu) ---------- */
+function zoneDev(c){const out=new Float32Array(BINS);for(let b=0;b<BINS;b++)out[b]=c.okUp[b]?Math.abs(c.lUp[b]-c.rUp[b])/.5:0;return out}
+function crossD(l,ok,lvl,upDir){ // D przy którym krzywa przekracza poziom
+  const idx=[...Array(BINS).keys()];if(!upDir)idx.reverse();
+  for(let n=1;n<idx.length;n++){const a=idx[n-1],b=idx[n];if(!ok[a]||!ok[b])continue;
+    const la=l[a],lb=l[b];if((la-lvl)*(lb-lvl)<=0&&la!==lb){const f=(lvl-la)/(lb-la);return(a+(b-a)*f)/(BINS-1)}}
+  return NaN}
+function hystOf(c){const r=[];for(const q of[.25,.5,.75]){const lv=1+.5*q;
+  const u=crossD(c.lUp,c.okUp,lv,true),d=crossD(c.lDn,c.okDn,lv,true);if(isFinite(u)&&isFinite(d))r.push((u-d)*100)}
+  return r.length?mean(r):NaN}
+function analyze(S,vt,scen){
+  const F=[];const add=(sev,title,detail,value)=>F.push({sev,title,detail,value});
+  const slow=S.sweeps.filter(c=>c.speed==="slow");const hotSw=S.sweeps.find(c=>c.speed==="hot");
+  const M={};
+  // brak ruchu
+  let span=0;for(const c of slow){let lo=9,hi=0;for(let b=0;b<BINS;b++)if(c.okUp[b]){lo=Math.min(lo,c.lUp[b]);hi=Math.max(hi,c.lUp[b])}span=Math.max(span,hi-lo)}
+  M.noMotion=slow.length&&span<.08;
+  if(!S.sweepOnly){
+    const rr=S.R20/vt.R20;M.rr=rr;const val=fmt(S.R20,2)+" Ω";
+    if(rr<.9)add(2,"Rezystancja za niska","możliwe zwarcie zwojów",val);
+    else if(rr<.95)add(1,"Rezystancja niska","próg ±5 %",val);
+    else if(rr>1.15)add(2,"Rezystancja za wysoka","przerwa, złe styki",val);
+    else if(rr>1.08)add(1,"Rezystancja wysoka","sprawdzić złącze",val);
+    const tr=S.tauMs/vt.tau;
+    if(tr<.82)add(2,"Stała czasowa za mała","uszkodzona cewka",fmt(S.tauMs,1)+" ms");
+    else if(tr<.9)add(1,"Stała czasowa mała","próg ±10 %",fmt(S.tauMs,1)+" ms");
+  }
+  if(M.noMotion)add(2,"Brak ruchu tłoczka","w zakresie 0–100 %","blokada");
+  else if(!S.sweepOnly&&!S.tons.length)add(2,"Brak dołka prądu","tłoczek nie dochodzi","—");
+  if(!S.sweepOnly&&!M.noMotion){
+    if(S.fail9>0)add(S.fail9>=3?2:1,"Nie zadziałał przy 9 V","za mały zapas siły",S.fail9+" / "+(S.fail9+S.tons9.length));
+    const tm=median(S.tons),tref=median(S.refTons);M.ton=tm;
+    if(tm&&tref){const r=tm/tref;
+      if(r>1.5)add(2,"Czas zadziałania długi","wzorzec +50 %",fmt(tm,1)+" ms");
+      else if(r>1.25)add(1,"Czas zadziałania dłuższy","wzorzec +25 %",fmt(tm,1)+" ms");
+      else if(r<.75)add(2,"Czas zadziałania krótki","słaba sprężyna?",fmt(tm,1)+" ms");
+      else if(r<.85)add(1,"Czas zadziałania krótszy","słabsza sprężyna?",fmt(tm,1)+" ms");}
+    const all=S.tons.concat(S.tonsDyn);const cv=all.length>3?sd(all)/mean(all)*100:0;M.cv=cv;
+    if(cv>10)add(2,"Rozrzut t_on","próg 10 %",fmt(cv,1)+" %");else if(cv>6)add(1,"Rozrzut t_on","próg 6 %",fmt(cv,1)+" %");
+    const stalls=S.stalls+S.stuckCold;M.stalls=stalls;
+    if(stalls>0)add(stalls>=3?2:1,"Zawieszenia tłoczka","w "+(S.tonsDyn.length+S.stalls+S.tons.length+S.stuckCold)+" cyklach",String(stalls));
+    if(S.tonsHot.length||S.stuckHot){
+      const th=median(S.tonsHot),thr=median(S.refTonsHot);
+      if(S.stuckHot>=2)add(2,"Na gorąco: zawieszenia","po rozgrzaniu",S.stuckHot+" / "+(S.stuckHot+S.tonsHot.length));
+      if(th&&tm){const r=(th/thr)/(tm/tref)*100-100;if(r>30)add(2,"Na gorąco gorzej","t_on vs zimny","+"+fmt(r,0)+" %");else if(r>15)add(1,"Na gorąco gorzej","t_on vs zimny","+"+fmt(r,0)+" %")}
+    }
+  }
+  // prąd I(D) względem wzorca w tej samej temperaturze
+  if(slow.length){const rs=[];for(const c of slow)for(let b=15;b<BINS;b++)if(c.okUp[b]&&c.riUp[b]>0)rs.push(c.iUp[b]/c.riUp[b]);
+    const ir=median(rs);M.ir=ir;const val=(ir>1?"+":"")+fmt((ir-1)*100,0)+" %";
+    if(ir>1.12)add(2,"Prąd I(D) za duży","nad wzorcem",val);else if(ir>1.06)add(1,"Prąd I(D) większy","nad wzorcem",val);
+    else if(ir<.88)add(2,"Prąd I(D) za mały","pod wzorcem",val);else if(ir<.94)add(1,"Prąd I(D) mniejszy","pod wzorcem",val);}
+  if(S.drops+(S.dropsStep||0)>=2)add(2,"Przerwy prądu","chwilowy brak obwodu",String(S.drops+(S.dropsStep||0)));
+  // przesunięcie charakterystyki i histereza
+  const zones=[];
+  if(slow.length&&!M.noMotion){
+    const sh=[];for(const c of slow){const a=crossD(c.lUp,c.okUp,1.25,true),r=crossD(c.rUp,c.okUp,1.25,true);if(isFinite(a)&&isFinite(r))sh.push((a-r)*100)}
+    const dd=median(sh);M.shift=dd;
+    if(Math.abs(dd)>10)add(2,"Przesunięta charakterystyka",dd<0?"sprężyna / zużycie":"większe tarcie",(dd>0?"+":"")+fmt(dd,0)+" pkt");
+    else if(Math.abs(dd)>4)add(1,"Przesunięta charakterystyka",dd<0?"słabsza sprężyna":"większe tarcie",(dd>0?"+":"")+fmt(dd,0)+" pkt");
+    const hy=median(slow.map(hystOf).filter(isFinite));M.hyst=hy;
+    if(hy>10)add(2,"Histereza L/L0","tarcie, prowadzenie",fmt(hy,1)+" %");else if(hy>5.5)add(1,"Histereza L/L0","próg 5 %",fmt(hy,1)+" %");
+    if(hotSw){const hh=hystOf(hotSw);M.hystHot=hh;if(isFinite(hh)&&hh-hy>6)add(hh-hy>12?2:1,"Histereza na gorąco","wzrost po rozgrzaniu",fmt(hh,1)+" %")}
+    // strefy powtarzalne w ≥2 z 3 wolnych cykli
+    const S3=slow.slice(0,3),dv=S3.map(zoneDev);const sev=new Uint8Array(BINS);
+    for(let b=2;b<BINS-1;b++){let w=0,bd=0;for(const d of dv){if(d[b]>.12)w++;if(d[b]>.22)bd++}
+      const need=Math.min(2,S3.length);sev[b]=bd>=need?2:w>=need?1:0}
+    for(let b=0;b<BINS;b++){if(!sev[b])continue;let e=b,s=sev[b];
+      while(e+1<BINS&&(sev[e+1]||(e+2<BINS&&sev[e+2])||(e+3<BINS&&sev[e+3]))){e++;s=Math.max(s,sev[e])}
+      zones.push({b0:b,b1:e,sev:s});b=e}
+    let conf=0;for(const d of dv){if(zones.some(z=>{for(let b=z.b0;b<=z.b1;b++)if(d[b]>.12)return true;return false}))conf++}
+    M.conf=conf;M.confN=S3.length;
+    for(const z of zones.slice(0,2))add(z.sev,z.sev===2?"Strefa odchyłki położenia":"Odchyłka w strefie","D "+Math.round(z.b0*2)+"–"+Math.round(z.b1*2)+" %",z.sev===2?"usterka":"uwaga");
+  }
+  if(M.noMotion)zones.push({b0:3,b1:BINS-4,sev:2});
+  F.sort((a,b)=>b.sev-a.sev);
+  const level=F.reduce((m,f)=>Math.max(m,f.sev),0);
+  let score=100;for(const f of F)score-=f.sev===2?28:11;
+  if(level===0)score=Math.round(Math.max(70,99-(M.cv||0)*.8-Math.max(0,(M.hyst||0)-2)*1.5-Math.abs(M.shift||0)*.6));
+  if(level===2)score=Math.min(score,35);if(level===1)score=Math.min(score,69);
+  score=clamp(score,4,100);
+  let advice;
+  const has=s=>F.some(f=>f.sev===level&&f.title.startsWith(s));
+  if(level===0)advice="Zawór sprawny w całym zakresie regulacji";
+  else if(M.noMotion)advice="Zwora zablokowana – wymiana zaworu";
+  else if(has("Przerwy")||(has("Rezystancja za wysoka")))advice="Przerwy w obwodzie – sprawdzić złącze i cewkę";
+  else if(has("Rezystancja")||has("Stała")||has("Prąd I(D) za duży"))advice="Uszkodzona cewka – wymiana zaworu";
+  else if(has("Na gorąco"))advice="Zacieranie na gorąco – wymiana, sprawdzić olej";
+  else if(has("Zawieszenia")||has("Strefa"))advice="Wymiana zaworu, sprawdzić olej i filtr";
+  else if(has("Nie zadziałał")||(has("Histereza")&&(M.shift||0)>0))advice="Duże tarcie – czyszczenie lub wymiana";
+  else if(level===2)advice="Zużyty zawór lub słaba sprężyna – wymiana";
+  else advice="Zawór na granicy – powtórzyć test";
+  const dom=(F.find(f=>f.sev===level)||{}).title||"";
+  const zoneRel=zones.length>0;
+  const sOk=level===0?(M.confN||3):zoneRel?Math.max(1,M.conf||0):(M.confN||3);
+  return{F,level,score,advice,dom,zones,M,seriesOk:sOk,seriesTotal:M.confN||3,summary:["SPRAWNY","UWAGA","USZKODZONY"][level]};
+}
+
+/* =====================================================================
+   EKRAN 320×240 (odwzorowanie interfejsu urządzenia)
+   ===================================================================== */
+const C={bg:"#05080c",panel:"#0d151e",panel2:"#162333",line:"#2a3a4d",grid:"#1a2736",ink:"#f0f6fc",dim:"#9aacbf",
+  trace:"#46e0f2",trace2:"#b89cff",trace3:"#ffffff",hot:"#ff8a3d",ref:"#5c7086",amber:"#ffb22e",good:"#38d98a",warn:"#ffd03a",bad:"#ff5048",goDark:"#0e3b26",badDark:"#3a1010"};
+const SANS='Inter,system-ui,"Segoe UI",sans-serif',MONO='"JetBrains Mono",ui-monospace,Consolas,monospace';
+const cv=document.getElementById("scr"),g=cv.getContext("2d");
+let SC=2;
+function fitCanvas(){const r=cv.getBoundingClientRect();const dpr=Math.min(3,window.devicePixelRatio||1);const w=Math.round(r.width*dpr);if(w>0&&cv.width!==w){cv.width=w;cv.height=Math.round(w*.75)}SC=cv.width/320}
+const app={screen:"splash",valve:0,v24:false,quick:false,scen:SCEN[0],speed:10,tab:0,full:null,fullBack:null,splashT:0,probe:null,probeFor:-1,press:null,lastResult:null,lastMode:"full"};
+let eng=new Engine();
+let hits=[];
+
+function font(sz,w=500,mono=false){g.font=`${w} ${sz}px ${mono?MONO:SANS}`}
+function text(s,x,y,col,sz,w=500,align="left",mono=false,base="alphabetic"){font(sz,w,mono);g.fillStyle=col;g.textAlign=align;g.textBaseline=base;g.fillText(s,x,y)}
+function rr(x,y,w,h,r){g.beginPath();g.roundRect?g.roundRect(x,y,w,h,r):g.rect(x,y,w,h)}
+function panel(x,y,w,h,border=C.line,fill=C.panel,r=6){rr(x+.5,y+.5,w-1,h-1,r);g.fillStyle=fill;g.fill();g.strokeStyle=border;g.lineWidth=1;g.stroke()}
+function hit(x,y,w,h,fn,id){hits.push({x,y,w,h,fn,id})}
+function pressed(id){return app.press&&app.press.id===id}
+function button(x,y,w,h,label,style="ghost",fn,id){
+  id=id||label;const p=pressed(id);
+  const st={ghost:[C.line,C.panel2,C.ink],go:[C.good,C.good,"#04140c"],stop:[C.bad,C.bad,"#1a0303"],accent:[C.trace,C.trace,"#04141a"],sel:[C.trace,"#0c2a33",C.trace]}[style];
+  panel(x,y,w,h,st[0],p?shade(st[1]):st[1],6);
+  text(label,x+w/2,y+h/2+1,st[2],Math.min(15,h*.48),600,"center",false,"middle");
+  if(fn)hit(x,y,w,h,fn,id);
+}
+function shade(c){return c==="#162333"?"#22344a":c+"cc"}
+function statusBar(title,right,alarm=false){
+  g.fillStyle=alarm?C.badDark:C.panel;g.fillRect(0,0,320,22);g.fillStyle=alarm?C.bad:C.line;g.fillRect(0,22,320,1);
+  text(title,6,16,alarm?"#ffd7d4":C.ink,14.5,700);text(right,314,15,C.dim,10,500,"right",true);
+}
+function segmented(x,y,w,h,labels,sel,fn,id){
+  panel(x,y,w,h,C.line,C.panel,6);const sw=w/labels.length;
+  labels.forEach((l,i)=>{if(i===sel){rr(x+2+i*sw,y+2,sw-4,h-4,4);g.fillStyle="#0c2a33";g.fill()}
+    text(l,x+i*sw+sw/2,y+h/2+1,i===sel?C.trace:C.dim,12.5,600,"center",false,"middle");hit(x+i*sw,y,sw,h,()=>fn(i),id+i)});
+}
+function progress(x,y,w,h,f,col){rr(x,y,w,h,h/2);g.fillStyle=C.panel2;g.fill();if(f>0){rr(x,y,Math.max(h,w*f),h,h/2);g.fillStyle=col;g.fill()}}
+function readout(x,y,w,label,value,unit,col=C.ink){text(label,x,y+9,C.dim,10.5,500);font(15,700,true);
+  const uw=unit?(g.measureText?0:0):0;text(value,x+w-(unit?16:0),y+27,col,15,700,"right",true);if(unit)text(unit,x+w,y+27,C.dim,10,500,"right")}
+function valveIcon(x,y,kind,c,a){g.strokeStyle=c;g.lineWidth=1.3;rr(x+.5,y+.5,10,18,2);g.stroke();
+  for(let k=1;k<5;k++){g.beginPath();g.moveTo(x+2,y+k*3.6+.5);g.lineTo(x+9,y+k*3.6+.5);g.stroke()}
+  g.beginPath();g.moveTo(x+5.5,y+19);g.lineTo(x+5.5,y+25);g.stroke();g.fillStyle=a;g.strokeStyle=a;
+  if(kind===0){g.beginPath();g.arc(x+5.5,y+27,2.5,0,7);g.stroke()}
+  else if(kind===1){g.beginPath();g.arc(x+5.5,y+27.5,2.4,0,7);g.fill()}
+  else if(kind===2){g.fillRect(x+2,y+26,7,1.3);g.fillRect(x+2,y+29,7,1.3)}
+  else{g.beginPath();g.moveTo(x+2,y+25.5);g.lineTo(x+9,y+25.5);g.lineTo(x+5.5,y+30);g.fill()}}
+
+/* ---------- wykresy: cienkie, wyraźne linie, duże opisy osi ---------- */
+function plotFrame(P,xDiv,yDiv,xf,yf,xUnit,yUnit,xLabels=true,big=false){
+  const{x,y,w,h,x0,x1,y0,y1}=P;g.fillStyle="#070c12";g.fillRect(x,y,w,h);
+  g.strokeStyle=C.grid;g.lineWidth=1;
+  for(let i=0;i<=xDiv;i++){const px=Math.round(x+i*w/xDiv)+.5;g.beginPath();g.moveTo(px,y);g.lineTo(px,y+h);g.stroke()}
+  for(let i=0;i<=yDiv;i++){const py=Math.round(y+h-i*h/yDiv)+.5;g.beginPath();g.moveTo(x,py);g.lineTo(x+w,py);g.stroke()}
+  g.strokeStyle=C.line;g.strokeRect(x+.5,y+.5,w-1,h-1);
+  const fs=big?12:10.5;
+  for(let i=0;i<=yDiv;i++){const v=y0+(y1-y0)*i/yDiv;text(yf(v),x-3,y+h-i*h/yDiv+4,C.dim,fs,500,"right",true)}
+  if(xLabels)for(let i=0;i<=xDiv;i++){const v=x0+(x1-x0)*i/xDiv;text(xf(v),x+i*w/xDiv,y+h+fs+2,C.dim,fs,500,i===0?"left":i===xDiv?"right":"center",true)}
+  if(yUnit)text(yUnit,x+4,y+12,C.dim,fs,600,"left",true);
+  if(xUnit)text(xUnit,x+w-4,y+h-5,C.dim,fs,600,"right",true);
+}
+const PX=(P,v)=>P.x+(v-P.x0)/(P.x1-P.x0)*(P.w-1);
+const PY=(P,v)=>P.y+P.h-1-(v-P.y0)/(P.y1-P.y0)*(P.h-1);
+function curve(P,xs,ys,n,col,lw=1.25,ok=null,alpha=1,glow=false){
+  g.save();g.beginPath();g.rect(P.x,P.y,P.w,P.h);g.clip();
+  g.strokeStyle=col;g.globalAlpha=alpha;g.lineWidth=lw;g.lineJoin="round";g.lineCap="round";
+  if(glow){g.shadowColor=col;g.shadowBlur=3*SC}
+  g.beginPath();let pen=false;
+  for(let k=0;k<n;k++){if(ok&&!ok[k]){pen=false;continue}const px=PX(P,xs(k)),py=PY(P,ys(k));if(!pen){g.moveTo(px,py);pen=true}else g.lineTo(px,py)}
+  g.stroke();g.restore();
+}
+function band(P,a,b,col,alpha){g.save();g.globalAlpha=alpha;g.fillStyle=col;const xa=PX(P,a),xb=PX(P,b);g.fillRect(xa,P.y,Math.max(2,xb-xa),P.h);g.restore()}
+function dashV(P,xv,col){const px=Math.round(PX(P,xv))+.5;g.save();g.setLineDash([3,2]);g.strokeStyle=col;g.lineWidth=1;g.beginPath();g.moveTo(px,P.y);g.lineTo(px,P.y+P.h);g.stroke();g.restore()}
+const binD=b=>b*2;
+
+function niceMax(v){const c=[.5,1,1.5,2,2.5,3,4,5,6,8,10,12,15,20];for(const x of c)if(x>=v)return x;return Math.ceil(v)}
+function liveZones(c){const z=[];if(!c)return z;for(let b=0;b<BINS;b++){if(!c.okUp[b])continue;const d=Math.abs(c.lUp[b]-c.rUp[b])/.5;if(d>.12)z.push({b,sev:d>.22?2:1})}return z}
+
+function drawSweepChart(P,kind,S,opts={}){
+  const big=!!opts.big;const isI=kind==="I";
+  let ymax;
+  if(isI){let m=.5;for(const c of S.sweeps.concat(S.live?[S.live]:[]))for(let b=0;b<BINS;b++){m=Math.max(m,c.iUp[b],c.riUp[b])}ymax=niceMax(m*1.08);P.y0=0;P.y1=ymax}
+  else{P.y0=.9;P.y1=1.7}
+  P.x0=0;P.x1=100;
+  plotFrame(P,5,big?4:2,v=>fmt(v,0),isI?v=>fmt(v,ymax<=3?1:0):v=>fmt(v,big?1:1),opts.xUnit?"D %":"",isI?"I śr. [A]":"L/L0",opts.xLabels!==false,big);
+  // strefy: zatwierdzone (po teście) lub bieżące (w trakcie)
+  const zs=opts.zones||[];
+  for(const z of zs)band(P,binD(z.b0)-1,binD(z.b1)+1,z.sev===2?C.bad:C.warn,.22);
+  if(opts.liveZones)for(const z of opts.liveZones)band(P,binD(z.b)-1,binD(z.b)+1,z.sev===2?C.bad:C.warn,.3);
+  const all=S.sweeps.concat(S.live?[S.live]:[]);
+  const ref=all.find(c=>c.speed==="slow")||all[0];
+  if(ref){const ys=isI?ref.riUp:ref.rUp;curve(P,k=>binD(k),k=>ys[k],BINS,C.ref,big?4:3,ref.okUp,.85);
+    const yd=isI?ref.riDn:ref.rDn;curve(P,k=>binD(k),k=>yd[k],BINS,C.ref,big?4:3,ref.okDn,.6)}
+  const n=all.length;
+  all.forEach((c,ci)=>{const col=SPEED[c.speed].col;const live=c===S.live;const a=live?1:ci>=n-3?.9:.55;
+    const yu=isI?c.iUp:c.lUp,yd=isI?c.iDn:c.lDn;
+    const okU=isI?c.okUp.map((o,b)=>o||c.drop[b]?1:0):c.okUp,okD=isI?c.okDn.map((o,b)=>o||c.drop[b+BINS]?1:0):c.okDn;
+    curve(P,k=>binD(k),k=>yu[k],BINS,col,big?1.6:1.25,okU,a,live);
+    curve(P,k=>binD(k),k=>yd[k],BINS,col,big?1.6:1.25,okD,a*.85,live);
+  });
+  if(S.live&&opts.cursor){dashV(P,S.D*100,C.amber);const px=PX(P,S.D*100);g.fillStyle=C.amber;g.beginPath();g.moveTo(px-4,P.y);g.lineTo(px+4,P.y);g.lineTo(px,P.y+5);g.fill()}
+}
+function drawStepChart(P,S,opts={}){
+  const big=!!opts.big;const hotMode=opts.hot;
+  const list=hotMode?S.stepsHot:S.steps;
+  let m=.5;for(const s of list)for(let k=0;k<s.tr.length;k+=4)m=Math.max(m,s.tr[k]);if(S.refStep)for(let k=0;k<800;k+=4)m=Math.max(m,S.refStep[k]);
+  P.x0=0;P.x1=40;P.y0=0;P.y1=niceMax(m*1.1);
+  plotFrame(P,4,4,v=>fmt(v,0),v=>fmt(v,1),"ms","A",opts.xLabels!==false,big);
+  const rs=hotMode?(S.refStepHot||S.refStep):S.refStep;
+  if(rs)curve(P,k=>k*.05,k=>rs[k],800,C.ref,big?3:2.4,null,.85);
+  for(let i=list.length-1;i>=0;i--){const s=list[i];const col=s.hot?C.hot:s.scale<1?C.trace2:C.trace;
+    curve(P,k=>k*.05,k=>s.tr[k],800,s.stuck?C.bad:col,i===0?(big?1.7:1.4):1,null,i===0?1:s.hot?.85:Math.max(.2,.6-i*.07),i===0)}
+  const s0=list[0];if(s0&&!s0.stuck&&s0.ton){dashV(P,s0.ton,C.amber);text("t_on "+fmt(s0.ton,1)+" ms",PX(P,s0.ton)+4,P.y+(big?28:24),C.amber,big?13:11,600,"left",true)}
+  if(s0&&s0.stuck)text("BRAK DOŁKA – zawieszenie",P.x+P.w-4,P.y+(big?28:24),C.bad,big?12:10.5,700,"right",true);
+}
+function drawHist(P,S,opts={}){
+  const big=!!opts.big;const all=S.tons.concat(S.tonsDyn);const ref=median(S.refTons);
+  const lo=ref?ref*.6:0,hi=ref?ref*1.6:10;const nb=20;const h=new Array(nb).fill(0);
+  for(const t of all){const b=clamp(Math.floor((t-lo)/(hi-lo)*nb),0,nb-1);h[b]++}
+  const mx=Math.max(4,...h);P.x0=lo;P.x1=hi;P.y0=0;P.y1=mx>40?Math.ceil(mx/40)*40:mx>20?Math.ceil(mx/20)*20:Math.ceil(mx/4)*4;
+  plotFrame(P,4,4,v=>fmt(v,1),v=>fmt(v,0),"t_on ms","",opts.xLabels!==false,big);
+  const bw=(P.w)/nb;
+  for(let b=0;b<nb;b++){if(!h[b])continue;const y=PY(P,h[b]);g.fillStyle=C.trace;g.globalAlpha=.85;g.fillRect(P.x+b*bw+1,y,bw-2,P.y+P.h-y);g.globalAlpha=1}
+  if(ref){dashV(P,ref,C.amber);text("wzorzec",PX(P,ref)-3,P.y+(big?14:12),C.amber,big?11:9.5,600,"right",true)}
+  const st=S.stalls+S.stuckCold;
+  text("zawieszenia: "+st,P.x+P.w-4,P.y+(big?30:26),st?C.bad:C.good,big?13:11,700,"right",true);
+  if(all.length>3)text("rozrzut "+fmt(sd(all)/mean(all)*100,1)+" %",P.x+P.w-4,P.y+(big?46:40),C.dim,big?12:10,500,"right",true);
+}
+function drawWave(P,S,D){
+  const v=eng.v;if(!v)return;const R=v.R(),L=v.Lnow(),tau=L/R,T=1/S.f,Ton=D*T,U=eng.U;
+  const a=Math.exp(-Ton/tau),b=Math.exp(-(T-Ton)/tau),iinf=U/R,imax=iinf*(1-a)/(1-a*b),imin=imax*b;
+  P.x0=0;P.x1=3*T*1000;P.y0=0;P.y1=niceMax(imax*1.25);
+  plotFrame(P,3,4,v=>fmt(v,v<10?1:0),v=>fmt(v,1),"ms","A",true,false);
+  curve(P,k=>k/240*3*T*1000,k=>{const ph=(k/240*3*T)%T;return ph<Ton?iinf+(imin-iinf)*Math.exp(-ph/tau):imax*Math.exp(-(ph-Ton)/tau)},241,C.trace,1.3,null,1,true);
+  text("D "+fmt(D*100,0)+" % · "+S.f+" Hz",P.x+P.w-4,P.y+12,C.amber,10.5,600,"right",true);
+}
+function drawHeat(P,S){
+  const L=S.heatLog;const tmax=Math.max(10,L.length?L[L.length-1].t:0);
+  P.x0=0;P.x1=Math.ceil(tmax/5)*5;P.y0=20;P.y1=Math.max(70,Math.ceil(((L.length?L[L.length-1].T:30)+10)/10)*10);
+  plotFrame(P,5,5,v=>fmt(v,0),v=>fmt(v,0),"s","°C",true,false);
+  dashV(P,0,C.line);
+  const target=(S.T0||22)+40;g.save();g.setLineDash([3,2]);g.strokeStyle=C.amber;g.beginPath();g.moveTo(P.x,PY(P,target));g.lineTo(P.x+P.w,PY(P,target));g.stroke();g.restore();
+  text("cel +40 K",P.x+4,PY(P,target)-4,C.amber,10,600,"left",true);
+  if(L.length>1)curve(P,k=>L[k].t,k=>L[k].T,L.length,C.hot,1.4,null,1,true);
+}
+
+/* ---------- ekrany ---------- */
+function scrSplash(now){
+  const t=(now-app.splashT)/1000;
+  g.fillStyle=C.bg;g.fillRect(0,0,320,240);
+  const a=clamp(t*2,0,1);g.globalAlpha=a;
+  // przebieg prądu jako logo
+  const P={x:60,y:58,w:200,h:70,x0:0,x1:40,y0:0,y1:2};
+  g.save();g.strokeStyle=C.trace;g.lineWidth=1.6;g.shadowColor=C.trace;g.shadowBlur=6*SC;g.beginPath();
+  for(let k=0;k<=200;k++){const ms=k/5;let i=ms<26?(ms<4?1.05*(1-Math.exp(-ms/1.6)):ms<5?1-.08*Math.sin((ms-4)*3.14):1.6-.62*Math.exp(-(ms-5)/4)):1.6*Math.exp(-(ms-26)/3);
+    const px=P.x+k*(P.w/200)*Math.min(1,t*1.2),py=P.y+P.h-i/2*P.h;k?g.lineTo(px,py):g.moveTo(px,py)}g.stroke();g.restore();
+  text("TESTER PWM",160,156,C.ink,24,700,"center");
+  text("elektrozawory · prąd · ruch tłoczka",160,176,C.dim,11,500,"center",true);
+  progress(100,200,120,4,clamp(t/1.6,0,1),C.trace);
+  text("SYMULACJA",160,224,C.amber,10,600,"center",true);
+  g.globalAlpha=1;
+  if(t>1.8)go("select");
+}
+function scrSelect(){
+  const U=app.v24?27:13.5;
+  statusBar("WYBÓR ZAWORU","SYMULACJA · "+fmt(U,1)+" V");
+  VALVES.forEach((v,i)=>{const x=i%2?163:6,y=i<2?28:86,w=151,h=52,sel=app.valve===i;
+    panel(x,y,w,h,sel?C.trace:C.line,sel?"#0b1f28":C.panel,7);if(sel){g.save();g.shadowColor=C.trace;g.shadowBlur=6*SC;panel(x,y,w,h,C.trace,"rgba(0,0,0,0)",7);g.restore()}
+    valveIcon(x+8,y+8,v.icon,"#c8d6e3",C.amber);
+    text(v.cat,x+28,y+16,C.amber,9.5,600);text(v.name,x+28,y+34,C.ink,v.name.length>10?14:16,700);
+    text("R "+fmt(v.R20,1)+" Ω · "+v.f+" Hz",x+28,y+47,C.dim,9,500,"left",true);
+    hit(x,y,w,h,()=>{app.valve=i;app.probe=null},"v"+i)});
+  text("Napięcie zasilania",8,151,C.dim,10,500);text("Rodzaj testu",118,151,C.dim,10,500);
+  segmented(6,155,104,28,["12 V","24 V"],app.v24?1:0,i=>{app.v24=!!i;app.probe=null},"u");
+  segmented(116,155,116,28,["Pełny","Szybki"],app.quick?1:0,i=>{app.quick=!!i},"q");
+  // trzeci przycisk: usterka symulowana (zsynchronizowana z panelem obok)
+  panel(238,155,76,28,C.amber,C.panel2,6);text("USTERKA",276,165,C.amber,8.5,700,"center",true);
+  const sn=app.scen.name.length>12?app.scen.name.slice(0,11)+"…":app.scen.name;text(sn,276,177,C.ink,9.5,600,"center");
+  hit(238,155,76,28,()=>{const i=SCEN.indexOf(app.scen);setScen(SCEN[(i+1)%SCEN.length])},"usterka");
+  // pasek wykrycia cewki
+  panel(6,188,308,14,C.line,C.panel,4);
+  if(!app.probe||app.probeFor!==app.valve+(app.v24?10:0)+SCEN.indexOf(app.scen)*100){
+    const vv=new Valve(VALVES[app.valve],app.scen.p,U);const R=vv.R()*(1+.003*(rand()-.5));app.probe={R,tau:vv.L0/R*1000};app.probeFor=app.valve+(app.v24?10:0)+SCEN.indexOf(app.scen)*100}
+  g.fillStyle=C.good;g.beginPath();g.arc(13,195,2.6,0,7);g.fill();
+  text("Wykryto cewkę: R = "+fmt(app.probe.R,2)+" Ω · τ = "+fmt(app.probe.tau,1)+" ms",20,198.5,C.ink,9.5,500);
+  text(app.quick?"ok. 2 min":"ok. 4 min",310,198.5,C.dim,9,500,"right",true);
+  button(6,206,124,30,"Przemiatanie","ghost",()=>startTest("sweep"),"bsw");
+  button(136,206,178,30,"START  ▶","go",()=>startTest(app.quick?"quick":"full"),"bst");
+}
+function scrTest(){
+  const S=eng.st;const ph=S.phase;const vt=eng.vt;
+  const isSweep=ph===3||(ph===6&&S.live);
+  statusBar(isSweep?"PRZEMIATANIE":"TEST W TOKU","PWM "+S.f+" Hz · D "+fmt(S.D*100,0)+" %");
+  // pasek faz
+  if(isSweep&&S.live){const c=S.live;const half=c.el<c.dur/2;
+    text(S.sweepLabel+" "+(half?"↑":"↓")+" · cykl "+S.cycle+"/"+S.cycleTarget,6,38,SPEED[c.speed].col,11,700,"left",true);
+    text("dotknij = powiększ",236,38,C.dim,9.5,500,"right")}
+  else{text(vt.name,6,38,C.ink,12.5,700);text("FAZA "+(ph+1)+"/7 · "+PHASES[ph],314,38,C.amber,9.5,600,"right",true)}
+  if(!S.sweepOnly){for(let i=0;i<7;i++){const x=6+i*44.3,w=40;rr(x,43,w,3,1.5);g.fillStyle=i<ph?C.trace:i===ph?C.amber:C.panel2;g.fill()}}
+  else{progress(6,43,308,3,S.progress,C.trace)}
+  // wykresy
+  const CH={x:30,y:54,w:202,h:128};
+  if(isSweep){
+    const P1={x:30,y:52,w:202,h:58},P2={x:30,y:120,w:202,h:62};
+    drawSweepChart(P1,"I",S,{xLabels:false,cursor:true,liveZones:liveZones(S.live)});
+    drawSweepChart(P2,"L",S,{xLabels:true,cursor:true,xUnit:true,liveZones:liveZones(S.live)});
+    hit(30,50,202,62,()=>openFull("I","test"),"cI");hit(30,118,202,80,()=>openFull("L","test"),"cL");
+  }else if(ph===2||ph===4||ph===6){
+    if(ph===4&&S.tonsDyn.length>5){drawHist(CH,S);hit(CH.x,CH.y,CH.w,CH.h,()=>openFull("H","test"),"cH")}
+    else{drawStepChart(CH,S,{hot:ph===6});hit(CH.x,CH.y,CH.w,CH.h,()=>openFull(ph===6?"SH":"S","test"),"cS")}
+  }else if(ph===5){drawHeat(CH,S)}
+  else{drawWave(CH,S,S.D||.5)}
+  // odczyty
+  const X=240,W=74;
+  if(isSweep){
+    readout(X,48,W,"I śr.",fmt(S.I,2),"A");
+    readout(X,80,W,"T uzw.",fmt(S.T,1),"°C",S.T>50?C.hot:C.ink);
+    const c=S.live;const lz=liveZones(c);
+    const hy=S.sweeps.filter(c=>c.speed==="slow").map(hystOf).filter(isFinite);
+    readout(X,112,W,"histereza",hy.length?fmt(median(hy),1):"—","%");
+    const zSev=lz.reduce((m,z)=>Math.max(m,z.sev),0);
+    if(zSev){const col=zSev===2?C.bad:C.warn;panel(X-2,150,W+2,40,col,zSev===2?C.badDark:"#3a3010",6);text("STREFA!",X+W/2-1,166,col,13,800,"center");
+      text("D "+lz[0].b*2+"–"+lz[lz.length-1].b*2+" %",X+W/2-1,181,C.ink,10,600,"center",true)}
+    else{readout(X,144,W,"L/L0",S.live?fmt(eng.v.Lnow()/S.Lid,2):"—","")}
+  }else{
+    readout(X,48,W,"R20 cewki",S.R20?fmt(S.R20,2):(S.probe?fmt(S.probe.R,2):"—"),"Ω");
+    readout(X,80,W,"t_on",S.tonLast?fmt(S.tonLast,1):"—","ms",C.amber);
+    readout(X,112,W,"I_pick",S.ipickLast?fmt(S.ipickLast,2):"—","A");
+    readout(X,144,W,"T uzwojenia",fmt(S.T,1),"°C",S.T>50?C.hot:C.ink);
+  }
+  // dół
+  const st=S.stalls+S.stuckCold+S.stuckHot;
+  let info=S.cycleTarget?("Cykl "+S.cycle+"/"+S.cycleTarget):PHASES[ph].toLowerCase();
+  if(ph>=2&&!S.sweepOnly)info+=" · zawieszenia "+st;
+  text(info,6,206,st?C.warn:C.ink,10.5,500);
+  text(Math.round(S.progress*100)+" %",226,206,C.dim,10,500,"right",true);
+  progress(6,214,222,5,S.progress,C.trace);
+  button(236,200,78,34,"STOP","stop",()=>stopTest(),"bstop");
+}
+function gauge(cx,cy,r,score,col){
+  const a0=Math.PI*.75,a1=Math.PI*2.25;g.lineCap="round";
+  g.strokeStyle=C.panel2;g.lineWidth=9;g.beginPath();g.arc(cx,cy,r,a0,a1);g.stroke();
+  g.strokeStyle=col;g.lineWidth=9;g.beginPath();g.arc(cx,cy,r,a0,a0+(a1-a0)*score/100);g.stroke();
+  const ae=a0+(a1-a0)*score/100;g.fillStyle=col;g.save();g.translate(cx+Math.cos(ae)*r,cy+Math.sin(ae)*r);g.rotate(ae+.785);g.fillRect(-5,-5,10,10);g.restore();g.lineCap="butt";
+  text(String(score),cx,cy+8,C.ink,28,700,"center",true);text("/ 100",cx,cy+24,C.dim,10,500,"center",true);
+}
+function scrResult(){
+  const S=eng.st,R=S.result;const col=[C.good,C.warn,C.bad][R.level];
+  statusBar("WYNIK TESTU",eng.vt.name+" · potw. "+R.seriesOk+"/"+R.seriesTotal,R.level===2);
+  gauge(62,84,42,R.score,col);
+  text(R.summary,62,150,col,R.summary.length>8?17:19,800,"center");
+  const dom=R.level?R.dom:"w całym zakresie";text(dom.length>22?dom.slice(0,21)+"…":dom,62,166,C.dim,10,500,"center");
+  // lista ustaleń
+  const list=R.F.length?R.F:[{sev:0,title:"Wszystkie pomiary w normie",detail:"R, τ, t_on, I(D), L/L0",value:"OK"},{sev:0,title:"Histereza L/L0",detail:"tarcie w normie",value:fmt(R.M.hyst||0,1)+" %"},{sev:0,title:"Czas zadziałania",detail:"zimny i gorący",value:R.M.ton?fmt(R.M.ton,1)+" ms":"—"}];
+  const shown=list.slice(0,4);
+  shown.forEach((f,i)=>{const y=28+i*36,c=[C.good,C.warn,C.bad][f.sev];panel(126,y,188,32,C.line,C.panel,5);g.fillStyle=c;g.fillRect(126,y+1,3,30);
+    text(f.title,134,y+14,C.ink,11.5,600);text(f.detail,134,y+27,C.dim,9,500,"left",true);text(f.value,309,y+27,c,11,700,"right",true)});
+  if(list.length>4)text("+ "+(list.length-4)+" w Wykresach",309,178,C.dim,9,500,"right");
+  text(R.advice,6,192,R.level?C.amber:C.good,10.5,600,"left",true);
+  button(6,202,98,34,"Wykresy","ghost",()=>{app.tab=0;go("charts")},"bw");
+  button(110,202,98,34,"Powtórz","ghost",()=>startTest(app.lastMode),"bp");
+  button(214,202,100,34,"Nowy test","accent",()=>go("select"),"bn");
+}
+const TABS=["I(D)","L/L0","Skok","t_on"];
+function scrCharts(){
+  const S=eng.st;statusBar("WYKRESY","dotknij = pełny ekran");
+  const tabs=S.sweepOnly?TABS.slice(0,2):TABS;
+  segmented(6,27,232,24,tabs,Math.min(app.tab,tabs.length-1),i=>app.tab=i,"tab");
+  button(244,27,70,24,"Wróć","ghost",()=>go(S.result?"result":"select"),"bback");
+  const P={x:30,y:58,w:280,h:146};const k=["I","L","S","H"][app.tab];
+  drawChartKind(k,P,S,false);hit(P.x,P.y,P.w,P.h+16,()=>openFull(k,"charts"),"cfull");
+  // legenda na dole
+  let lx=6;const items=k==="S"?[["zimny",C.trace],["9 V",C.trace2],["gorący",C.hot],["zawieszenie",C.bad],["wzorzec",C.ref]]:k==="H"?[["t_on",C.trace],["wzorzec",C.ref]]:[["wolno",C.trace],["średnio",C.trace2],["szybko",C.trace3],["gorący",C.hot],["wzorzec",C.ref]];
+  for(const[n,c]of items){g.fillStyle=c;g.fillRect(lx,231,12,2);text(n,lx+15,235,C.dim,9,500,"left");font(9);lx+=g.measureText(n).width+26}
+}
+function drawChartKind(k,P,S,big){
+  const R=S.result;
+  if(k==="I")drawSweepChart(P,"I",S,{xUnit:true,zones:R?R.zones:[],big});
+  else if(k==="L")drawSweepChart(P,"L",S,{xUnit:true,zones:R?R.zones:[],big});
+  else if(k==="S"){drawStepChart(P,S.stepsHot.length&&!eng.running?{...S,steps:S.steps.slice(0,6).concat(S.stepsHot.slice(0,2))}:S,{big})}
+  else if(k==="SH")drawStepChart(P,S,{big,hot:true});
+  else if(k==="H")drawHist(P,S,{big});
+}
+function scrFull(){
+  const S=eng.st;const k=app.full;
+  g.fillStyle=C.bg;g.fillRect(0,0,320,240);
+  const title={I:"Prąd średni I(D)",L:"Położenie tłoczka L/L0",S:"Skok prądu",SH:"Skok na gorąco",H:"Histogram t_on"}[k];
+  text(title,6,15,C.ink,13,700);text("dotknij = wróć",314,14,C.dim,9.5,500,"right");
+  if(eng.running&&S.live&&(k==="I"||k==="L"))text(S.sweepLabel+" · D "+fmt(S.D*100,0)+" %",170,14,C.amber,10,600,"center",true);
+  const P={x:34,y:22,w:280,h:196};
+  if(k==="I"||k==="L")drawSweepChart(P,k,S,{xUnit:true,zones:S.result?S.result.zones:[],liveZones:eng.running?liveZones(S.live):null,cursor:eng.running,big:true});
+  else drawChartKind(k,P,S,true);
+  hit(0,0,320,240,()=>{app.full=null;go(app.fullBack)},"full");
+  if(eng.running&&app.fullBack==="test"){const ph=S.phase;const ok=(k==="I"||k==="L")?(ph===3||(ph===6&&S.live)):k==="H"?ph===4:(ph===2||ph===6||ph===4);if(!ok){app.full=null;go("test")}}
+}
+function openFull(k,back){app.full=k;app.fullBack=back;go("full")}
+function scrStopped(){
+  statusBar("TEST PRZERWANY","STOP");
+  text("Test zatrzymany przez operatora.",160,100,C.ink,13,600,"center");
+  text("Cewka odłączona, prąd 0 A.",160,120,C.dim,11,500,"center");
+  button(60,180,200,36,"Wróć do wyboru","accent",()=>go("select"),"bret");
+}
+function go(s){app.screen=s;narrate()}
+
+/* ---------- sterowanie ---------- */
+function startTest(mode){
+  app.lastMode=mode;eng.start(app.valve,app.scen,app.v24?27:13.5,mode);go("test");setLed();
+}
+function stopTest(){eng.stop();go("stopped");setLed()}
+function setLed(){const t=document.getElementById("ledTxt");
+  t.textContent="stan: "+(eng.running?"pomiar w toku":eng.finished?"wynik "+eng.st.result.summary:"gotowy");
+  t.className=eng.running?"run":eng.finished?["ok","warn","fail"][eng.st.result.level]:""}
+
+let lastNarr="";
+function narrate(){
+  const ph=document.getElementById("narrPh"),tx=document.getElementById("narrTx");let a,b;
+  if(app.screen==="select"||app.screen==="splash"){a="Gotowy";b="Ekran wyboru zaworu. Dotknij karty zaworu, potem START. Usterkę do zasymulowania wybierasz w panelu obok albo przyciskiem USTERKA na ekranie."}
+  else if((app.screen==="test"||app.screen==="full")&&eng.running){const p=eng.st.phase;a=(eng.st.sweepOnly?"Przemiatanie":"Faza "+(p+1)+"/7")+" · "+PHASES[p];b=NARR[p]}
+  else if(app.screen==="result"||(app.screen==="full"&&eng.finished)||app.screen==="charts"){const R=eng.st&&eng.st.result;if(R){a="Wynik · "+R.summary+" · "+R.score+"/100";
+    b=R.level===0?"Zawór sprawny. Wszystkie pomiary mieszczą się we wzorcu. Otwórz Wykresy, żeby zobaczyć nałożone krzywe z kolejnych cykli.":"Najważniejsze ustalenie: "+R.dom.toLowerCase()+". Zalecenie: "+R.advice.toLowerCase()+". Strefy usterek są zaznaczone na wykresach I(D) i L/L0."}}
+  else if(app.screen==="stopped"){a="Przerwano";b="Test zatrzymany. Wybierz zawór i uruchom ponownie."}
+  if(a&&a+b!==lastNarr){lastNarr=a+b;ph.textContent=a;tx.textContent=b}
+}
+
+/* ---------- pętla ---------- */
+let lastT=performance.now();
+function frame(now){
+  const dt=Math.min(.1,(now-lastT)/1000);lastT=now;
+  if(eng.running){eng.tick(dt,app.speed);if(eng.finished){app.lastResult=eng.st.result;setLed();if(app.screen!=="full"||app.fullBack==="test"){app.full=null;go("result")}}}
+  fitCanvas();g.setTransform(SC,0,0,SC,0,0);g.fillStyle=C.bg;g.fillRect(0,0,320,240);hits=[];
+  ({splash:scrSplash,select:scrSelect,test:scrTest,result:scrResult,charts:scrCharts,full:scrFull,stopped:scrStopped}[app.screen]||scrSelect)(now);
+  if(eng.running)narrate();
+  requestAnimationFrame(frame);
+}
+function toLogical(e){const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*320,y:(e.clientY-r.top)/r.height*240}}
+function findHit(p){for(let i=hits.length-1;i>=0;i--){const h=hits[i];if(p.x>=h.x&&p.x<h.x+h.w&&p.y>=h.y&&p.y<h.y+h.h)return h}return null}
+cv.addEventListener("pointerdown",e=>{const h=findHit(toLogical(e));app.press=h?{id:h.id}:null});
+cv.addEventListener("pointerup",e=>{const h=findHit(toLogical(e));const p=app.press;app.press=null;if(h&&p&&p.id===h.id)h.fn()});
+cv.addEventListener("pointerleave",()=>app.press=null);
+
+function key(k){
+  if(app.screen==="splash")return;
+  if(k==="start"){if(app.screen==="select")startTest(app.quick?"quick":"full");else if(app.screen==="result"||app.screen==="stopped"||app.screen==="charts")go("select")}
+  if(k==="stop"){if(eng.running)stopTest();else if(app.screen==="full"){app.full=null;go(app.fullBack)}else if(app.screen==="charts")go("result")}
+  if(k==="prev"||k==="next"){const d=k==="next"?1:-1;
+    if(app.screen==="select"){app.valve=(app.valve+d+4)%4;app.probe=null}
+    else if(app.screen==="charts"){const n=eng.st.sweepOnly?2:4;app.tab=(app.tab+d+n)%n}
+    else if(app.screen==="result")go("charts")}
+}
+document.getElementById("kS1").onclick=()=>key("start");document.getElementById("kS2").onclick=()=>key("stop");
+document.getElementById("kS3").onclick=()=>key("prev");document.getElementById("kS4").onclick=()=>key("next");
+window.addEventListener("keydown",e=>{if(e.target.closest&&e.target.closest("input,textarea"))return;
+  if(e.key==="ArrowLeft")key("prev");else if(e.key==="ArrowRight")key("next")});
+
+/* ---------- panel scenariuszy ---------- */
+const scList=document.getElementById("scList");
+SCEN.forEach(s=>{const b=document.createElement("button");b.className="btn";b.type="button";b.id="sc-"+s.id;
+  b.innerHTML=`<i class="i${s.sev}"></i><span>${s.name}</span>`;b.onclick=()=>setScen(s);scList.appendChild(b)});
+document.getElementById("scTable").innerHTML=SCEN.map(s=>`<tr><td><b>${s.name}</b></td><td>${s.mech}</td><td>${s.cur}</td><td class="${["ok","warn","fail"][s.sev]}"><b>${s.verdict}</b></td></tr>`).join("");
+function setScen(s){
+  app.scen=s;app.probe=null;
+  for(const b of scList.children)b.setAttribute("aria-pressed",b.id==="sc-"+s.id?"true":"false");
+  document.getElementById("scName").textContent=s.name;
+  const bd=document.getElementById("scBadge");bd.textContent="Oczekiwany werdykt: "+s.verdict;
+  document.getElementById("scCard").className="box "+["ok","warn","fail"][s.sev];
+  document.getElementById("scMech").textContent=s.mech;document.getElementById("scCur").textContent=s.cur;
+  document.getElementById("scVer").textContent=s.ver;document.getElementById("scWatch").innerHTML="Na co patrzeć: "+s.watch;
+  try{localStorage.setItem("pwmLabScen",s.id)}catch(e){}
+}
+document.getElementById("bFull").onclick=()=>{if(eng.running)eng.stop();startTest(app.quick?"quick":"full")};
+document.getElementById("bSweep").onclick=()=>{if(eng.running)eng.stop();startTest("sweep")};
+const speedSeg=document.getElementById("speedSeg");
+speedSeg.querySelectorAll("button").forEach(b=>b.onclick=()=>{app.speed=+b.dataset.s;speedSeg.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"))});
+let saved=null;try{saved=localStorage.getItem("pwmLabScen")}catch(e){}
+setScen(SCEN.find(s=>s.id===saved)||SCEN[1]);
+app.splashT=performance.now();
+requestAnimationFrame(frame);
+
+
+/* ---------- scenariusze testowe (jak w innych symulacjach LAB) ---------- */
+const CHK={
+ ok:[["Charakterystyka L/L0","brak stref odchyłki",(R)=>!R.zones.length,(R)=>R.zones.length?"stref: "+R.zones.length:"brak stref"]],
+ stick:[["Przemiatanie I(D)","strefa odchyłki położenia w środku zakresu",(R)=>R.F.some(f=>f.title.startsWith("Strefa")),(R)=>zoneTxt(R)],
+        ["Cykle dynamiczne","zawieszenia tłoczka",(R)=>(R.M.stalls||0)>=3,(R)=>"zawieszenia "+(R.M.stalls||0)]],
+ wear:[["Charakterystyka L/L0","przesunięta w lewo (słaba sprężyna)",(R)=>(R.M.shift||0)<-6,(R)=>"przesunięcie "+fmt(R.M.shift||0,0)+" pkt"],
+       ["Prąd I(D)","w normie, cewka sprawna",(R)=>Math.abs((R.M.ir||1)-1)<.06,(R)=>"I/wzorzec "+fmt(((R.M.ir||1)-1)*100,0)+" %"]],
+ block:[["Przemiatanie L/L0","brak ruchu tłoczka",(R)=>!!R.M.noMotion,(R)=>R.M.noMotion?"L/L0 płaskie":"tłoczek się rusza"],
+        ["Rezystancja R20","w normie",(R)=>Math.abs((R.M.rr||1)-1)<.05,(R)=>"R/R nom "+fmt((R.M.rr||1)*100,0)+" %"]],
+ short:[["Test statyczny","rezystancja za niska",(R)=>(R.M.rr||1)<.9,(R)=>"R/R nom "+fmt((R.M.rr||1)*100,0)+" %"],
+        ["Prąd I(D)","nad wzorcem",(R)=>(R.M.ir||1)>1.12,(R)=>"I/wzorzec +"+fmt(((R.M.ir||1)-1)*100,0)+" %"]],
+ open:[["Test statyczny","rezystancja za wysoka",(R)=>(R.M.rr||1)>1.15,(R)=>"R/R nom "+fmt((R.M.rr||1)*100,0)+" %"],
+       ["Przemiatanie i skok","przerwy prądu",(R)=>R.F.some(f=>f.title==="Przerwy prądu"),(R)=>{const f=R.F.find(f=>f.title==="Przerwy prądu");return f?"przerw "+f.value:"brak"}]],
+ dirt:[["Cykle dynamiczne","zawieszenia tłoczka",(R)=>(R.M.stalls||0)>=3,(R)=>"zawieszenia "+(R.M.stalls||0)]],
+ hot:[["Faza zimna","histereza w normie",(R)=>(R.M.hyst||0)<5.5,(R)=>"histereza "+fmt(R.M.hyst||0,1)+" %"],
+      ["Powtórka na gorąco","wyraźnie gorzej niż na zimno",(R)=>R.F.some(f=>f.title.includes("gorąco")),(R)=>"histereza na gorąco "+fmt(R.M.hystHot||0,1)+" %"]],
+ stiff:[["Skok 9 V","zwora nie rusza",(R)=>R.F.some(f=>f.title.startsWith("Nie zadziałał")),(R)=>{const f=R.F.find(f=>f.title.startsWith("Nie zadziałał"));return f?"bez ruchu "+f.value:"działa"}],
+        ["Charakterystyka L/L0","szeroka histereza",(R)=>(R.M.hyst||0)>10,(R)=>"histereza "+fmt(R.M.hyst||0,1)+" %"]],
+ weak:[["Charakterystyka L/L0","lekkie odchylenie, bez usterki",(R)=>R.level===1,(R)=>"przesunięcie "+fmt(R.M.shift||0,0)+" pkt"]]
+};
+function zoneTxt(R){return R.zones.length?R.zones.map(z=>"D "+z.b0*2+"–"+z.b1*2+" %").join(", "):"brak"}
+const logEl=document.getElementById("log"),sumEl=document.getElementById("scSum"),selEl=document.getElementById("scSel"),runBtn=document.getElementById("scRun"),allBtn=document.getElementById("runAll");
+const GRP=[["Odniesienie",["ok"]],["Mechanika tłoczka",["stick","wear","block","stiff","weak"]],["Elektryka cewki",["short","open"]],["Olej i temperatura",["dirt","hot"]]];
+GRP.forEach(([t,ids])=>{const og=document.createElement("optgroup");og.label=t;ids.forEach(id=>{const k=SCEN.findIndex(s=>s.id===id);const o=document.createElement("option");o.value=k;o.textContent=(k+1)+". "+SCEN[k].name;og.appendChild(o)});selEl.appendChild(og)});
+const Wt=ms=>new Promise(r=>setTimeout(r,ms));
+let busy=false;
+function logRow(id,a,e,st,ok){const tr=document.createElement("tr");tr.innerHTML=`<td>${id}</td><td></td><td></td><td class="small mono"></td><td class="${ok?"ok":"bad"}">${ok?"OK":"BŁĄD"}</td>`;
+  tr.children[1].textContent=a;tr.children[2].textContent=e;tr.children[3].textContent=st;logEl.appendChild(tr);return ok}
+function checkScenario(k,S){
+  const sc=SCEN[k],R=S.result;let ok=true,i=0;const id=()=>(k+1)+"."+(++i);
+  const hd=document.createElement("tr");hd.className="hd";hd.innerHTML=`<td>${k+1}</td><td colspan="4"></td>`;hd.children[1].textContent=sc.name+" · zawór "+VALVES[app.valve].name;logEl.appendChild(hd);
+  ok&=logRow(id(),"Podłączenie, identyfikacja","cewka wykryta, R20 i τ zmierzone","R20 "+fmt(S.R20,2)+" Ω · τ "+fmt(S.tauMs,1)+" ms",S.R20>0);
+  for(const[a,e,c,st]of CHK[sc.id]||[])ok&=logRow(id(),a,e,st(R),!!c(R));
+  ok&=logRow(id(),"Werdykt",sc.verdict,R.summary+" "+R.score+"/100 · potw. "+R.seriesOk+"/"+R.seriesTotal,R.level===sc.sev);
+  return !!ok}
+function busyUI(b){busy=b;runBtn.disabled=allBtn.disabled=selEl.disabled=b;document.getElementById("bFull").disabled=document.getElementById("bSweep").disabled=b}
+async function runOne(k){
+  setScen(SCEN[k]);if(eng.running)eng.stop();const sp=app.speed;app.speed=25;app.quick=false;
+  startTest("full");document.getElementById("scr").scrollIntoView({behavior:"smooth",block:"center"});
+  while(eng.running)await Wt(200);
+  app.speed=sp;if(!eng.finished)return false;
+  return checkScenario(k,eng.st)}
+runBtn.onclick=async()=>{if(busy)return;busyUI(true);logEl.innerHTML="";const k=+selEl.value;const ok=await runOne(k);
+  sumEl.innerHTML=`Wynik: <span class="${ok?"ok":"bad"}">${ok?"1/1":"0/1"} scenariuszy OK</span>`;busyUI(false)};
+allBtn.onclick=async()=>{if(busy)return;busyUI(true);logEl.innerHTML="";let n=0;
+  document.getElementById("scr").scrollIntoView({behavior:"smooth",block:"center"});
+  for(let k=0;k<SCEN.length;k++){setScen(SCEN[k]);if(eng.running)eng.stop();
+    const e=new Engine();e.start(app.valve,SCEN[k],app.v24?27:13.5,"full");let g2=0;while(e.running&&g2++<200000)e.tick(.05,1);
+    eng=e;app.lastMode="full";setLed();go("result");
+    if(checkScenario(k,e.st))n++;await Wt(900)}
+  sumEl.innerHTML=`Wynik: <span class="${n===SCEN.length?"ok":"bad"}">${n}/${SCEN.length} scenariuszy OK</span>`;busyUI(false)};
+/* interfejs do testów automatycznych */
+window.PWMLAB={SCEN,VALVES,Engine,analyze,run(id,valve=0,mode="full",s){if(s!==undefined)seed=s;const e=new Engine();e.start(valve,SCEN.find(x=>x.id===id),13.5,mode);let n=0;while(e.running&&n++<200000)e.tick(.05,1);return e.st}};
+</script><script data-goatcounter="https://ekotronik.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
