@@ -55,6 +55,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://ekotronik.github.io/ecu-immo-elv/lab/tester-elektrozaworow-pwm.html</loc>
+    <lastmod>2026-11-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://ekotronik.github.io/ecu-immo-elv/lab/kontrola-rozrzadu.html</loc>
     <lastmod>2026-11-10</lastmod>
     <changefreq>monthly</changefreq>
